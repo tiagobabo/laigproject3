@@ -16,12 +16,15 @@ vector<Peca*> player2;
 #define gameRatio 8
 bool pecaSelectedB = false;
 Peca* pecaSelected;
+float movH;
+float movV;
 
 // dimensoes e localizacao da janela
 #define DIMX 500
 #define DIMY 500
 #define INITIALPOS_X 200
 #define INITIALPOS_Y 200
+#define mili_secs 20
 
 #define BUFSIZE 512
 
@@ -104,8 +107,6 @@ float light_ambient[] = {0.2, 0.2, 0.2, 1.0}; /* Set the background ambient ligh
 int main_window;
 GLUI  *glui2;
 int background_text=0;
-//SceneLoader *scene;
-
 
 GLUquadric* glQ;	// nec. p/ criar sup. quadraticas (cilindros, esferas...)
 
@@ -227,6 +228,7 @@ void drawPiece(int player){
 			glLoadName (100+i);
 
 			glPushMatrix();
+			glTranslatef(player1.at(i)->AniX,player1.at(i)->AniY,player1.at(i)->AniZ);
 			glTranslatef(player1.at(i)->x,player1.at(i)->y,player1.at(i)->z);
 			drawPiece(1);
 			glPopMatrix();
@@ -238,6 +240,7 @@ void drawPiece(int player){
 			glLoadName (200+i);
 
 			glPushMatrix();
+			glTranslatef(player2.at(i)->AniX,player2.at(i)->AniY,player2.at(i)->AniZ);
 			glTranslatef(player2.at(i)->x,player2.at(i)->y,player2.at(i)->z);
 			drawPiece(2);
 			glPopMatrix();
@@ -357,7 +360,6 @@ void display(void)
 
 	glColor3f(1.0,1.0,1.0);
 	glDisable(GL_COLOR_MATERIAL);
-	
 
 	//desenha a cena
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -369,42 +371,93 @@ void display(void)
 	glFlush();
 }
 
+void pecaAniSelect(int status){
+	
+	switch(status){
+		case 0:
+			if(pecaSelected->y < 23.0){
+				pecaSelected->y+=0.1;
+				glutTimerFunc(mili_secs, pecaAniSelect, 0);
+			}
+			break;
+		case 1:
+			if(pecaSelected->y > 21.2){
+				pecaSelected->y-=0.1;
+				glutTimerFunc(mili_secs, pecaAniSelect, 1);
+			}
+			break;
+	}
+}
+
+void pecaAniMovH(int status){
+	cout <<pecaSelected->x << " == " << movH<< endl;
+	if(movH == pecaSelected->x){
+		cout << "DONE"<< endl;
+		pecaAniSelect(1);
+	}
+	else if(movH > pecaSelected->x){
+		pecaSelected->x+=0.1;
+		glutTimerFunc(mili_secs, pecaAniMovH, 0);
+	}
+	else if(movH < pecaSelected->x){
+		pecaSelected->x-=0.1;
+		glutTimerFunc(mili_secs, pecaAniMovH, 0);
+	}
+
+}
+
 // ACÇÃO DO PICKING
 void pickingAction(GLuint answer) {
 	int player = answer/100;
 	int i = answer%10;
-
-	if(player == 1){
+	
+	if(pecaSelectedB){
+		int pos = pecaSelected->PosTab;
+		int column = pos%10;
+		int answerColumn = answer%10;
+		int row = pos/10;
+		int answerRow = answer/10;
+		cout << "---------------------JOGADA-----------------------" << endl;
+		cout << "FROM: "<<  pecaSelected->PosTab<< endl;
+		cout << "TO: " << answer << endl;
+		cout << "From Column: " << column<< endl << "To Column: " << answerColumn<<endl;
+		cout << "From Row: " << row << endl << "To Row: " << answerRow<<endl;
 		
+		if(answerColumn == column){
+			float mov = row - answerRow ;
+			pecaSelected->z-= mov*2;
+			pecaSelected->PosTab-=mov*10; 
+			cout << "--------------------/JOGADA-----------------------" << endl;
+			pecaAniSelect(1);
+		}else if(row == answerRow){
+			float mov = column - answerColumn ;
+			pecaSelected->x-= mov*2;
+			movH = mov*2 + pecaSelected->x;
+			pecaSelected->PosTab-=mov*1; 
+			cout << "MOV: " << mov<< endl;
+			cout << "--------------------/JOGADA-----------------------" << endl;
+			//pecaAniMovH(mov*2);
+			pecaAniSelect(1);
+		}
+		else{
+			cout << "JOGADA INVALIDA!" << endl;
+			cout << "--------------------/JOGADA-----------------------" << endl;
+			pecaAniSelect(1);
+		}
+		pecaSelectedB = false;
+	}else if(player == 1){
+		cout << "---------------------JOGADOR 1-----------------------" << endl;
 		cout << "Player1"<< endl<< "PECA: "<< answer << endl << "POS: "<< player1.at(i)->PosTab<< endl;
 		pecaSelected = player1.at(i);
 		pecaSelectedB = true;
+		pecaAniSelect(0);
 	}
 	else if(player == 2){
+		cout << "---------------------JOGADOR 2-----------------------" << endl;
 		cout << "Player2"<< endl<< "PECA: "<< answer << endl << "POS: "<< player2.at(i)->PosTab<< endl;
 		pecaSelected = player2.at(i);
 		pecaSelectedB = true;
-	}
-	else if(pecaSelectedB){
-		cout << "FROM: "<<  pecaSelected->PosTab<< endl;
-		cout << "TO: " << answer << endl;
-		int pos = pecaSelected->PosTab;
-		int row = pos%10;
-		int column = pos/10;
-		int answerColumn = answer/10;
-		cout << "c: " << column<< endl << "c1: " << answerColumn<<endl;
-		if(i = row){
-			int mov = column - answerColumn ;
-			pecaSelected->z-= mov*2;
-		}
-		
-		if(column == answerColumn)
-		{
-			cout << "r: "<< row<< "c: " << i<< endl;
-			int mov = row - i ;
-			pecaSelected->x-= mov*2;
-		}
-		pecaSelectedB = false;
+		pecaAniSelect(0);
 	}
 
 }
@@ -596,11 +649,19 @@ void myGlutIdle( void )
 void inicializacao()
 {
 	glFrontFace(GL_CCW);		/* Front faces defined using a counterclockwise rotation. */
-	glDepthFunc(GL_LEQUAL);		/* Por defeito e GL_LESS */
+	//glDepthFunc(GL_LEQUAL);		/* Por defeito e GL_LESS */
 	glEnable(GL_DEPTH_TEST);	/* Use a depth (z) buffer to draw only visible objects. */
 	glEnable(GL_CULL_FACE);		/* Use face culling to improve speed. */
 	glCullFace(GL_BACK);		/* Cull only back faces. */
 
+	glEnable(GL_POLYGON_SMOOTH);
+	glEnable(GL_LINE_SMOOTH);
+	glEnable(GL_POINT_SMOOTH);
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	glHint(GL_PERSPECTIVE_CORRECTION_HINT,GL_NICEST);
+	glHint(GL_POINT_SMOOTH_HINT,GL_NICEST);
+	glHint(GL_POLYGON_SMOOTH_HINT,GL_NICEST);
 
 	// por defeito a cor e de fundo e o preto
 	glClearColor(cena.background[0],cena.background[1],cena.background[2], cena.background[3]);    // cor de fundo a branco
