@@ -1,6 +1,7 @@
 // G1_Ilum.cpp : Defines the entry point for the console application.
 //
 #include "SceneLoader.h"
+#include "game.h"
 
 #include <GL\glui.h>
 #include <math.h>
@@ -10,7 +11,11 @@ using namespace std;
 
 RGBpixmap pixmap2;
 
-
+vector<Peca*> player1;
+vector<Peca*> player2;
+#define gameRatio 8
+bool pecaSelectedB = false;
+Peca* pecaSelected;
 
 // dimensoes e localizacao da janela
 #define DIMX 500
@@ -104,210 +109,139 @@ int background_text=0;
 
 GLUquadric* glQ;	// nec. p/ criar sup. quadraticas (cilindros, esferas...)
 
+
+
 //Utiliza as estruturas de dados com a informação do xml para construir o plano
 
 /* Function to normalise a vector to unit length */
-void normalise(GLdouble *vec)
-{
-  GLdouble length = 0.0;
-  int i;
 
-  for (i=0;i<VLENGTH;i++){
-     length += vec[i]*vec[i]; 
-  }
-  length= (GLdouble) sqrt((double)length); 
+void drawPieceLateral(){
 
-  for (i=0;i<VLENGTH;i++){
-     vec[i] = vec[i]/length; 
-  }
+	glBegin(GL_POLYGON);
+		glNormal3d(0.0,1.0,0.0);  // esta normal fica comum aos 4 vertices
+		glTexCoord2f(0.0,0.0); glVertex3d( -0.1, 0.0,  0.5);
+		glTexCoord2f(1.0,0.0); glVertex3d(0.1, 0.0,  0.5);
+		glTexCoord2f(1.0,1.0); glVertex3d(0.1, 0.0,  -0.5);
+		glTexCoord2f(0.0,1.0); glVertex3d(-0.1, 0.0,  -0.5);
+	glEnd();
 }
 
+void drawPieceSquare(){
 
-
-
-void newellSquare(GLdouble *vec1,GLdouble *vec2,GLdouble *vec3,GLdouble *vec4,GLdouble *normal)
-{
-  normal[0] = (vec1[1]-vec2[1])*(vec1[2]+vec2[2]) + 
-	      (vec2[1]-vec3[1])*(vec2[2]+vec3[2]) + 
-	      (vec3[1]-vec4[1])*(vec3[2]+vec4[2]) +
-	      (vec4[1]-vec1[1])*(vec4[2]+vec1[2]);
-  normal[1] = (vec1[2]-vec2[2])*(vec1[0]+vec2[0]) + 
-	      (vec2[2]-vec3[2])*(vec2[0]+vec3[0]) + 
-	      (vec3[2]-vec4[2])*(vec3[0]+vec4[0]) +
-	      (vec4[2]-vec1[2])*(vec4[0]+vec1[0]);
-  normal[2] = (vec1[0]-vec2[0])*(vec1[1]+vec2[1]) + 
-	      (vec2[0]-vec3[0])*(vec2[1]+vec3[1]) + 
-	      (vec3[0]-vec4[0])*(vec3[1]+vec4[1]) +
-	      (vec4[0]-vec1[0])*(vec4[1]+vec1[1]);
-
-  normalise(normal);
+	glBegin(GL_POLYGON);
+		glNormal3d(0.0,1.0,0.0);  // esta normal fica comum aos 4 vertices
+		glTexCoord2f(0.0,0.0); glVertex3d( -0.5, 0.0,  0.5);
+		glTexCoord2f(1.0,0.0); glVertex3d(0.5, 0.0,  0.5);
+		glTexCoord2f(1.0,1.0); glVertex3d(0.5, 0.0,  -0.5);
+		glTexCoord2f(0.0,1.0); glVertex3d(-0.5, 0.0,  -0.5);
+	glEnd();
 
 }
 
-void paralelo(GLdouble dimx, GLdouble dimy, GLdouble dimz){
-	GLdouble dx=dimx/2, dy=dimy/2, dz=dimz/2;
-	
-	GLdouble v1[3] = {dx,-dy,dz};
-	GLdouble v2[3] = {dx,-dy,-dz};
-	GLdouble v3[3] = {dx,dy,dz};
-	GLdouble v4[3] = {dx,dy,-dz};
-	GLdouble v5[3] = {-dx,-dy,dz};
-	GLdouble v6[3] = {-dx,dy,dz};
-	GLdouble v7[3] = {-dx,dy,-dz};
-	GLdouble v8[3] = {-dx,-dy,-dz};
-	GLdouble normal[VLENGTH];
-
-	float mat_shininess[] = {20.0}; /* How shiny is the object (specular exponent)  */
-	float mat_specular[] = {1.0, 1.0, 1.0, 1.0}; /* specular reflection. */
-	float mat_diffuse[] = {1.0, 1.00, 1.00, 1.0}; /* diffuse reflection. */
-	// define as caracteristicas do material (dos materiais seguintes, i.e. ate nova alteracao
-	glMaterialfv(GL_FRONT, GL_SHININESS, mat_shininess);
-	glMaterialfv(GL_FRONT, GL_SPECULAR, mat_specular);
-	glMaterialfv(GL_FRONT, GL_DIFFUSE, mat_diffuse);
-
-
-	//Face frente - 0
-	newellSquare(v1,v3,v6,v5,normal);
-	glBegin(GL_POLYGON);
-	    glNormal3dv(normal);
-		glVertex3dv(v1);
-		glVertex3dv(v3);
-		glVertex3dv(v6);
-		glVertex3dv(v5);
-	glEnd();
-
-	// face anterior - 1
-	newellSquare(v8,v7,v4,v2,normal);
-	glBegin(GL_POLYGON);
-	    glNormal3dv(normal);
-		glVertex3dv(v8);
-		glVertex3dv(v7);
-		glVertex3dv(v4);
-		glVertex3dv(v2);
-	glEnd();
-
-	// face lateral - 2
-	newellSquare(v2,v4,v3,v1,normal);
-	glBegin(GL_POLYGON);
- 	    glNormal3dv(normal);
-		glVertex3dv(v2);
-		glVertex3dv(v4);
-		glVertex3dv(v3);
-		glVertex3dv(v1);
-	glEnd();
-
-	newellSquare(v5,v6,v7,v8,normal);
-	glBegin(GL_POLYGON);
-	    glNormal3dv(normal);
-		glVertex3dv(v5);
-		glVertex3dv(v6);
-		glVertex3dv(v7);
-		glVertex3dv(v8);
-	glEnd();
-
-	// base
-	newellSquare(v1,v5,v8,v2,normal);
-	glBegin(GL_POLYGON);
-	    glNormal3dv(normal);
-		glVertex3dv(v1);
-		glVertex3dv(v5);
-		glVertex3dv(v8);
-		glVertex3dv(v2);
-	glEnd();
-
-
+void drawPiece(int player){
+	//Topo
 	glEnable(GL_TEXTURE_2D);
-	glBindTexture(GL_TEXTURE_2D, 2001);			// activa a textura 2001
-
-	// topo 
-	newellSquare(v3,v4,v7,v6,normal);
-	glBegin(GL_POLYGON);
-	    glNormal3dv(normal);
-		glTexCoord2f(0.0,0.0); glVertex3dv(v3);
-		glTexCoord2f(1.0,0.0); glVertex3dv(v4);
-		glTexCoord2f(1.0,1.0); glVertex3dv(v7);
-		glTexCoord2f(0.0,1.0); glVertex3dv(v6);
-	glEnd();
+	glBindTexture(GL_TEXTURE_2D, player);
+	glPushMatrix();
+	glTranslatef(0.0,0.2,0.0);
+	drawPieceSquare();
+	glPopMatrix();
 	glDisable(GL_TEXTURE_2D);
 
-}
+	//Fundo
+	glPushMatrix();
+	glRotatef(180.0, 0.0,0.0,1.0);
+	drawPieceSquare();
+	glPopMatrix();
 
+	//Lateral Direita
+	glPushMatrix();
+	glTranslatef(0.5,0.1,0.0);
+	glRotatef(-90.0, 0.0,0.0,1.0);
+	drawPieceLateral();
+	glPopMatrix();
+	
+	//Lateral esquerda
+	glPushMatrix();
+	glTranslatef(-0.5,0.1,0.0);
+	glRotatef(90.0, 0.0,0.0,1.0);
+	drawPieceLateral();
+	glPopMatrix();
+	
+	//Tras
+	glPushMatrix();
+	glTranslatef(0.0,0.1,0.5);
+	glRotatef(90.0, 1.0,0.0,0.0);
+	glRotatef(90.0, 0.0,1.0,0.0);
+	drawPieceLateral();
+	glPopMatrix();
+	
+	//Frente
+	glPushMatrix();
+	glTranslatef(0.0,0.1,-0.5);
+	glRotatef(-90.0, 1.0,0.0,0.0);
+	glRotatef(90.0, 0.0,1.0,0.0);
+	drawPieceLateral();
+	glPopMatrix();
+
+}
 
  void drawScene(GLenum mode)
 {
-	glFrustum( -xy_aspect*.04, xy_aspect*.04, -.04, .04, .1, 50.0 );
+	glFrustum( -xy_aspect*0.04, xy_aspect*0.04, -0.04, 0.04, cena.near, cena.far);
 
 	glMatrixMode( GL_MODELVIEW );
 	glLoadIdentity();
     
-	glMultMatrixf(&cena.m[0][0]);
     glTranslatef( obj_pos[0], obj_pos[1], -obj_pos[2] ); 
+	glMultMatrixf(&cena.m[0][0]);
 	glMultMatrixf( view_rotate );
-	
-	// tabuleiro
+
 	if (mode == GL_SELECT)
 		glPushName(0);
-
-	glCallList(mesaList);
-
-	// esfera 1
-	if (mode == GL_SELECT) 
-		glLoadName (1);
-
-	// define caracteristicas do material da esfera 1
-	glMaterialfv(GL_FRONT, GL_SHININESS, mat1_shininess);
-	glMaterialfv(GL_FRONT, GL_SPECULAR, mat1_specular);
-	glMaterialfv(GL_FRONT, GL_DIFFUSE, mat1_diffuse);
-
-	glPushMatrix();
-
-	glTranslated(0.0,1.0,0.0);
-	gluSphere(glQ, 0.5, 16, 8);
-	glPopMatrix();
-
-	// fim de esfera 1
-
-	// esfera 2
-	if (mode == GL_SELECT)
-		glLoadName (2);
 	
-	glColorMaterial(GL_FRONT_AND_BACK,GL_DIFFUSE);
-	glEnable(GL_COLOR_MATERIAL);
-	glColor3f(0.0,1.0,0.0);
-	glPushMatrix();
+	//Desenha Zonas do tabuleiro
+	//Linhas
+	for(int i = 0; i<gameRatio; i++){
+	//Colunas	
+		for(int j=0; j<gameRatio; j++){
+			if (mode == GL_SELECT)
+			glLoadName ((i*10)+j);
 
-	glTranslated(2.5,1.0,-1.0);
-	gluSphere(glQ, 0.5, 16, 8);
-	glPopMatrix();
+			glPushMatrix();
+			glTranslatef(-8.0+(2*j),21.0,-6.0+(2*i));
+			glBegin(GL_POLYGON);
+				glNormal3d(0.0,1.0,0.0);  // esta normal fica comum aos 4 vertices
+				glTexCoord2f(0.0,0.0); glVertex3d( 0.0, 0.0,  0.0);
+				glTexCoord2f(1.0,0.0); glVertex3d(2.0, 0.0,  0.0);
+				glTexCoord2f(1.0,1.0); glVertex3d(2.0, 0.0,  -2.0);
+				glTexCoord2f(0.0,1.0); glVertex3d(0.0, 0.0,  -2.0);
+			glEnd();
+			glPopMatrix();
+		}
+	}
 
-	// fim da esfera
+	//Player1
+	for(int i = 0; i<player1.size(); i++){
+			if (mode == GL_SELECT)
+			glLoadName (100+i);
 
+			glPushMatrix();
+			glTranslatef(player1.at(i)->x,player1.at(i)->y,player1.at(i)->z);
+			drawPiece(1);
+			glPopMatrix();
+		}
 
-	// teapot
-	
-	if (mode == GL_SELECT)
-		glLoadName (3);
-	
-	glColor3f(1.0,1.0,0.0);
-	glPushMatrix();
+	//Player2
+	for(int i = 0; i<player2.size(); i++){
+			if (mode == GL_SELECT)
+			glLoadName (200+i);
 
-	glTranslated(1.0,1.0,2.0);
-	glutSolidTeapot(0.80);
-	// fim teapot
-
-	if (mode == GL_SELECT)
-		glLoadName (4);
-	glColor3f(1.0,0.0,0.0);
-	glPushMatrix();
-	glTranslatef(0.0,22.7,0.0);
-	glBegin(GL_POLYGON);
-		glNormal3d(0.0,1.0,0.0);  // esta normal fica comum aos 4 vertices
-		glTexCoord2f(0.0,0.0); glVertex3d( 0.0, 0.0,  0.0);
-		glTexCoord2f(1.0,0.0); glVertex3d(5.0, 0.0,  0.0);
-		glTexCoord2f(1.0,1.0); glVertex3d(5.0, 0.0,  -5.0);
-		glTexCoord2f(0.0,1.0); glVertex3d(0.0, 0.0,  -5.0);
-	glEnd();
-	glPopMatrix();
+			glPushMatrix();
+			glTranslatef(player2.at(i)->x,player2.at(i)->y,player2.at(i)->z);
+			drawPiece(2);
+			glPopMatrix();
+		}
 
 	glPopName();
 
@@ -437,7 +371,42 @@ void display(void)
 
 // ACÇÃO DO PICKING
 void pickingAction(GLuint answer) {
-	printf("%d\n", answer);
+	int player = answer/100;
+	int i = answer%10;
+
+	if(player == 1){
+		
+		cout << "Player1"<< endl<< "PECA: "<< answer << endl << "POS: "<< player1.at(i)->PosTab<< endl;
+		pecaSelected = player1.at(i);
+		pecaSelectedB = true;
+	}
+	else if(player == 2){
+		cout << "Player2"<< endl<< "PECA: "<< answer << endl << "POS: "<< player2.at(i)->PosTab<< endl;
+		pecaSelected = player2.at(i);
+		pecaSelectedB = true;
+	}
+	else if(pecaSelectedB){
+		cout << "FROM: "<<  pecaSelected->PosTab<< endl;
+		cout << "TO: " << answer << endl;
+		int pos = pecaSelected->PosTab;
+		int row = pos%10;
+		int column = pos/10;
+		int answerColumn = answer/10;
+		cout << "c: " << column<< endl << "c1: " << answerColumn<<endl;
+		if(i = row){
+			int mov = column - answerColumn ;
+			pecaSelected->z-= mov*2;
+		}
+		
+		if(column == answerColumn)
+		{
+			cout << "r: "<< row<< "c: " << i<< endl;
+			int mov = row - i ;
+			pecaSelected->x-= mov*2;
+		}
+		pecaSelectedB = false;
+	}
+
 }
 
 // processa os hits no picking
@@ -563,6 +532,16 @@ void reshape(int w, int h)
 	glutPostRedisplay();
 }
 
+void inicializacaoPecas()
+{
+	for(int i=0; i< gameRatio; i++){
+		Peca* p1 = new Peca(-7.0+(2*i),21.2,7.0, 70+i);
+		Peca* p2 = new Peca(-7.0+(2*i),21.2,-7.0,i);
+		player1.push_back(p1);
+		player2.push_back(p2);
+	}
+
+}
 
 void keyboard(unsigned char key, int x, int y)
 {
@@ -576,6 +555,12 @@ void keyboard(unsigned char key, int x, int y)
 	  break;
 	case 'a':
 	  background_text--;
+	  break;
+	case '-':
+		player1.at(0)->z-=1;
+	  break;
+	case '+':
+		inicializacaoPecas();
 	  break;
    }
 }
@@ -605,6 +590,8 @@ void myGlutIdle( void )
 //  glui->sync_live();
 
 }
+
+
 
 void inicializacao()
 {
@@ -652,12 +639,7 @@ void inicializacao()
 	pixmap2.readBMPFile("textures/tiles.bmp");
 	pixmap2.setTexture(3);
 
-	// display list para a mesa
-	glNewList(mesaList, GL_COMPILE);
-		glPushMatrix();
-		paralelo(10.0,1.0,10.0);
-		glPopMatrix();
-	glEndList();
+	inicializacaoPecas();
 
 }
 
