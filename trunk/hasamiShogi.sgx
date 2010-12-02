@@ -115,7 +115,7 @@
 			<texture id="clear"/>
 			<children>
         <objectref id="sala"/>
-        <!--<objectref id="mesa"/>-->
+        <objectref id="mesa"/>
         <objectref id="tabuleiro"/>
       </children>
 		</object>
@@ -298,7 +298,7 @@
 
     <object id="copo1" type="compound">
       <transformations>
-        <translation x="30.0" y="0.0" z="0.0" />
+        <translation x="0.0" y="0.0" z="0.0" />
       </transformations>
       <material id="null"/>
       <texture id="null"/>
@@ -823,7 +823,7 @@
 		</object>
 		<object id="mesa" type="compound">
 			<transformations>
-        <translation x="0.0" y="20.1" z="0.0"/>
+				<translation x="0.0" y="20.1" z="0.0"/>
 			</transformations>
 			<material id="white"/>
 			<texture id="wood"/>
@@ -832,6 +832,7 @@
 				<objectref id="pernas"/>
 			</children>
 		</object>
+		
 		<object id="tampo" type="simple">
 			<transformations>
 			</transformations>
