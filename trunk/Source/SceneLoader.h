@@ -8,6 +8,7 @@
 #include <numeric>
 #include <iterator>
 
+
 #include "RGBpixmap.h"
 #include "..\tinyxml.h"
 
