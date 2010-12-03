@@ -495,7 +495,7 @@ void pecaAniSelect(int status){
 			mouseBlock = true;
 			if(pecaSelected->y-gameSpeed > 21.2){
 				pecaSelected->y-=gameSpeed;
-				glutTimerFunc(mili_secs, pecaAniSelect, 1);
+				glutTimerFunc(mili_secs, pecaAniSelect, 2);
 			}
 			else{
 				//end of play
