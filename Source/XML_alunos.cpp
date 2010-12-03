@@ -17,7 +17,7 @@ RGBpixmap pixmap2;
 #define INITIALPOS_X 200
 #define INITIALPOS_Y 200
 #define mili_secs 20
-
+#define PI 3.14159265
 #define BUFSIZE 512
 
 #define VLENGTH 3
@@ -102,11 +102,48 @@ int background_text=0;
 
 GLUquadric* glQ;	// nec. p/ criar sup. quadraticas (cilindros, esferas...)
 
-
-
 //Utiliza as estruturas de dados com a informação do xml para construir o plano
 
 /* Function to normalise a vector to unit length */
+void processView(int dummy){
+
+	switch(flagJog){
+		case 0:
+			if(angView < 180){
+				angView+=viewSpeed;
+				matrixViewPlayer[0][0] = cos(angView*PI/180);
+				matrixViewPlayer[0][2] = -sin(angView*PI/180);
+				matrixViewPlayer[2][0] = sin(angView*PI/180);
+				matrixViewPlayer[2][2] = cos(angView*PI/180);
+				glutTimerFunc(mili_secs, processView, 0);
+			}
+			else{
+				angView = 180.0;
+				matrixViewPlayer[0][0] = cos(angView*PI/180);
+				matrixViewPlayer[0][2] = -sin(angView*PI/180);
+				matrixViewPlayer[2][0] = sin(angView*PI/180);
+				matrixViewPlayer[2][2] = cos(angView*PI/180);
+			}
+			break;
+		case 1:
+			if(angView >0){
+				angView-=viewSpeed;
+				matrixViewPlayer[0][0] = cos(angView*PI/180);
+				matrixViewPlayer[0][2] = -sin(angView*PI/180);
+				matrixViewPlayer[2][0] = sin(angView*PI/180);
+				matrixViewPlayer[2][2] = cos(angView*PI/180);
+				glutTimerFunc(mili_secs, processView, 0);
+			}
+			else{
+				angView = 0.0;
+				matrixViewPlayer[0][0] = cos(angView*PI/180);
+				matrixViewPlayer[0][2] = -sin(angView*PI/180);
+				matrixViewPlayer[2][0] = sin(angView*PI/180);
+				matrixViewPlayer[2][2] = cos(angView*PI/180);
+			}
+			break;
+	}
+}
 
 void drawPieceLateral(){
 
@@ -189,7 +226,7 @@ void drawPiece(int player){
     glTranslatef( obj_pos[0], obj_pos[1], -obj_pos[2] ); 
 	glMultMatrixf(&cena.m[0][0]);
 	glMultMatrixf( view_rotate );
-
+	glMultMatrixf( &matrixViewPlayer[0][0]);
 	if (mode == GL_SELECT)
 		glPushName(0);
 	
@@ -361,6 +398,11 @@ void display(void)
 	glFlush();
 }
 
+void changePlayer(){
+	flagJog = !flagJog;
+	processView(0);
+}
+
 int getJogador(float row, float column)
 {
 	float pos = 10*row + column;
@@ -404,6 +446,19 @@ void pecaAniSelect(int status){
 			}
 			break;
 		case 1:
+			mouseBlock = true;
+			if(pecaSelected->y-gameSpeed > 21.2){
+				pecaSelected->y-=gameSpeed;
+				glutTimerFunc(mili_secs, pecaAniSelect, 1);
+			}
+			else{
+				//end of play
+				pecaSelected->y=21.2;
+				mouseBlock=false;
+				changePlayer();
+			}
+			break;
+		case 2:
 			mouseBlock = true;
 			if(pecaSelected->y-gameSpeed > 21.2){
 				pecaSelected->y-=gameSpeed;
@@ -467,7 +522,6 @@ void processPlay(float row, float column, float answerRow, float answerColumn, f
 			if(answer != -1)
 				jogo.insertJog(Jog);
 			pecaAniMovV(0);
-			flagJog = !flagJog;
 		}else if(row == answerRow && answer < 100){
 			float mov = column - answerColumn ;
 			movH = -mov*2 + pecaSelected->x;
@@ -477,11 +531,10 @@ void processPlay(float row, float column, float answerRow, float answerColumn, f
 			if(answer != -1)
 				jogo.insertJog(Jog);
 			pecaAniMovH(0);
-			flagJog = !flagJog;
 		}else{
 			cout << "JOGADA INVALIDA!" << endl;
 			cout << "--------------------/JOGADA-----------------------" << endl;
-			pecaAniSelect(1);
+			pecaAniSelect(2);
 		}
 		pecaSelectedB = false;
 
@@ -778,6 +831,11 @@ void inicializacao()
 	pixmap2.setTexture(3);
 
 	inicializacaoPecas();
+
+	matrixViewPlayer[0][0] = cos(angView);
+	matrixViewPlayer[0][2] = -sin(angView);
+	matrixViewPlayer[2][0] = sin(angView);
+	matrixViewPlayer[2][2] = cos(angView);
 
 }
 
