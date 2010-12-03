@@ -1,6 +1,9 @@
 #define gameRatio 9
 #define gameSpeed 0.5
 
+//flag Jogador [1] -> jogador1
+bool flagJog = true;
+
 class Peca{
 public:
 	float x;
@@ -26,6 +29,7 @@ bool pecaSelectedB = false;
 float movH;
 float movV;
 bool mouseBlock = false;
+bool Pview = true;
 
 class Jogada{
 public:
@@ -49,6 +53,7 @@ public:
 	void insertJog(Jogada* jog);
 	void printJogo(void);
 	vector<Jogada*> getJogo(void);
+	void retrieveLast(void);
 	Jogo(){}
 
 };
@@ -59,8 +64,8 @@ void Jogo::insertJog(Jogada* jog){
 
 void Jogo::printJogo(void){
 	for(int i = 0; i<this->Jogadas.size();i++){
-		cout << "::Jogada "<< i <<"::"<< endl;
-		cout << "- Jogador" << this->Jogadas.at(i)->Jog << endl;
+		cout << ":::::Jogada "<< i <<":::::"<< endl;
+		cout << "- Jogador" << this->Jogadas.at(i)->Jog << " -"  << endl;
 		cout << "FROM: " << "[" <<this->Jogadas.at(i)->fromRow << "|" << this->Jogadas.at(i)->fromColumn<< "]" << endl;
 		cout << "TO:   " << "[" <<this->Jogadas.at(i)->toRow << "|" << this->Jogadas.at(i)->toColumn<< "]" << endl;
 	}
@@ -70,3 +75,7 @@ vector<Jogada*> Jogo::getJogo(void){
 	return this->Jogadas;
 }
 
+
+void Jogo::retrieveLast(void){
+	this->Jogadas.pop_back();
+}
