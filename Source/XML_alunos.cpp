@@ -11,14 +11,6 @@ using namespace std;
 
 RGBpixmap pixmap2;
 
-vector<Peca*> player1;
-vector<Peca*> player2;
-#define gameRatio 8
-bool pecaSelectedB = false;
-Peca* pecaSelected;
-float movH;
-float movV;
-
 // dimensoes e localizacao da janela
 #define DIMX 500
 #define DIMY 500
@@ -29,7 +21,6 @@ float movV;
 #define BUFSIZE 512
 
 #define VLENGTH 3
-#define mesaList 1
 
 float xy_aspect;		// aspect ratio da area de visualizacao
 int window_w=DIMX;
@@ -40,6 +31,7 @@ GLuint selectBuf[BUFSIZE];
 
 Node* raiz;
 Scene cena;
+Jogo jogo;
 
 // matriz de transf. geometrica utilizada pelo botao esferico
 float view_rotate[16] =	{ 1,0,0,0,
@@ -210,7 +202,7 @@ void drawPiece(int player){
 			glLoadName ((i*10)+j);
 
 			glPushMatrix();
-			glTranslatef(-8.0+(2*j),21.0,-6.0+(2*i));
+			glTranslatef(-9.0+(2*j),21.0,-7.0+(2*i));
 			glBegin(GL_POLYGON);
 				glNormal3d(0.0,1.0,0.0);  // esta normal fica comum aos 4 vertices
 				glTexCoord2f(0.0,0.0); glVertex3d( 0.0, 0.0,  0.0);
@@ -228,7 +220,6 @@ void drawPiece(int player){
 			glLoadName (100+i);
 
 			glPushMatrix();
-			glTranslatef(player1.at(i)->AniX,player1.at(i)->AniY,player1.at(i)->AniZ);
 			glTranslatef(player1.at(i)->x,player1.at(i)->y,player1.at(i)->z);
 			drawPiece(1);
 			glPopMatrix();
@@ -240,7 +231,6 @@ void drawPiece(int player){
 			glLoadName (200+i);
 
 			glPushMatrix();
-			glTranslatef(player2.at(i)->AniX,player2.at(i)->AniY,player2.at(i)->AniZ);
 			glTranslatef(player2.at(i)->x,player2.at(i)->y,player2.at(i)->z);
 			drawPiece(2);
 			glPopMatrix();
@@ -371,37 +361,81 @@ void display(void)
 	glFlush();
 }
 
+int getJogador(float row, float column)
+{
+	float pos = 10*row + column;
+	for(int i=0; i<player1.size(); i++){
+		if(player1.at(i)->PosTab == pos)
+			return 1;
+	}
+	for(int i=0; i<player2.size(); i++){
+		if(player2.at(i)->PosTab == pos)
+			return 2;
+	}
+	return 0;
+
+}
+
 void pecaAniSelect(int status){
 	
 	switch(status){
 		case 0:
-			if(pecaSelected->y < 23.0){
-				pecaSelected->y+=0.1;
+			mouseBlock = true;
+			if(pecaSelected->y+gameSpeed < 23.0){
+				pecaSelected->y+=gameSpeed;
 				glutTimerFunc(mili_secs, pecaAniSelect, 0);
+			}
+			else{
+				pecaSelected->y=23.0;
+				mouseBlock = false;
 			}
 			break;
 		case 1:
-			if(pecaSelected->y > 21.2){
-				pecaSelected->y-=0.1;
+			mouseBlock = true;
+			if(pecaSelected->y-gameSpeed > 21.2){
+				pecaSelected->y-=gameSpeed;
 				glutTimerFunc(mili_secs, pecaAniSelect, 1);
+			}
+			else{
+				pecaSelected->y=21.2;
+				mouseBlock=false;
 			}
 			break;
 	}
 }
 
 void pecaAniMovH(int status){
-	cout <<pecaSelected->x << " == " << movH<< endl;
-	if(movH == pecaSelected->x){
+	mouseBlock = true;
+	if(pecaSelected->x-gameSpeed < movH  && movH < pecaSelected->x + gameSpeed){
 		cout << "DONE"<< endl;
+		pecaSelected->x = movH;
 		pecaAniSelect(1);
 	}
 	else if(movH > pecaSelected->x){
-		pecaSelected->x+=0.1;
+		pecaSelected->x+=gameSpeed;
 		glutTimerFunc(mili_secs, pecaAniMovH, 0);
 	}
 	else if(movH < pecaSelected->x){
-		pecaSelected->x-=0.1;
+		pecaSelected->x-=gameSpeed;
 		glutTimerFunc(mili_secs, pecaAniMovH, 0);
+	}
+
+}
+
+void pecaAniMovV(int status){
+	mouseBlock = true;
+	if(pecaSelected->z-gameSpeed < movV  && movV < pecaSelected->z + gameSpeed){
+		cout << "DONE"<< endl;
+		pecaSelected->z = movV;
+		pecaAniSelect(1);
+	}
+	else if(movV > pecaSelected->z){
+		pecaSelected->z+=gameSpeed;
+		glutTimerFunc(mili_secs, pecaAniMovV, 0);
+	}
+	else if(movV < pecaSelected->z){
+		pecaSelected->z-=gameSpeed;
+		glutTimerFunc(mili_secs, pecaAniMovV, 0);
 	}
 
 }
@@ -422,22 +456,22 @@ void pickingAction(GLuint answer) {
 		cout << "TO: " << answer << endl;
 		cout << "From Column: " << column<< endl << "To Column: " << answerColumn<<endl;
 		cout << "From Row: " << row << endl << "To Row: " << answerRow<<endl;
-		
-		if(answerColumn == column){
+		Jogada* Jog = new Jogada(getJogador(row,column),row,column,answerRow,answerColumn);
+		if(answerColumn == column && answer < 100){
 			float mov = row - answerRow ;
-			pecaSelected->z-= mov*2;
+			movV = -mov*2 + pecaSelected->z;
 			pecaSelected->PosTab-=mov*10; 
 			cout << "--------------------/JOGADA-----------------------" << endl;
-			pecaAniSelect(1);
-		}else if(row == answerRow){
+			jogo.insertJog(Jog);
+			pecaAniMovV(0);
+		}else if(row == answerRow && answer < 100){
 			float mov = column - answerColumn ;
-			pecaSelected->x-= mov*2;
-			movH = mov*2 + pecaSelected->x;
+			movH = -mov*2 + pecaSelected->x;
 			pecaSelected->PosTab-=mov*1; 
 			cout << "MOV: " << mov<< endl;
 			cout << "--------------------/JOGADA-----------------------" << endl;
-			//pecaAniMovH(mov*2);
-			pecaAniSelect(1);
+			jogo.insertJog(Jog);
+			pecaAniMovH(0);
 		}
 		else{
 			cout << "JOGADA INVALIDA!" << endl;
@@ -498,59 +532,63 @@ struct g_mouseState{
 
 /* Mouse handling */
 void processMouse(int button, int state, int x, int y) {
-    GLint hits;
-	GLint viewport[4];
-
-	// update our button state
-	if(button == GLUT_LEFT_BUTTON) {
-		if(state == GLUT_DOWN)
-			MouseState.leftButton = true;
-		else
-			MouseState.leftButton = false;
-	}
-	if(button == GLUT_RIGHT_BUTTON) {
-		if(state == GLUT_DOWN)
-			MouseState.rightButton = true;
-		else
-			MouseState.rightButton = false;
-	}
-	if(button == GLUT_MIDDLE_BUTTON) {
-		if(state == GLUT_DOWN)
-			MouseState.middleButton = true;
-		else
-			MouseState.middleButton = false;
-	}
-
-	// update our position so we know a delta when the mouse is moved
-	MouseState.x = x;
-	MouseState.y = y;
 	
-	if (MouseState.leftButton && !MouseState.rightButton && !MouseState.middleButton) {
-		/* obrigatorio para o picking */
-		// obter o viewport actual
-		glGetIntegerv(GL_VIEWPORT, viewport);
+	if(!mouseBlock)
+	{
+		GLint hits;
+		GLint viewport[4];
 
-		glSelectBuffer (BUFSIZE, selectBuf);
-		glRenderMode (GL_SELECT);
+		// update our button state
+		if(button == GLUT_LEFT_BUTTON) {
+			if(state == GLUT_DOWN)
+				MouseState.leftButton = true;
+			else
+				MouseState.leftButton = false;
+		}
+		if(button == GLUT_RIGHT_BUTTON) {
+			if(state == GLUT_DOWN)
+				MouseState.rightButton = true;
+			else
+				MouseState.rightButton = false;
+		}
+		if(button == GLUT_MIDDLE_BUTTON) {
+			if(state == GLUT_DOWN)
+				MouseState.middleButton = true;
+			else
+				MouseState.middleButton = false;
+		}
 
-		// inicia processo de picking
-		glInitNames();
-		glMatrixMode (GL_PROJECTION);
-		glPushMatrix ();
+		// update our position so we know a delta when the mouse is moved
+		MouseState.x = x;
+		MouseState.y = y;
+	
+		if (MouseState.leftButton && !MouseState.rightButton && !MouseState.middleButton) {
+			/* obrigatorio para o picking */
+			// obter o viewport actual
+			glGetIntegerv(GL_VIEWPORT, viewport);
 
-		//  cria uma região de 5x5 pixels em torno do click do rato para o processo de picking
-		glLoadIdentity ();
-		gluPickMatrix ((GLdouble) x, (GLdouble) (window_h - y), 1.0, 1.0, viewport);
+			glSelectBuffer (BUFSIZE, selectBuf);
+			glRenderMode (GL_SELECT);
 
-		drawScene(GL_SELECT);
-		raiz->draw();
+			// inicia processo de picking
+			glInitNames();
+			glMatrixMode (GL_PROJECTION);
+			glPushMatrix ();
 
-		glMatrixMode (GL_PROJECTION);
-		glPopMatrix ();
-		glFlush ();
+			//  cria uma região de 5x5 pixels em torno do click do rato para o processo de picking
+			glLoadIdentity ();
+			gluPickMatrix ((GLdouble) x, (GLdouble) (window_h - y), 1.0, 1.0, viewport);
 
-		hits = glRenderMode(GL_RENDER);
-		processHits(hits, selectBuf);
+			drawScene(GL_SELECT);
+			raiz->draw();
+
+			glMatrixMode (GL_PROJECTION);
+			glPopMatrix ();
+			glFlush ();
+
+			hits = glRenderMode(GL_RENDER);
+			processHits(hits, selectBuf);
+		}
 	}
 }
 
@@ -588,8 +626,8 @@ void reshape(int w, int h)
 void inicializacaoPecas()
 {
 	for(int i=0; i< gameRatio; i++){
-		Peca* p1 = new Peca(-7.0+(2*i),21.2,7.0, 70+i);
-		Peca* p2 = new Peca(-7.0+(2*i),21.2,-7.0,i);
+		Peca* p1 = new Peca(-8.0+(2*i),21.2,8.0, 80+i);
+		Peca* p2 = new Peca(-8.0+(2*i),21.2,-8.0,i);
 		player1.push_back(p1);
 		player2.push_back(p2);
 	}
@@ -601,6 +639,7 @@ void keyboard(unsigned char key, int x, int y)
 	switch(key)
 	{
      case 27:		// tecla de escape termina o programa
+		 mouseBlock=false;
         exit(0);
         break;
 	 case 's':
@@ -614,6 +653,9 @@ void keyboard(unsigned char key, int x, int y)
 	  break;
 	case '+':
 		inicializacaoPecas();
+	  break;
+	case 'p':
+		jogo.printJogo();
 	  break;
    }
 }
