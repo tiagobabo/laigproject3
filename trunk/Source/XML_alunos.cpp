@@ -376,6 +376,19 @@ int getJogador(float row, float column)
 
 }
 
+Peca* getPiece(float row, float column){
+	float pos = 10*row + column;
+	for(int i=0; i<player1.size(); i++){
+		if(player1.at(i)->PosTab == pos)
+			return player1.at(i);
+	}
+	for(int i=0; i<player2.size(); i++){
+		if(player2.at(i)->PosTab == pos)
+			return player2.at(i);
+	}
+	return NULL;
+}
+
 void pecaAniSelect(int status){
 	
 	switch(status){
@@ -397,6 +410,7 @@ void pecaAniSelect(int status){
 				glutTimerFunc(mili_secs, pecaAniSelect, 1);
 			}
 			else{
+				//end of play
 				pecaSelected->y=21.2;
 				mouseBlock=false;
 			}
@@ -440,6 +454,39 @@ void pecaAniMovV(int status){
 
 }
 
+void processPlay(float row, float column, float answerRow, float answerColumn, float answer){
+	
+	if(answer == -1)
+		pecaSelected = getPiece(row,column);
+	Jogada* Jog = new Jogada(getJogador(row,column),row,column,answerRow,answerColumn);
+		if(answerColumn == column && answer < 100){
+			float mov = row - answerRow ;
+			movV = -mov*2 + pecaSelected->z;
+			pecaSelected->PosTab-=mov*10; 
+			cout << "--------------------/JOGADA-----------------------" << endl;
+			if(answer != -1)
+				jogo.insertJog(Jog);
+			pecaAniMovV(0);
+			flagJog = !flagJog;
+		}else if(row == answerRow && answer < 100){
+			float mov = column - answerColumn ;
+			movH = -mov*2 + pecaSelected->x;
+			pecaSelected->PosTab-=mov*1; 
+			cout << "MOV: " << mov<< endl;
+			cout << "--------------------/JOGADA-----------------------" << endl;
+			if(answer != -1)
+				jogo.insertJog(Jog);
+			pecaAniMovH(0);
+			flagJog = !flagJog;
+		}else{
+			cout << "JOGADA INVALIDA!" << endl;
+			cout << "--------------------/JOGADA-----------------------" << endl;
+			pecaAniSelect(1);
+		}
+		pecaSelectedB = false;
+
+}
+
 // ACÇÃO DO PICKING
 void pickingAction(GLuint answer) {
 	int player = answer/100;
@@ -451,44 +498,26 @@ void pickingAction(GLuint answer) {
 		int answerColumn = answer%10;
 		int row = pos/10;
 		int answerRow = answer/10;
+		
 		cout << "---------------------JOGADA-----------------------" << endl;
 		cout << "FROM: "<<  pecaSelected->PosTab<< endl;
 		cout << "TO: " << answer << endl;
 		cout << "From Column: " << column<< endl << "To Column: " << answerColumn<<endl;
 		cout << "From Row: " << row << endl << "To Row: " << answerRow<<endl;
-		Jogada* Jog = new Jogada(getJogador(row,column),row,column,answerRow,answerColumn);
-		if(answerColumn == column && answer < 100){
-			float mov = row - answerRow ;
-			movV = -mov*2 + pecaSelected->z;
-			pecaSelected->PosTab-=mov*10; 
-			cout << "--------------------/JOGADA-----------------------" << endl;
-			jogo.insertJog(Jog);
-			pecaAniMovV(0);
-		}else if(row == answerRow && answer < 100){
-			float mov = column - answerColumn ;
-			movH = -mov*2 + pecaSelected->x;
-			pecaSelected->PosTab-=mov*1; 
-			cout << "MOV: " << mov<< endl;
-			cout << "--------------------/JOGADA-----------------------" << endl;
-			jogo.insertJog(Jog);
-			pecaAniMovH(0);
-		}
-		else{
-			cout << "JOGADA INVALIDA!" << endl;
-			cout << "--------------------/JOGADA-----------------------" << endl;
-			pecaAniSelect(1);
-		}
-		pecaSelectedB = false;
-	}else if(player == 1){
+		
+		processPlay(row, column, answerRow, answerColumn, answer);
+	}else if(player == 1 && flagJog){
 		cout << "---------------------JOGADOR 1-----------------------" << endl;
 		cout << "Player1"<< endl<< "PECA: "<< answer << endl << "POS: "<< player1.at(i)->PosTab<< endl;
+		
 		pecaSelected = player1.at(i);
 		pecaSelectedB = true;
 		pecaAniSelect(0);
 	}
-	else if(player == 2){
+	else if(player == 2 && !flagJog){
 		cout << "---------------------JOGADOR 2-----------------------" << endl;
 		cout << "Player2"<< endl<< "PECA: "<< answer << endl << "POS: "<< player2.at(i)->PosTab<< endl;
+		
 		pecaSelected = player2.at(i);
 		pecaSelectedB = true;
 		pecaAniSelect(0);
@@ -656,6 +685,12 @@ void keyboard(unsigned char key, int x, int y)
 	  break;
 	case 'p':
 		jogo.printJogo();
+	  break;
+	case 'z':
+		if(jogo.getJogo().size() != 0 && !mouseBlock){
+			processPlay(jogo.getJogo().back()->toRow, jogo.getJogo().back()->toColumn, jogo.getJogo().back()->fromRow, jogo.getJogo().back()->fromColumn, -1);
+			jogo.retrieveLast();
+		}
 	  break;
    }
 }
