@@ -1,5 +1,13 @@
 #define gameRatio 9
 #define gameSpeed 0.5
+#define viewSpeed 2
+
+float matrixViewPlayer[4][4] = {{0,0,0,0},
+								{0,1,0,0},
+								{0,0,0,0},
+								{0,0,0,1}
+								};
+float angView = 0;
 
 //flag Jogador [1] -> jogador1
 bool flagJog = true;
