@@ -40,7 +40,7 @@
     <!-- (até ao máximo declarado em "globals") -->
     <!-- Os identificadores "id" nao podem ser repetidos -->
     <!-- s e t: factores de escala (ver notas finais) -->
-    <texture id="board5" file="textures/board5.bmp" length_s="20.0" length_t="20.0" />
+    <texture id="board5" file="textures/board5.bmp" length_s="22.0" length_t="22.0" />
     <texture id="wood" file="textures/wood.bmp" length_s="40.0" length_t="30.0" />
     <texture id="wall" file="textures/wall.bmp" length_s="25.0" length_t="25.0" />
     <texture id="tile" file="textures/tiles.bmp" length_s="25.0" length_t="25.0" />
@@ -819,7 +819,7 @@
 			</transformations>
 			<material id="metal"/>
 			<texture id="board5"/>
-			<geometry type="box" dx="20" dy="1" dz="20" />
+			<geometry type="box" dx="22" dy="1" dz="22" />
 		</object>
 		<object id="mesa" type="compound">
 			<transformations>
