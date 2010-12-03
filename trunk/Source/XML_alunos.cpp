@@ -398,6 +398,39 @@ void display(void)
 	glFlush();
 }
 
+void getMatrixGame(){
+	for(int i=0; i< gameRatio; i++){
+		for(int j=0; j< gameRatio; j++)
+			gameMatrix[i][j]=0;
+	}
+
+	for(int i=0; i<player1.size(); i++){
+		int pos = player1.at(i)->PosTab;
+		int row = pos/10;
+		int column = pos%10;
+		gameMatrix[row][column] = 1;
+	}
+
+	for(int i=0; i<player2.size(); i++){
+		int pos = player2.at(i)->PosTab;
+		int row = pos/10;
+		int column = pos%10;
+		gameMatrix[row][column] = 2;
+	}
+}
+
+void printMatrixGame(){
+	getMatrixGame();
+	for(int i=0; i< gameRatio; i++){
+		cout << "[";
+		for(int j=0; j< gameRatio; j++){
+			cout<< gameMatrix[i][j] << ",";
+		}
+		cout<< "]" << endl;
+	}
+
+}
+
 void changePlayer(){
 	flagJog = !flagJog;
 	processView(0);
@@ -738,6 +771,7 @@ void keyboard(unsigned char key, int x, int y)
 	  break;
 	case 'p':
 		jogo.printJogo();
+		printMatrixGame();
 	  break;
 	case 'z':
 		if(jogo.getJogo().size() != 0 && !mouseBlock){
