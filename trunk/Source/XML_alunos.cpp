@@ -104,7 +104,24 @@ GLUquadric* glQ;	// nec. p/ criar sup. quadraticas (cilindros, esferas...)
 
 //Utiliza as estruturas de dados com a informação do xml para construir o plano
 
-/* Function to normalise a vector to unit length */
+void showCamera(char* camera)
+{
+	glDisable( GL_LIGHTING );  /* Disable lighting while we render text */
+	glMatrixMode( GL_PROJECTION );
+	glLoadIdentity();
+	gluOrtho2D( 0.0, 100.0, 0.0, 100.0  );
+	glMatrixMode( GL_MODELVIEW );
+	glLoadIdentity();
+	glColor3ub( 0.5, 0.3, 0.8 );
+	glRasterPos2i( 1, 96);
+	int len = strlen(camera);
+	for (int i = 0; i < len; i++)
+	{
+		glutBitmapCharacter(GLUT_BITMAP_HELVETICA_18, camera[i]);
+	}
+	glEnable( GL_LIGHTING );
+}
+
 void processView(int dummy){
 
 	switch(flagJog){
@@ -144,6 +161,7 @@ void processView(int dummy){
 			break;
 	}
 }
+
 
 void drawPieceLateral(){
 
@@ -224,9 +242,23 @@ void drawPiece(int player){
 	glLoadIdentity();
     
     glTranslatef( obj_pos[0], obj_pos[1], -obj_pos[2] ); 
-	glMultMatrixf(&cena.m[0][0]);
-	glMultMatrixf( view_rotate );
-	glMultMatrixf( &matrixViewPlayer[0][0]);
+	
+	switch(viewSelected){
+		case 0:
+			glMultMatrixf(&cena.m[0][0]);
+			glMultMatrixf( view_rotate );
+			glMultMatrixf( &matrixViewPlayer[0][0]);
+			break;
+		case 1:
+			gluLookAt( 0.0, 45.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -1.0 );
+			break;
+		case 2:
+			gluLookAt( -30.0, 45.0, 0.0, 0.0, 22.0, 0.0, 1.0, 1.0, 0.0 );
+			break;
+		default:
+			glMultMatrixf( view_rotate );
+	}
+	
 	if (mode == GL_SELECT)
 		glPushName(0);
 	
@@ -393,6 +425,18 @@ void display(void)
 	drawScene(GL_RENDER);
 	raiz->draw();
 	glDisable(GL_NORMALIZE);
+
+	switch(viewSelected){
+	case 1:
+		showCamera("TOP VIEW");
+		break;
+	case 2:
+		showCamera("OBSERVER");
+		break;
+	default:
+		break;
+	}
+
 	// swapping the buffers causes the rendering above to be shown
 	glutSwapBuffers();
 	glFlush();
@@ -773,6 +817,15 @@ void keyboard(unsigned char key, int x, int y)
 		jogo.printJogo();
 		printMatrixGame();
 	  break;
+	case '1':
+		viewSelected = 0;
+	break;
+	case '2':
+		viewSelected = 1;
+	break;
+	case '3':
+		viewSelected = 2;
+	break;
 	case 'z':
 		if(jogo.getJogo().size() != 0 && !mouseBlock){
 			processPlay(jogo.getJogo().back()->toRow, jogo.getJogo().back()->toColumn, jogo.getJogo().back()->fromRow, jogo.getJogo().back()->fromColumn, -1);
