@@ -139,8 +139,8 @@ void processView(void)
 		if (viewElement)
 		{
 			cout <<  endl <<"::Processing view::"<< endl << endl;
-			if (viewElement->QueryFloatAttribute("near",&scene.near)==TIXML_SUCCESS && 
-				viewElement->QueryFloatAttribute("far",&scene.far)==TIXML_SUCCESS &&
+			if (viewElement->QueryFloatAttribute("near",&scene.near2)==TIXML_SUCCESS && 
+				viewElement->QueryFloatAttribute("far",&scene.far2)==TIXML_SUCCESS &&
 				viewElement->QueryFloatAttribute("axisscale",&scene.axisscale)==TIXML_SUCCESS)
 				cout << "view atributes: " << scene.axisscale << endl;
 			else

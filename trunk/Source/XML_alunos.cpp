@@ -5,7 +5,7 @@
 
 #include <GL\glui.h>
 #include <math.h>
-#include <iostream>
+#include <winsock2.h>
 
 using namespace std;
 
@@ -19,6 +19,9 @@ RGBpixmap pixmap2;
 #define mili_secs 20
 #define PI 3.14159265
 #define BUFSIZE 512
+
+#define IPADDRESS "127.0.0.1"
+#define PORT 60070
 
 #define VLENGTH 3
 
@@ -101,6 +104,75 @@ GLUI  *glui2;
 int background_text=0;
 
 GLUquadric* glQ;	// nec. p/ criar sup. quadraticas (cilindros, esferas...)
+
+SOCKET m_socket;
+
+bool socketConnect() {// Initialize Winsock.
+    WSADATA wsaData;
+    int iResult = WSAStartup(MAKEWORD(2,2), &wsaData);
+    if (iResult != NO_ERROR)
+		printf("Client: Error at WSAStartup().\n");
+    else
+        printf("Client: WSAStartup() is OK.\n");
+
+	// Create a socket.
+    m_socket = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
+    if (m_socket == INVALID_SOCKET) {
+        printf("Client: socket() - Error at socket(): %ld\n", WSAGetLastError());
+        WSACleanup();
+        return false;
+    }
+	else
+       printf("Client: socket() is OK.\n");
+
+    // Connect to a server.
+    sockaddr_in clientService;
+    clientService.sin_family = AF_INET;
+    // Just test using the localhost, you can try other IP address
+    clientService.sin_addr.s_addr = inet_addr("127.0.0.1");
+    clientService.sin_port = htons(60070);
+
+    if (connect(m_socket, (SOCKADDR*)&clientService, sizeof(clientService)) == SOCKET_ERROR) {
+        printf("Client: connect() - Failed to connect.\n");
+        WSACleanup();
+        return false;
+    }
+    else {
+       printf("Client: connect() is OK.\n");
+       printf("Client: Can start sending and receiving data...\n");
+    }
+
+    // Send and receive data.
+	printf("Connected\n");
+	return true;
+}
+
+void envia(char *s, int len) {
+	int bytesSent = send(m_socket, s, len, 0);
+	if(bytesSent == SOCKET_ERROR)
+		printf("Client: send() error %ld.\n", WSAGetLastError());
+}
+
+void recebe(char *ans) {
+	int bytesRecv = SOCKET_ERROR;
+	int pos = 0;
+	while (true) {
+		recv(m_socket, &ans[pos], 1, 0);
+		if (ans[pos] == '\n')
+			break;
+		pos++;
+	}
+	ans[pos] = 0;
+	cout << "prolog answered: " << ans << endl;
+}
+
+void quit() {
+	cout << "Asking prolog to quit" << endl;
+	char buff[] = "quit.\n";
+	envia(buff, 6);
+	char ans[1024];
+	recebe(ans);
+}
 
 //Utiliza as estruturas de dados com a informação do xml para construir o plano
 
@@ -236,7 +308,7 @@ void drawPiece(int player){
 
  void drawScene(GLenum mode)
 {
-	glFrustum( -xy_aspect*0.04, xy_aspect*0.04, -0.04, 0.04, cena.near, cena.far);
+	glFrustum( -xy_aspect*0.04, xy_aspect*0.04, -0.04, 0.04, cena.near2, cena.far2);
 
 	glMatrixMode( GL_MODELVIEW );
 	glLoadIdentity();
@@ -364,7 +436,7 @@ void display(void)
 	// inicializacoes da matriz de visualizacao
 	glMatrixMode( GL_PROJECTION );
 	glLoadIdentity();
-	glFrustum( -xy_aspect*0.04, xy_aspect*0.04, -0.04, 0.04, cena.near, cena.far);
+	glFrustum( -xy_aspect*0.04, xy_aspect*0.04, -0.04, 0.04, cena.near2, cena.far2);
 	//inicializacoes da matriz de transformacoes geometricas
 	glMatrixMode( GL_MODELVIEW );
 	glLoadIdentity();
@@ -964,6 +1036,7 @@ void visib_control( int control )
 int main(int argc, char* argv[])
 {
 	
+	socketConnect();
 	glutInit(&argc, argv);
 	glutInitDisplayMode(GLUT_DEPTH | GLUT_DOUBLE | GLUT_RGBA);
 	glutInitWindowSize (DIMX, DIMY);
@@ -1009,8 +1082,20 @@ int main(int argc, char* argv[])
 	GLUI_Master.set_glutIdleFunc( myGlutIdle );
    
 	inicializacao();
-
+	char *s = "comando(1, 2).\n";
+	char *s2 = "verificaCaminho(1,1,1,1,2,[[1,1],[0,0],[2,2]]).\n";
+	char *s3 = "jogadasPossiveis(1,1,1,[[1,1],[0,0],[2,2]]).\n";
+	char *s4 = "conquistas([[1,1,1,1,1,1,1,1,1],[0,1,2,1,0,0,0,0,0],[0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0],[2,2,2,2,2,2,2,2,2]]).\n";
+	char *s5 = "terminouJogo([[1,1,1,1,1,1,1,1,1],[0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0],[2,2,2,2,2,2,2,2,2]]).\n";
+	char *s6 = "jogada(1,1,1,1,2,[[1,1],[0,0],[2,2]]).\n";
+	char *s7 = "modoIntermedio([[1,1,1,1,1,1,1,1,1],[0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0],[2,2,2,2,2,2,2,2,2]], 1).\n";
+	char *s8 = "modoFacil([[1,1,1,1,1,1,1,1,1],[0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0],[2,2,2,2,2,2,2,2,2]], 1).\n";
+	char *s9 = "modoDificil([[1,1,1,1,1,1,1,1,1],[0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0],[2,2,2,2,2,2,2,2,2]], 1).\n";
+	envia(s8, strlen(s8));
+	char ans[1024];
+	recebe(ans);
 	glutMainLoop();
 
+	quit();
 	return 0;
 }
