@@ -8,7 +8,6 @@
 #include <numeric>
 #include <iterator>
 
-
 #include "RGBpixmap.h"
 #include "..\tinyxml.h"
 
@@ -209,8 +208,8 @@ public:
 	string root;
 
 	//view
-	float near;
-	float far;
+	float near2;
+	float far2;
 	float axisscale;
 
 	//matrix de transformacao inicial
