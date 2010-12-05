@@ -305,7 +305,7 @@ void drawPiece(int player){
 	glPopMatrix();
 
 }
-
+float rotY = 0, rotX = 0;
  void drawScene(GLenum mode)
 {
 	glFrustum( -xy_aspect*0.04, xy_aspect*0.04, -0.04, 0.04, cena.near2, cena.far2);
@@ -318,7 +318,11 @@ void drawPiece(int player){
 	switch(viewSelected){
 		case 0:
 			glMultMatrixf(&cena.m[0][0]);
+			glTranslatef(0.0,20.0,0.0);
 			glMultMatrixf( view_rotate );
+			glRotatef(rotX,1.0,0.0,0.0);
+			glRotatef(rotY,0.0,1.0,0.0);
+			glTranslatef(0.0,-20.0,0.0);
 			glMultMatrixf( &matrixViewPlayer[0][0]);
 			break;
 		case 1:
@@ -445,8 +449,12 @@ void display(void)
 	glTranslatef( obj_pos[0], obj_pos[1], -obj_pos[2]);    
 	glMultMatrixf(&cena.m[0][0]);
 	// aplica efeito do botao de rotacao
+	glTranslatef(0.0,20.0,0.0);
 	glMultMatrixf( view_rotate );
-	/*glPopMatrix();*/
+	glRotatef(rotX,1.0,0.0,0.0);
+	glRotatef(rotY,0.0,1.0,0.0);
+	glTranslatef(0.0,-20.0,0.0);
+	glPopMatrix();
 
 	//propriedades das luzes
 	for(int i = 0; i < cena.lights.size(); i++)
@@ -760,7 +768,7 @@ struct g_mouseState{
 	int x;
 	int y;
 } MouseState;
-
+int press = 0;
 /* Mouse handling */
 void processMouse(int button, int state, int x, int y) {
 	
@@ -771,8 +779,11 @@ void processMouse(int button, int state, int x, int y) {
 
 		// update our button state
 		if(button == GLUT_LEFT_BUTTON) {
+			press = 1;
 			if(state == GLUT_DOWN)
+			{
 				MouseState.leftButton = true;
+			}
 			else
 				MouseState.leftButton = false;
 		}
@@ -823,9 +834,57 @@ void processMouse(int button, int state, int x, int y) {
 	}
 }
 
+float xant=0, yant = 0, xant2 = 0, yant2 = 0;
+float dir = 1, dir2 = 1;
 void processMouseMoved(int x, int y)
-{
-	
+{	
+	if(press == 1)
+	{
+		xant = x;
+		yant = y;
+		press = 0;
+	}
+	else
+	{
+		if(dir == -1 && x-xant2 < 0)
+			dir = -1;
+		else if(dir == -1 && x-xant2 > 0)
+		{
+			xant = x;
+			dir = 1;
+		}
+		else if (dir == 1 && x-xant2 > 0)
+			dir = 1;
+		else
+		{
+			xant = x;
+			dir = -1;
+		}
+		
+		if(dir2 == -1 && y-yant2 < 0)
+			dir2 = -1;
+		else if(dir2 == -1 && y-yant2 > 0)
+		{
+			yant = y;
+			dir2 = 1;
+		}
+		else if (dir2 == 1 && y-yant2 > 0)
+			dir2 = 1;
+		else
+		{
+			yant = y;
+			dir2 = -1;
+		}
+		yant2 = y;
+		xant2 = x;
+		rotY += (x-xant)/100;
+		rotX += (y-yant)/100;
+	}
+	if(rotX > 45)
+		rotX = 45;
+	else if(rotX < -45)
+		rotX = -45;
+
 	// pedido de refrescamento da janela
 	glutPostRedisplay();				
 
@@ -1036,7 +1095,7 @@ void visib_control( int control )
 int main(int argc, char* argv[])
 {
 	
-	socketConnect();
+	//socketConnect();
 	glutInit(&argc, argv);
 	glutInitDisplayMode(GLUT_DEPTH | GLUT_DOUBLE | GLUT_RGBA);
 	glutInitWindowSize (DIMX, DIMY);
@@ -1091,11 +1150,11 @@ int main(int argc, char* argv[])
 	char *s7 = "modoIntermedio([[1,1,1,1,1,1,1,1,1],[0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0],[2,2,2,2,2,2,2,2,2]], 1).\n";
 	char *s8 = "modoFacil([[1,1,1,1,1,1,1,1,1],[0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0],[2,2,2,2,2,2,2,2,2]], 1).\n";
 	char *s9 = "modoDificil([[1,1,1,1,1,1,1,1,1],[0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0],[2,2,2,2,2,2,2,2,2]], 1).\n";
-	envia(s8, strlen(s8));
+	//envia(s8, strlen(s8));
 	char ans[1024];
-	recebe(ans);
+	//recebe(ans);
 	glutMainLoop();
 
-	quit();
+	//quit();
 	return 0;
 }
