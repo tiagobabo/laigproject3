@@ -522,7 +522,7 @@ void display(void)
 	glFlush();
 }
 
-void getMatrixGame(){
+string getMatrixGame(){
 	for(int i=0; i< gameRatio; i++){
 		for(int j=0; j< gameRatio; j++)
 			gameMatrix[i][j]=0;
@@ -541,6 +541,30 @@ void getMatrixGame(){
 		int column = pos%10;
 		gameMatrix[row][column] = 2;
 	}
+	string matrix;
+	matrix += '[';
+	int w = 0;
+	for(w = 0; w < 9; w++)
+	{
+		matrix +='[';
+		for(int z = 0; z < 9; z++)
+		{
+			if(gameMatrix[w][z] == 1)
+				matrix += '1';
+			else if(gameMatrix[w][z] == 2)
+				matrix += '2';
+			else
+				matrix +='0';
+			if(z != 8)
+				matrix += ',';
+		}
+		matrix += ']';
+		if(w != 8)
+			matrix += ',';
+	}
+	matrix += ']';
+	
+	return matrix;
 }
 
 void printMatrixGame(){
@@ -666,8 +690,86 @@ void pecaAniMovV(int status){
 
 }
 
-void processPlay(float row, float column, float answerRow, float answerColumn, float answer){
+void removePiece(int pos){
+	vector<Peca*>::iterator it;
+	for(it=player1.begin(); it!=player1.end();it++){
+		if((*it)->PosTab == pos){
+			if(it+1 == player1.end()){
+				player1.pop_back();
+				break;
+			}
+			else
+				it=player1.erase(it);
+		}
+	}
 	
+	vector<Peca*>::iterator it2;
+	for(it2=player2.begin(); it2!=player2.end();it2++){
+		cout << (*it2)->PosTab << "==" << pos<< endl;
+		if((*it2)->PosTab == pos){
+			if(it2+1 == player2.end()){
+				player2.pop_back();
+				break;
+			}
+			else
+				it2=player2.erase(it2);
+		}
+	}
+}
+
+void changeGameMatrix(float matrix[gameRatio][gameRatio])
+{
+	for(int i = 0; i < gameRatio; i++)
+		for(int j = 0; j < gameRatio; j++)
+			if(gameMatrix[i][j] != matrix[i][j]){
+				cout << "encontrei um diferente em: [" << i << "|" << j <<"]" << endl; 
+				int pos = i*10 + j;
+				removePiece(pos);
+			}
+}
+
+void removePecasConquistadas()
+{
+	string matrix = getMatrixGame();
+	char s2[1024];
+	sprintf(s2,"conquistas(%s).\n",matrix.c_str());
+	envia(s2, strlen(s2));
+	char ans[1024];
+	recebe(ans);
+	string resp;
+	resp = ans;
+	replace( resp.begin(), resp.end(), '[', ' ');
+	replace( resp.begin(), resp.end(), ']', ' ');
+	replace( resp.begin(), resp.end(), ',', ' ');
+	replace( resp.begin(), resp.end(), '.', ' ');
+	float matrix_recebe[gameRatio][gameRatio];
+	//[[1,1,1,1,1,1,1,1,1],[0,1,2,1,0,0,0,0,0],[0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0],[2,2,2,2,2,2,2,2,2]]).
+	cout << ans<< endl;
+	int k= 0;
+	int j= 0;
+	int i= 0;
+	while(1){
+		if(ans[k] == '1' || ans[k] == '2' || ans[k] == '0'){
+			if(j == gameRatio){
+					j=0;
+					i++;
+			}
+			matrix_recebe[i][j] = atoi(&ans[k]);
+			j++;
+		}
+		k++;
+		if(ans[k]=='.')
+			break;
+	}
+	for(int i = 0; i < gameRatio; i++){
+		for(int j = 0; j < gameRatio; j++)
+			cout << matrix_recebe[i][j] << "," ;
+		cout << endl;
+	}
+	changeGameMatrix(matrix_recebe);
+}
+
+void processPlay(float row, float column, float answerRow, float answerColumn, float answer) {
 	if(answer == -1)
 		pecaSelected = getPiece(row,column);
 	Jogada* Jog = new Jogada(getJogador(row,column),row,column,answerRow,answerColumn);
@@ -679,6 +781,7 @@ void processPlay(float row, float column, float answerRow, float answerColumn, f
 			if(answer != -1)
 				jogo.insertJog(Jog);
 			pecaAniMovV(0);
+			removePecasConquistadas();
 		}else if(row == answerRow && answer < 100){
 			float mov = column - answerColumn ;
 			movH = -mov*2 + pecaSelected->x;
@@ -688,13 +791,13 @@ void processPlay(float row, float column, float answerRow, float answerColumn, f
 			if(answer != -1)
 				jogo.insertJog(Jog);
 			pecaAniMovH(0);
+			removePecasConquistadas();
 		}else{
 			cout << "JOGADA INVALIDA!" << endl;
 			cout << "--------------------/JOGADA-----------------------" << endl;
 			pecaAniSelect(2);
 		}
 		pecaSelectedB = false;
-
 }
 
 // ACÇÃO DO PICKING
@@ -714,12 +817,24 @@ void pickingAction(GLuint answer) {
 		cout << "TO: " << answer << endl;
 		cout << "From Column: " << column<< endl << "To Column: " << answerColumn<<endl;
 		cout << "From Row: " << row << endl << "To Row: " << answerRow<<endl;
-		
-		processPlay(row, column, answerRow, answerColumn, answer);
+		char s2[1024];
+		string matrix = getMatrixGame();
+		if(flagJog)
+			sprintf(s2,"verificaCaminho(%d,%d,%d,%d,%d,%s).\n",1, column+1, row+1, answerColumn+1, answerRow+1, matrix.c_str());
+		else
+			sprintf(s2,"verificaCaminho(%d,%d,%d,%d,%d,%s).\n",2, column+1, row+1, answerColumn+1, answerRow+1, matrix.c_str());
+		cout << s2;
+		envia(s2, strlen(s2));
+		char ans[1024];
+		recebe(ans);
+		cout << endl << ans << endl;
+		if(ans[0] == '1')
+			processPlay(row, column, answerRow, answerColumn, answer);
+		else
+			processPlay(row, column, answerRow, answerColumn, 200);
 	}else if(player == 1 && flagJog){
 		cout << "---------------------JOGADOR 1-----------------------" << endl;
 		cout << "Player1"<< endl<< "PECA: "<< answer << endl << "POS: "<< player1.at(i)->PosTab<< endl;
-		
 		pecaSelected = player1.at(i);
 		pecaSelectedB = true;
 		pecaAniSelect(0);
@@ -727,7 +842,6 @@ void pickingAction(GLuint answer) {
 	else if(player == 2 && !flagJog){
 		cout << "---------------------JOGADOR 2-----------------------" << endl;
 		cout << "Player2"<< endl<< "PECA: "<< answer << endl << "POS: "<< player2.at(i)->PosTab<< endl;
-		
 		pecaSelected = player2.at(i);
 		pecaSelectedB = true;
 		pecaAniSelect(0);
@@ -930,6 +1044,7 @@ void keyboard(unsigned char key, int x, int y)
 	{
      case 27:		// tecla de escape termina o programa
 		 mouseBlock=false;
+		 quit();
         exit(0);
         break;
 	 case 's':
@@ -1095,12 +1210,18 @@ void visib_control( int control )
 int main(int argc, char* argv[])
 {
 	
-	//socketConnect();
+	if(socketConnect() == false) 
+	{
+		system("pause");
+		return -1;
+	}
 	glutInit(&argc, argv);
 	glutInitDisplayMode(GLUT_DEPTH | GLUT_DOUBLE | GLUT_RGBA);
-	glutInitWindowSize (DIMX, DIMY);
-	glutInitWindowPosition (INITIALPOS_X, INITIALPOS_Y);
-	main_window = glutCreateWindow (argv[0]);
+	glutGameModeString( "1280x800:32@75" ); //the settings 
+    glutEnterGameMode(); //set glut to fullscreen using the 
+
+
+	
 	
 	raiz = loadScene(&cena);
 	
@@ -1114,29 +1235,7 @@ int main(int argc, char* argv[])
    GLUI_Master.set_glutSpecialFunc( NULL );
    
 
-	/*** Create the bottom subwindow ***/
-	glui2 = GLUI_Master.create_glui_subwindow( main_window, GLUI_SUBWINDOW_BOTTOM );
-	glui2->set_main_gfx_window( main_window );
-
-	GLUI_Rotation *view_rot = glui2->add_rotation( "Rotacao", view_rotate );
-	view_rot->set_spin( 1.0 );
-	glui2->add_column( false );
-
-	GLUI_Translation *trans_z = 
-	glui2->add_translation( "Zoom", GLUI_TRANSLATION_Z, &obj_pos[2] );
-	trans_z->set_speed( 2 );
-
-	/******** Add some controls for lights ********/
-	glui2->add_column( false );
-	for(int i = 0; i < cena.lights.size(); i++)
-	{
-		int ena = cena.lights.at(i)->enabled;
-		glui2->add_checkbox(const_cast<char*> (cena.lights.at(i)->id.c_str()), &ena,
-				200+i, control_cb );
-	}
-	glui2->add_column( false );
-	int enable = 1;
-	glui2->add_checkbox("Visibilidade", &enable,0, visib_control);
+	
 	/* We register the idle callback with GLUI, not with GLUT */
 	GLUI_Master.set_glutIdleFunc( myGlutIdle );
    
@@ -1155,6 +1254,6 @@ int main(int argc, char* argv[])
 	//recebe(ans);
 	glutMainLoop();
 
-	//quit();
+	quit();
 	return 0;
 }
