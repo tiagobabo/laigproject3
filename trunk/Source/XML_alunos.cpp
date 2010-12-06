@@ -258,19 +258,23 @@ void drawPieceSquare(){
 
 }
 
-void drawPiece(int player){
-	glEnable(GL_COLOR_MATERIAL);
-	glColor4f(1.0,1.0,1.0,0.2);
-	glEnable (GL_BLEND); glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-	glDisable(GL_LIGHTING);
+void drawPiece(int player, int ghost){
+	if(ghost)
+	{
+		glEnable(GL_COLOR_MATERIAL);
+		glColor4f(1.0,1.0,1.0,0.4);
+		glEnable (GL_BLEND); glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+		glDisable(GL_LIGHTING);
+	}
 	//Topo
-	//glEnable(GL_TEXTURE_2D);
+	if(!ghost)
+		glEnable(GL_TEXTURE_2D);
 	glBindTexture(GL_TEXTURE_2D, player);
 	glPushMatrix();
 	glTranslatef(0.0,0.2,0.0);
 	drawPieceSquare();
 	glPopMatrix();
-	//glDisable(GL_TEXTURE_2D);
+	glDisable(GL_TEXTURE_2D);
 
 	//Fundo
 	glPushMatrix();
@@ -369,7 +373,7 @@ float rotY = 0, rotX = 0;
 			glLoadName (100+i);
 			glPushMatrix();
 			glTranslatef(player1.at(i)->x,player1.at(i)->y,player1.at(i)->z);
-			drawPiece(1);
+			drawPiece(1, 0);
 			glPopMatrix();
 		}
 
@@ -379,7 +383,7 @@ float rotY = 0, rotX = 0;
 			glLoadName (200+i);
 			glPushMatrix();
 			glTranslatef(player2.at(i)->x,player2.at(i)->y,player2.at(i)->z);
-			drawPiece(2);
+			drawPiece(2, 0);
 			glPopMatrix();
 		}
 
@@ -419,6 +423,26 @@ void drawBackground() {
 	glMatrixMode(GL_PROJECTION);
 	glPopMatrix();
 	glMatrixMode(GL_MODELVIEW);
+}
+
+int ghost = 0;
+string ghosts;
+
+void drawGhosts()
+{
+	int j = 0;
+	while(j < ghosts.size()-1)
+	{
+		char temp[1], temp2[1];
+		temp[0] = ghosts.c_str()[j];
+		temp2[0] = ghosts.c_str()[++j];
+		cout << atoi(temp)<< atoi(temp2) << endl;
+		glPushMatrix();
+		glTranslatef(-8.0+(2*(atoi(temp)-1)),21.2,2*(atoi(temp2)-1)-8);
+		drawPiece(1, 1);
+		glPopMatrix();
+		j++;
+	}
 }
 
 void display(void)
@@ -464,7 +488,8 @@ void display(void)
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glCallList(1);
 	drawScene(GL_RENDER);
-
+	if(ghost)
+		drawGhosts();
 	glDisable(GL_NORMALIZE);
 	
 	switch(viewSelected){
@@ -761,12 +786,32 @@ void processPlay(float row, float column, float answerRow, float answerColumn, f
 		pecaSelectedB = false;
 }
 
+void verificaJogadasPossiveis(int jog, int pos)
+{
+	ghosts.clear();
+	string matrix = getMatrixGame();
+	char s2[1024];
+	sprintf(s2,"jogadasPossiveis(%d,%d,%d,%s).\n",jog, pos%10+1, pos/10+1, matrix.c_str());
+	envia(s2, strlen(s2));
+	char ans[1024];
+	recebe(ans);
+	cout << endl << ans << endl;
+	string res;
+	for(int i = 0; ans[i] != '\0'; i++)
+		if(ans[i] != '-' && ans[i] != '.' && ans[i] != '[' && ans[i] != ']' && ans[i] != ',')
+			res += ans[i];
+	
+	ghost = 1;
+	ghosts = res;
+}
+
 // ACÇÃO DO PICKING
 void pickingAction(GLuint answer) {
 	int player = answer/100;
 	int i = answer%10;
 	
 	if(pecaSelectedB){
+		ghost = 0;
 		int pos = pecaSelected->PosTab;
 		int column = pos%10;
 		int answerColumn = answer%10;
@@ -793,19 +838,21 @@ void pickingAction(GLuint answer) {
 			processPlay(row, column, answerRow, answerColumn, answer);
 		else
 			processPlay(row, column, answerRow, answerColumn, 200);
-	}else if(player == 1 && flagJog){
+	}else if(player == 1 && flagJog) {
 		cout << "---------------------JOGADOR 1-----------------------" << endl;
 		cout << "Player1"<< endl<< "PECA: "<< answer << endl << "POS: "<< player1.at(i)->PosTab<< endl;
 		pecaSelected = player1.at(i);
 		pecaSelectedB = true;
 		pecaAniSelect(0);
+		verificaJogadasPossiveis(1, player1.at(i)->PosTab);
 	}
-	else if(player == 2 && !flagJog){
+	else if(player == 2 && !flagJog) {
 		cout << "---------------------JOGADOR 2-----------------------" << endl;
 		cout << "Player2"<< endl<< "PECA: "<< answer << endl << "POS: "<< player2.at(i)->PosTab<< endl;
 		pecaSelected = player2.at(i);
 		pecaSelectedB = true;
 		pecaAniSelect(0);
+		verificaJogadasPossiveis(2, player2.at(i)->PosTab);
 	}
 
 }
@@ -1182,9 +1229,11 @@ int main(int argc, char* argv[])
 	}
 	glutInit(&argc, argv);
 	glutInitDisplayMode(GLUT_DEPTH | GLUT_DOUBLE | GLUT_RGBA);
-	glutGameModeString( "1280x800:32@75" ); //the settings 
-    glutEnterGameMode(); //set glut to fullscreen using the 
-
+	/*glutGameModeString( "1280x800:32@75" ); //the settings 
+    glutEnterGameMode(); //set glut to fullscreen using the */
+	glutInitWindowSize (DIMX, DIMY);
+	glutInitWindowPosition (INITIALPOS_X, INITIALPOS_Y);
+	main_window = glutCreateWindow (argv[0]);
 
 	
 	
@@ -1199,7 +1248,29 @@ int main(int argc, char* argv[])
    glutPassiveMotionFunc(processPassiveMouseMoved);   
    GLUI_Master.set_glutSpecialFunc( NULL );
    
+   /*** Create the bottom subwindow ***/
+	glui2 = GLUI_Master.create_glui_subwindow( main_window, GLUI_SUBWINDOW_BOTTOM );
+	glui2->set_main_gfx_window( main_window );
 
+	GLUI_Rotation *view_rot = glui2->add_rotation( "Rotacao", view_rotate );
+	view_rot->set_spin( 1.0 );
+	glui2->add_column( false );
+
+	GLUI_Translation *trans_z = 
+	glui2->add_translation( "Zoom", GLUI_TRANSLATION_Z, &obj_pos[2] );
+	trans_z->set_speed( 2 );
+
+	/******** Add some controls for lights ********/
+	glui2->add_column( false );
+	for(int i = 0; i < cena.lights.size(); i++)
+	{
+		int ena = cena.lights.at(i)->enabled;
+		glui2->add_checkbox(const_cast<char*> (cena.lights.at(i)->id.c_str()), &ena,
+				200+i, control_cb );
+	}
+	glui2->add_column( false );
+	int enable = 1;
+	glui2->add_checkbox("Visibilidade", &enable,0, visib_control);
 	
 	/* We register the idle callback with GLUI, not with GLUT */
 	GLUI_Master.set_glutIdleFunc( myGlutIdle );
