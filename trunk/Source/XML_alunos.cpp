@@ -259,14 +259,18 @@ void drawPieceSquare(){
 }
 
 void drawPiece(int player){
+	glEnable(GL_COLOR_MATERIAL);
+	glColor4f(1.0,1.0,1.0,0.2);
+	glEnable (GL_BLEND); glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	glDisable(GL_LIGHTING);
 	//Topo
-	glEnable(GL_TEXTURE_2D);
+	//glEnable(GL_TEXTURE_2D);
 	glBindTexture(GL_TEXTURE_2D, player);
 	glPushMatrix();
 	glTranslatef(0.0,0.2,0.0);
 	drawPieceSquare();
 	glPopMatrix();
-	glDisable(GL_TEXTURE_2D);
+	//glDisable(GL_TEXTURE_2D);
 
 	//Fundo
 	glPushMatrix();
@@ -303,7 +307,9 @@ void drawPiece(int player){
 	glRotatef(90.0, 0.0,1.0,0.0);
 	drawPieceLateral();
 	glPopMatrix();
-
+	glEnable(GL_LIGHTING);
+	glDisable (GL_BLEND);
+	glDisable(GL_COLOR_MATERIAL);
 }
 float rotY = 0, rotX = 0;
  void drawScene(GLenum mode)
@@ -312,7 +318,6 @@ float rotY = 0, rotX = 0;
 
 	glMatrixMode( GL_MODELVIEW );
 	glLoadIdentity();
-    
     glTranslatef( obj_pos[0], obj_pos[1], -obj_pos[2] ); 
 	
 	switch(viewSelected){
@@ -345,7 +350,6 @@ float rotY = 0, rotX = 0;
 		for(int j=0; j<gameRatio; j++){
 			if (mode == GL_SELECT)
 			glLoadName ((i*10)+j);
-
 			glPushMatrix();
 			glTranslatef(-9.0+(2*j),21.0,-7.0+(2*i));
 			glBegin(GL_POLYGON);
@@ -363,7 +367,6 @@ float rotY = 0, rotX = 0;
 	for(int i = 0; i<player1.size(); i++){
 			if (mode == GL_SELECT)
 			glLoadName (100+i);
-
 			glPushMatrix();
 			glTranslatef(player1.at(i)->x,player1.at(i)->y,player1.at(i)->z);
 			drawPiece(1);
@@ -374,16 +377,11 @@ float rotY = 0, rotX = 0;
 	for(int i = 0; i<player2.size(); i++){
 			if (mode == GL_SELECT)
 			glLoadName (200+i);
-
 			glPushMatrix();
 			glTranslatef(player2.at(i)->x,player2.at(i)->y,player2.at(i)->z);
 			drawPiece(2);
 			glPopMatrix();
 		}
-
-	glPopName();
-
-	glDisable(GL_COLOR_MATERIAL);
 
 	glPopName();
 }
@@ -425,17 +423,9 @@ void drawBackground() {
 
 void display(void)
 {
-	
-	// ****** declaracoes internas 'a funcao display() ******
-
-
-	// ****** fim de todas as declaracoes da funcao display() ******
-
 	glQ = gluNewQuadric();
 	
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-	//drawBackground();
 
 	// inicializacoes da matriz de visualizacao
 	glMatrixMode( GL_PROJECTION );
@@ -445,67 +435,38 @@ void display(void)
 	glMatrixMode( GL_MODELVIEW );
 	glLoadIdentity();
 
-	// ...decorrente da utilizacao do botao de afastamento
-	glTranslatef( obj_pos[0], obj_pos[1], -obj_pos[2]);    
-	glMultMatrixf(&cena.m[0][0]);
-	// aplica efeito do botao de rotacao
-	glTranslatef(0.0,20.0,0.0);
-	glMultMatrixf( view_rotate );
-	glRotatef(rotX,1.0,0.0,0.0);
-	glRotatef(rotY,0.0,1.0,0.0);
-	glTranslatef(0.0,-20.0,0.0);
-	glPopMatrix();
+	switch(viewSelected){
+		case 0:
+			glMultMatrixf(&cena.m[0][0]);
+			glTranslatef(0.0,20.0,0.0);
+			glMultMatrixf( view_rotate );
+			glRotatef(rotX,1.0,0.0,0.0);
+			glRotatef(rotY,0.0,1.0,0.0);
+			glTranslatef(0.0,-20.0,0.0);
+			glMultMatrixf( &matrixViewPlayer[0][0]);
+			break;
+		case 1:
+			gluLookAt( 0.0, 45.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -1.0 );
+			break;
+		case 2:
+			gluLookAt( -30.0, 45.0, 0.0, 0.0, 22.0, 0.0, 1.0, 1.0, 0.0 );
+			break;
+		default:
+			glMultMatrixf( view_rotate );
+	}
 
 	//propriedades das luzes
 	for(int i = 0; i < cena.lights.size(); i++)
 		glLightfv(GL_LIGHT0+i, GL_POSITION, cena.lights.at(i)->position);
 	glEnable(GL_NORMALIZE);
-	axis_lenght =cena.axisscale;
-	glEnable(GL_COLOR_MATERIAL);
-	glPushMatrix();
-	// cilindro representativo do eixo X
-	glColor3f(1.0,0.0,0.0);		// vermelho
-	glPushMatrix();
-	glRotated(90.0, 0.0,1.0,0.0 );
-	gluCylinder(glQ, axis_radius_begin, axis_radius_end,
-		             axis_lenght, axis_nslices, axis_nstacks);   // nao tem bases
-	glPopMatrix();
-
-	// cilindro representativo do eixo Y
-	glColor3f(0.0,1.0,0.0);		// verde
-	glPushMatrix();
-	glRotated(-90.0, 1.0,0.0,0.0 );
-	gluCylinder(glQ, axis_radius_begin, axis_radius_end,
-		             axis_lenght, axis_nslices, axis_nstacks);   // nao tem bases
-	glPopMatrix();
-	
-	// cilindro representativo do eixo Z
-	glColor3f(0.0,0.0,1.0);		// azul
-	glPushMatrix();
-	// nao necessita rotacao... glRotated(...);
-	gluCylinder(glQ, axis_radius_begin, axis_radius_end,
-		             axis_lenght, axis_nslices, axis_nstacks);   // nao tem bases
-	glPopMatrix();
-	glPopMatrix();
-
-	// ... e da esfera que a simboliza
-	glColor3f(1.0,1.0,0.0);		// cor amarela
-	gluQuadricOrientation( glQ, GLU_INSIDE);
-	glPushMatrix();
-	glTranslated(cena.lights.at(i)->position[0],cena.lights.at(i)->position[1],cena.lights.at(i)->position[2]);
-	gluSphere(glQ, symb_light0_radius, symb_light0_slices, symb_light0_stacks);
-    glPopMatrix();
-	gluQuadricOrientation( glQ, GLU_OUTSIDE);
-
-	glColor3f(1.0,1.0,1.0);
-	glDisable(GL_COLOR_MATERIAL);
 
 	//desenha a cena
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	glCallList(1);
 	drawScene(GL_RENDER);
-	raiz->draw();
-	glDisable(GL_NORMALIZE);
 
+	glDisable(GL_NORMALIZE);
+	
 	switch(viewSelected){
 	case 1:
 		showCamera("TOP VIEW");
@@ -1169,6 +1130,10 @@ void inicializacao()
 	matrixViewPlayer[0][2] = -sin(angView);
 	matrixViewPlayer[2][0] = sin(angView);
 	matrixViewPlayer[2][2] = cos(angView);
+
+	glNewList(1,GL_COMPILE);
+		raiz->draw();
+	glEndList();
 
 }
 
