@@ -483,7 +483,7 @@ parse_input(verificaCaminho(Jogador,X,Y,Xf,Yf,T), 0) :-
 	\+ verificaCaminho(Jogador,X,Y,Xf,Yf,T).	
 
 parse_input(jogadasPossiveis(Jog,X,Y,T), Res) :-
-	findall(X-Y-Xf-Yf, verificaCaminho(Jog, X,Y,Xf,Yf, T), Res).	
+	findall(Xf-Yf, verificaCaminho(Jog, X,Y,Xf,Yf, T), Res).	
 
 parse_input(conquistas(T), Res):-
 	conquistaPecas(T, TNovo, 1),
