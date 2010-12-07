@@ -2,6 +2,9 @@
 #define gameSpeed 0.5
 #define viewSpeed 2
 int viewSelected = 0;
+bool fullscreen = false;
+bool ingame = false;
+int menuFade = 100;
 
 float gameMatrix[gameRatio][gameRatio] = {{0,0,0,0,0,0,0,0,0},{0,0,0,0,0,0,0,0,0},{0,0,0,0,0,0,0,0,0},{0,0,0,0,0,0,0,0,0},{0,0,0,0,0,0,0,0,0},{0,0,0,0,0,0,0,0,0},{0,0,0,0,0,0,0,0,0},{0,0,0,0,0,0,0,0,0},{0,0,0,0,0,0,0,0,0}};
 
