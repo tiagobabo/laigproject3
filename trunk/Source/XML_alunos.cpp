@@ -267,15 +267,29 @@ void drawPieceSquare(){
 }
 
 void drawPiece(int player, int ghost){
-	if(ghost)
+	if(ghost == 1)
 	{
 		glEnable(GL_COLOR_MATERIAL);
 		glColor4f(1.0,1.0,1.0,0.4);
 		glEnable (GL_BLEND); glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 		glDisable(GL_LIGHTING);
 	}
+	else if(ghost == 2)
+	{
+		glEnable(GL_COLOR_MATERIAL);
+		glColor4f(0.0,1.0,0.0,0.4);
+		glEnable (GL_BLEND); glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+		glDisable(GL_LIGHTING);
+	}
+	else if (ghost == 3)
+	{
+		glEnable(GL_COLOR_MATERIAL);
+		glColor4f(1.0,0.0,0.0,0.4);
+		glEnable (GL_BLEND); glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+		glDisable(GL_LIGHTING);
+	}
 	//Topo
-	if(!ghost)
+	else if(ghost == 0)
 		glEnable(GL_TEXTURE_2D);
 	glBindTexture(GL_TEXTURE_2D, player);
 	glPushMatrix();
@@ -548,6 +562,29 @@ void drawMenu(GLenum mode)
 	glPopName();
 }
 
+int drawNeg = 0, negcount = 0;
+float negCol, negRow;
+
+void drawNegation()
+{
+	glPushMatrix();
+	glTranslatef(-8.0+(2*negCol),21.2,2*negRow-8);
+	drawPiece(1, 3);
+	glPopMatrix();
+}
+
+
+int drawConf = 0;
+float confCol, confRow;
+
+void drawConfirmation()
+{
+	glPushMatrix();
+	glTranslatef(-8.0+(2*confCol),21.2,2*confRow-8);
+	drawPiece(1, 2);
+	glPopMatrix();
+}
+
 void display(void)
 {
 	glQ = gluNewQuadric();
@@ -603,7 +640,16 @@ void display(void)
 		else
 			drawMenu(GL_RENDER);
 		if(ghost)
-			drawGhosts();
+		drawGhosts();
+	if(drawConf)
+		drawConfirmation();
+	if(drawNeg && negcount < 15)
+	{
+		negcount++;
+		if(negcount%2 == 0)
+			drawNegation();
+	}
+	glDisable(GL_NORMALIZE);
 		glDisable(GL_NORMALIZE);
 	
 		if(ingame)
@@ -761,6 +807,7 @@ void pecaAniMovH(int status){
 		cout << "DONE"<< endl;
 		pecaSelected->x = movH;
 		pecaAniSelect(1);
+		drawConf = 0;
 	}
 	else if(movH > pecaSelected->x){
 		pecaSelected->x+=gameSpeed;
@@ -779,6 +826,7 @@ void pecaAniMovV(int status){
 		cout << "DONE"<< endl;
 		pecaSelected->z = movV;
 		pecaAniSelect(1);
+		drawConf = 0;
 	}
 	else if(movV > pecaSelected->z){
 		pecaSelected->z+=gameSpeed;
@@ -881,6 +929,10 @@ void processPlay(float row, float column, float answerRow, float answerColumn, f
 			cout << "--------------------/JOGADA-----------------------" << endl;
 			if(answer != -1)
 				jogo.insertJog(Jog);
+			confCol = answerColumn;
+			confRow = answerRow;
+			drawConf = 1;
+			drawConfirmation();
 			pecaAniMovV(0);
 			removePecasConquistadas();
 		}else if(row == answerRow && answer < 100){
@@ -891,12 +943,21 @@ void processPlay(float row, float column, float answerRow, float answerColumn, f
 			cout << "--------------------/JOGADA-----------------------" << endl;
 			if(answer != -1)
 				jogo.insertJog(Jog);
+			confCol = answerColumn;
+			confRow = answerRow;
+			drawConf = 1;
+			drawConfirmation();
 			pecaAniMovH(0);
 			removePecasConquistadas();
 		}else{
 			cout << "JOGADA INVALIDA!" << endl;
 			cout << "--------------------/JOGADA-----------------------" << endl;
 			pecaAniSelect(2);
+			negCol = answerColumn;
+			negRow = answerRow;
+			drawNeg = 1;
+			negcount = 0;
+			drawNegation();
 		}
 		pecaSelectedB = false;
 }
