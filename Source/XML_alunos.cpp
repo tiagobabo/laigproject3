@@ -458,7 +458,6 @@ void drawGhosts()
 		char temp[1], temp2[1];
 		temp[0] = ghosts.c_str()[j];
 		temp2[0] = ghosts.c_str()[++j];
-		cout << atoi(temp)<< atoi(temp2) << endl;
 		glPushMatrix();
 		glTranslatef(-8.0+(2*(atoi(temp)-1)),21.2,2*(atoi(temp2)-1)-8);
 		drawPiece(1, 1);
@@ -585,6 +584,28 @@ void drawConfirmation()
 	glPopMatrix();
 }
 
+
+void inicializacaoPecas()
+{
+	for(int i=0; i< gameRatio; i++){
+		Peca* p1 = new Peca(-8.0+(2*i),21.2,8.0, 80+i);
+		Peca* p2 = new Peca(-8.0+(2*i),21.2,-8.0,i);
+		player1.push_back(p1);
+		player2.push_back(p2);
+	}
+}
+
+void terminaJogo()
+{
+	player1.clear();
+	player2.clear();
+	inicializacaoPecas();
+	ingame = false;
+	viewSelected = 0;
+	terminajogo = 0;
+	menuFade = 100;
+}
+
 void display(void)
 {
 	glQ = gluNewQuadric();
@@ -635,14 +656,18 @@ void display(void)
 		//desenha a cena
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		glCallList(1);
-		if(ingame)
-			drawScene(GL_RENDER);
-		else
-			drawMenu(GL_RENDER);
-		if(ghost)
+	if(ingame && !terminajogo)
+		drawScene(GL_RENDER);
+	else if(!ingame && !terminajogo)
+		drawMenu(GL_RENDER);
+	else
+		terminaJogo();
+	
+	if(ghost)
 		drawGhosts();
 	if(drawConf)
 		drawConfirmation();
+
 	if(drawNeg && negcount < 15)
 	{
 		negcount++;
@@ -918,6 +943,21 @@ void removePecasConquistadas()
 	changeGameMatrix(matrix_recebe);
 }
 
+void verificaTermino()
+{
+	string matrix = getMatrixGame();
+	char s2[1024];
+	sprintf(s2,"terminouJogo(%s).\n",matrix.c_str());
+	envia(s2, strlen(s2));
+	char ans[1024];
+	recebe(ans);
+	if(ans[0] == '1' || ans[0] == '2')
+	{
+		ingame = 0;
+		terminajogo = 1;
+	}
+}
+
 void processPlay(float row, float column, float answerRow, float answerColumn, float answer) {
 	if(answer == -1)
 		pecaSelected = getPiece(row,column);
@@ -935,6 +975,7 @@ void processPlay(float row, float column, float answerRow, float answerColumn, f
 			drawConfirmation();
 			pecaAniMovV(0);
 			removePecasConquistadas();
+			verificaTermino();
 		}else if(row == answerRow && answer < 100){
 			float mov = column - answerColumn ;
 			movH = -mov*2 + pecaSelected->x;
@@ -949,6 +990,7 @@ void processPlay(float row, float column, float answerRow, float answerColumn, f
 			drawConfirmation();
 			pecaAniMovH(0);
 			removePecasConquistadas();
+			verificaTermino();
 		}else{
 			cout << "JOGADA INVALIDA!" << endl;
 			cout << "--------------------/JOGADA-----------------------" << endl;
@@ -1038,6 +1080,7 @@ void pickingAction(GLuint answer) {
 		if(answer == 1){
 			aniStartGame(0);
 			ingame = true;
+			terminajogo = 0;
 		}
 		else if(answer == 2)
 			cout << "OPTIONS!" << endl;
@@ -1136,11 +1179,14 @@ void processMouse(int button, int state, int x, int y) {
 			glLoadIdentity ();
 			gluPickMatrix ((GLdouble) x, (GLdouble) (window_h - y), 1.0, 1.0, viewport);
 
-			if(ingame)
+			if(ingame && !terminajogo)
 				drawScene(GL_SELECT);
-			else
+			else if(!ingame && !terminajogo)
 				drawMenu(GL_SELECT);
-			raiz->draw();
+			else
+				terminaJogo();
+			
+			glCallList(1);
 
 			glMatrixMode (GL_PROJECTION);
 			glPopMatrix ();
@@ -1231,16 +1277,6 @@ void reshape(int w, int h)
 	glutPostRedisplay();
 }
 
-void inicializacaoPecas()
-{
-	for(int i=0; i< gameRatio; i++){
-		Peca* p1 = new Peca(-8.0+(2*i),21.2,8.0, 80+i);
-		Peca* p2 = new Peca(-8.0+(2*i),21.2,-8.0,i);
-		player1.push_back(p1);
-		player2.push_back(p2);
-	}
-
-}
 
 void keyboard(unsigned char key, int x, int y)
 {
@@ -1329,15 +1365,6 @@ void inicializacao()
 	glEnable(GL_DEPTH_TEST);	/* Use a depth (z) buffer to draw only visible objects. */
 	glEnable(GL_CULL_FACE);		/* Use face culling to improve speed. */
 	glCullFace(GL_BACK);		/* Cull only back faces. */
-
-	glEnable(GL_POLYGON_SMOOTH);
-	glEnable(GL_LINE_SMOOTH);
-	glEnable(GL_POINT_SMOOTH);
-	glEnable(GL_BLEND);
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-	glHint(GL_PERSPECTIVE_CORRECTION_HINT,GL_NICEST);
-	glHint(GL_POINT_SMOOTH_HINT,GL_NICEST);
-	glHint(GL_POLYGON_SMOOTH_HINT,GL_NICEST);
 
 	// por defeito a cor e de fundo e o preto
 	glClearColor(cena.background[0],cena.background[1],cena.background[2], cena.background[3]);    // cor de fundo a branco
