@@ -1081,7 +1081,7 @@ void processPlay(float row, float column, float answerRow, float answerColumn, f
 			cout << "JOGADA INVALIDA!" << endl;
 			cout << "--------------------/JOGADA-----------------------" << endl;
 			pecaAniSelect(2);
-			if(answer < 100){
+			if(answer > 100){
 				negCol = answerColumn;
 				negRow = answerRow;
 			}
@@ -1150,8 +1150,14 @@ void pickingAction(GLuint answer) {
 			cout << endl << ans << endl;
 			if(ans[0] == '1')
 				processPlay(row, column, answerRow, answerColumn, answer);
+			else if(answer < 89)
+				processPlay(row, column, answerRow, answerColumn, 300);
 			else
-				processPlay(row, column, answerRow, answerColumn, answer);
+			{
+				answerColumn = (int) player1.at(i)->PosTab%10;
+				answerRow = (int) player1.at(i)->PosTab/10;
+				processPlay(row, column, answerRow, answerColumn, 300);
+			}
 		}else if(player == 1 && flagJog) {
 			cout << "---------------------JOGADOR 1-----------------------" << endl;
 			cout << "Player1"<< endl<< "PECA: "<< answer << endl << "POS: "<< player1.at(i)->PosTab<< endl;
