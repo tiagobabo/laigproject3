@@ -43,7 +43,7 @@
     <texture id="board5" file="textures/board5.bmp" length_s="22.0" length_t="22.0" />
     <texture id="wood" file="textures/wood.bmp" length_s="40.0" length_t="30.0" />
     <texture id="wall" file="textures/wall.bmp" length_s="25.0" length_t="25.0" />
-    <texture id="tile" file="textures/tiles.bmp" length_s="25.0" length_t="25.0" />
+    <texture id="tile" file="textures/wood.bmp" length_s="25.0" length_t="25.0" />
     <texture id="muralhas" file="textures/muralhas.bmp" length_s="4.0" length_t="4.0" />
     <texture id="sandeman" file="textures/sandeman.bmp" length_s="4.0" length_t="4.0" />
     <texture id="malibu" file="textures/malibu.bmp" length_s="4.0" length_t="4.0" />
@@ -115,8 +115,8 @@
 			<texture id="clear"/>
 			<children>
         <objectref id="sala"/>
-        <objectref id="mesa"/>
-        <objectref id="tabuleiro"/>
+        <!--<objectref id="mesa"/>-->
+        <objectref id="tabuleiro"/> 
       </children>
 		</object>
     
@@ -147,6 +147,7 @@
         <objectref id="paredeT"/>
         <objectref id="paredeE"/>
         <objectref id="paredeD"/>
+        <objectref id ="telhado"/>
       </children>
     </object>
 
@@ -699,7 +700,15 @@
       <texture id="wall"/>
       <geometry type="rectangle" x1="-75" y1="-75" x2="75" y2="75" />
     </object>
-
+    <object id="telhado" type="simple">
+      <transformations>
+        <translation x="0.0" y="50.0" z="0.0"/>
+        <rotation axis="x" angle="90" />
+      </transformations>
+      <material id="null"/>
+      <texture id="wall"/>
+      <geometry type="rectangle" x1="-75" y1="-75" x2="75" y2="75" />
+    </object>
     <object id="socket1" type="simple">
       <transformations>
         <translation x="-73.9" y="1.0" z="0.0"/>
@@ -815,11 +824,11 @@
 <!--TABULEIRO & MESA-->
 		<object id="tabuleiro" type="simple">
 			<transformations>
-			<translation x="0.0" y="20.6" z="0.0"/>
+			<translation x="0.0" y="19.6" z="0.0"/>
 			</transformations>
 			<material id="metal"/>
 			<texture id="board5"/>
-			<geometry type="box" dx="22" dy="1" dz="22" />
+			<geometry type="box" dx="22" dy="3.0" dz="22" />
 		</object>
 		<object id="mesa" type="compound">
 			<transformations>
