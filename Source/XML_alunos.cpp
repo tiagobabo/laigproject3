@@ -242,15 +242,53 @@ void aniStartGame(int status){
 	}
 }
 
+void drawPieceTop(){
+	glBegin(GL_POLYGON);
+		glNormal3d(0.0,1.0,0.0);  // esta normal fica comum aos 4 vertices
+		glTexCoord2f(0.0,0.0); glVertex3d( -0.5, 0.0,  0.5);
+		glTexCoord2f(1.0,0.0); glVertex3d(0.5, 0.0,  0.5);
+		glTexCoord2f(1.0,1.0); glVertex3d(0.4, 0.0,  -0.5);
+		glTexCoord2f(0.0,1.0); glVertex3d(-0.4, 0.0,  -0.5);
+	glEnd();
+}
 
-void drawPieceLateral(){
+void drawPieceLateralR(){
+	glBegin(GL_POLYGON);
+		glNormal3d(0.0,1.0,0.0);  // esta normal fica comum aos 4 vertices
+		glTexCoord2f(0.0,0.0); glVertex3d( -0.1, 0.0,  0.5);
+		glTexCoord2f(1.0,0.0); glVertex3d(0.1, 0.0,  0.5);
+		glTexCoord2f(1.0,1.0); glVertex3d(0.1, 0.0,  -0.5);
+		glTexCoord2f(0.0,1.0); glVertex3d(0.0, 0.0,  -0.5);
+	glEnd();
+}
 
+void drawPieceLateralL(){
+	glBegin(GL_POLYGON);
+		glNormal3d(0.0,1.0,0.0);  // esta normal fica comum aos 4 vertices
+		glTexCoord2f(0.0,0.0); glVertex3d( -0.1, 0.0,  0.5);
+		glTexCoord2f(1.0,0.0); glVertex3d(0.1, 0.0,  0.5);
+		glTexCoord2f(1.0,1.0); glVertex3d(0.0, 0.0,  -0.5);
+		glTexCoord2f(0.0,1.0); glVertex3d(-0.1, 0.0,  -0.5);
+	glEnd();
+}
+
+void drawPieceBack(){
 	glBegin(GL_POLYGON);
 		glNormal3d(0.0,1.0,0.0);  // esta normal fica comum aos 4 vertices
 		glTexCoord2f(0.0,0.0); glVertex3d( -0.1, 0.0,  0.5);
 		glTexCoord2f(1.0,0.0); glVertex3d(0.1, 0.0,  0.5);
 		glTexCoord2f(1.0,1.0); glVertex3d(0.1, 0.0,  -0.5);
 		glTexCoord2f(0.0,1.0); glVertex3d(-0.1, 0.0,  -0.5);
+	glEnd();
+}
+
+void drawPieceFront(){
+	glBegin(GL_POLYGON);
+		glNormal3d(0.0,1.0,0.0);  // esta normal fica comum aos 4 vertices
+		glTexCoord2f(0.0,0.0); glVertex3d( -0.05, 0.0,  0.4);
+		glTexCoord2f(1.0,0.0); glVertex3d(0.05, 0.0,  0.4);
+		glTexCoord2f(1.0,1.0); glVertex3d(0.05, 0.0,  -0.4);
+		glTexCoord2f(0.0,1.0); glVertex3d(-0.05, 0.0,  -0.4);
 	glEnd();
 }
 
@@ -267,6 +305,9 @@ void drawPieceSquare(){
 }
 
 void drawPiece(int player, int ghost){
+	double ang = atan(10.0)*180/PI;
+	double ang2 = atan(0.1)*180/PI;
+
 	if(ghost == 1)
 	{
 		glEnable(GL_COLOR_MATERIAL);
@@ -294,28 +335,37 @@ void drawPiece(int player, int ghost){
 	glBindTexture(GL_TEXTURE_2D, player);
 	glPushMatrix();
 	glTranslatef(0.0,0.2,0.0);
-	drawPieceSquare();
+	glTranslatef(0.0,0.0,0.5);
+	glRotatef(-(90.0-ang),1.0,0.0,0.0);
+	glTranslatef(0.0,0.0,-0.5);
+	drawPieceTop();
 	glPopMatrix();
 	glDisable(GL_TEXTURE_2D);
 
 	//Fundo
 	glPushMatrix();
 	glRotatef(180.0, 0.0,0.0,1.0);
-	drawPieceSquare();
+	drawPieceTop();
 	glPopMatrix();
 
 	//Lateral Direita
 	glPushMatrix();
 	glTranslatef(0.5,0.1,0.0);
+	glTranslatef(0.0,0.0,0.5);
+	glRotatef(ang2,0.0,1.0,0.0);
+	glTranslatef(0.0,0.0,-0.5);
 	glRotatef(-90.0, 0.0,0.0,1.0);
-	drawPieceLateral();
+	drawPieceLateralR();
 	glPopMatrix();
 	
 	//Lateral esquerda
 	glPushMatrix();
 	glTranslatef(-0.5,0.1,0.0);
+	glTranslatef(0.0,0.0,0.5);
+	glRotatef(ang2,0.0,-1.0,0.0);
+	glTranslatef(0.0,0.0,-0.5);
 	glRotatef(90.0, 0.0,0.0,1.0);
-	drawPieceLateral();
+	drawPieceLateralL();
 	glPopMatrix();
 	
 	//Tras
@@ -323,15 +373,15 @@ void drawPiece(int player, int ghost){
 	glTranslatef(0.0,0.1,0.5);
 	glRotatef(90.0, 1.0,0.0,0.0);
 	glRotatef(90.0, 0.0,1.0,0.0);
-	drawPieceLateral();
+	drawPieceBack();
 	glPopMatrix();
 	
 	//Frente
 	glPushMatrix();
-	glTranslatef(0.0,0.1,-0.5);
+	glTranslatef(0.0,0.05,-0.5);
 	glRotatef(-90.0, 1.0,0.0,0.0);
 	glRotatef(90.0, 0.0,1.0,0.0);
-	drawPieceLateral();
+	drawPieceFront();
 	glPopMatrix();
 	glEnable(GL_LIGHTING);
 	glDisable (GL_BLEND);
@@ -368,7 +418,7 @@ float rotY = 0, rotX = 0;
 	
 	if (mode == GL_SELECT)
 		glPushName(0);
-	
+
 	//Desenha Zonas do tabuleiro
 	//Linhas
 	for(int i = 0; i<gameRatio; i++){
@@ -405,6 +455,7 @@ float rotY = 0, rotX = 0;
 			glLoadName (200+i);
 			glPushMatrix();
 			glTranslatef(player2.at(i)->x,player2.at(i)->y,player2.at(i)->z);
+			glRotatef(180.0, 0.0,1.0,0.0);
 			drawPiece(2, 0);
 			glPopMatrix();
 		}
@@ -423,28 +474,25 @@ void drawBackground() {
 	glPushMatrix();
 	glLoadIdentity();
 	
+	glEnable(GL_TEXTURE_2D);
 	// No depth buffer writes for background.
 	glDepthMask( false );
-	glEnable(GL_TEXTURE_2D);
-	glBindTexture( GL_TEXTURE_2D, background_text );
-	glBegin(GL_QUADS ); {
-	glTexCoord2f( 0.0f, 0.0f );
-	glVertex2f( 0, 0 );
-	glTexCoord2f( 0.0f, 1.0f );
-	glVertex2f( 0, 1.0f );
-	glTexCoord2f( 1.0f, 1.0f );
-	glVertex2f( 1.0f, 1.0f );
-	glTexCoord2f( 1.0f, 0.0f );
-	  glVertex2f( 1.0f, 0 );
-	}
-	glEnd();
-	glDisable(GL_TEXTURE_2D);
-	glDepthMask( true );
 
+	glBindTexture(GL_TEXTURE_2D,104);
+	glBegin( GL_QUADS );
+	  glTexCoord2f( 0.0, 0.0 ); glVertex2f( 0, 0 );
+	  glTexCoord2f( 0.0, 1.0 ); glVertex2f( 0, 1.0 );
+	  glTexCoord2f( 1.0, 1.0 ); glVertex2f( 1.0, 1.0 );
+	  glTexCoord2f( 1.0, 0.0 ); glVertex2f( 1.0, 0 );
+	glEnd();
+
+	glDepthMask( true );
+	glDisable(GL_TEXTURE_2D);
 	glPopMatrix();
 	glMatrixMode(GL_PROJECTION);
 	glPopMatrix();
 	glMatrixMode(GL_MODELVIEW);
+
 }
 
 int ghost = 0;
@@ -460,17 +508,43 @@ void drawGhosts()
 		temp2[0] = ghosts.c_str()[++j];
 		glPushMatrix();
 		glTranslatef(-8.0+(2*(atoi(temp)-1)),21.2,2*(atoi(temp2)-1)-8);
-		drawPiece(1, 1);
+		if(flagJog)
+			drawPiece(1, 1);
+		else{
+			glRotatef(180.0, 0.0,1.0,0.0);
+			drawPiece(2,1);
+		}
 		glPopMatrix();
 		j++;
 	}
 }
 
+void drawMenuBackground(){
+	/*
+	glEnable(GL_TEXTURE_2D);
+	glBindTexture(GL_TEXTURE_2D, 104);
+	glPushMatrix();
+	glTranslatef(0.0,45.0,30);
+	glRotatef(-45,1.0,0.0,0.0);
+	glTranslatef(0.0,40.0,0.0);
+	glRotatef(90,1.0,0.0,0.0);
+	glBegin(GL_POLYGON);
+		glNormal3d(0.0,1.0,0.0);  // esta normal fica comum aos 4 vertices
+		glTexCoord2f(0.0,0.0); glVertex3d( -75.0, 0.0,  75.0);
+		glTexCoord2f(1.0,0.0); glVertex3d(75.0, 0.0,  75.0);
+		glTexCoord2f(1.0,1.0); glVertex3d(75.0, 0.0,  -75.0);
+		glTexCoord2f(0.0,1.0); glVertex3d(-75.0, 0.0,  -75.0);
+	glEnd();
+	glPopMatrix();
+	glDisable(GL_TEXTURE_2D);
+	*/
+}
 void drawStartGameButton()
 {
 	glEnable(GL_TEXTURE_2D);
 	glBindTexture(GL_TEXTURE_2D, 101);
 	glPushMatrix();
+	//glTranslatef(0.0,0.0,60);
 	glRotatef(-45,1.0,0.0,0.0);
 	glTranslatef(0.0,45.0,30);
 	glRotatef(90,1.0,0.0,0.0);
@@ -534,14 +608,14 @@ void drawMenu(GLenum mode)
 
 	glMatrixMode( GL_MODELVIEW );
 	glLoadIdentity();
-    
+
     glTranslatef( 0, 0, -100 ); 
 	glMultMatrixf(&cena.m[0][0]);
 	
 	if (mode == GL_SELECT)
 		glPushName(0);
-	
-	
+	drawMenuBackground();
+
 	if (mode == GL_SELECT)
 		glLoadName(1);
 	drawStartGameButton();	
@@ -568,7 +642,12 @@ void drawNegation()
 {
 	glPushMatrix();
 	glTranslatef(-8.0+(2*negCol),21.2,2*negRow-8);
-	drawPiece(1, 3);
+	if(flagJog)
+		drawPiece(1, 3);
+	else{
+		glRotatef(180.0, 0.0,1.0,0.0);
+		drawPiece(2,3);
+	}
 	glPopMatrix();
 }
 
@@ -580,7 +659,12 @@ void drawConfirmation()
 {
 	glPushMatrix();
 	glTranslatef(-8.0+(2*confCol),21.2,2*confRow-8);
-	drawPiece(1, 2);
+	if(flagJog)
+		drawPiece(1, 2);
+	else{
+		glRotatef(180.0, 0.0,1.0,0.0);
+		drawPiece(2,2);
+	}
 	glPopMatrix();
 }
 
@@ -588,8 +672,8 @@ void drawConfirmation()
 void inicializacaoPecas()
 {
 	for(int i=0; i< gameRatio; i++){
-		Peca* p1 = new Peca(-8.0+(2*i),21.2,8.0, 80+i);
-		Peca* p2 = new Peca(-8.0+(2*i),21.2,-8.0,i);
+		Peca* p1 = new Peca(-8.0+(2*i),21.1,8.0, 80+i);
+		Peca* p2 = new Peca(-8.0+(2*i),21.1,-8.0,i);
 		player1.push_back(p1);
 		player2.push_back(p2);
 	}
@@ -608,19 +692,18 @@ void terminaJogo()
 
 void display(void)
 {
-	glQ = gluNewQuadric();
-	
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-	// inicializacoes da matriz de visualizacao
-	glMatrixMode( GL_PROJECTION );
-	glLoadIdentity();
-	glFrustum( -xy_aspect*0.04, xy_aspect*0.04, -0.04, 0.04, cena.near2, cena.far2);
-	//inicializacoes da matriz de transformacoes geometricas
-	glMatrixMode( GL_MODELVIEW );
-	glLoadIdentity();
-
-		if(ingame){
+	 glQ = gluNewQuadric();
+        
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        // inicializacoes da matriz de visualizacao
+        glMatrixMode( GL_PROJECTION );
+        glLoadIdentity();
+        glFrustum( -xy_aspect*0.04, xy_aspect*0.04, -0.04, 0.04, cena.near2, cena.far2);
+        //inicializacoes da matriz de transformacoes geometricas
+        glMatrixMode( GL_MODELVIEW );
+        glLoadIdentity();
+		glTranslatef( obj_pos[0], obj_pos[1], -obj_pos[2] );
+        if(ingame){
 			switch(viewSelected){
 				case 0:
 					glTranslatef( 0, 0, -menuFade ); 
@@ -641,43 +724,41 @@ void display(void)
 				default:
 					glMultMatrixf( view_rotate );
 			}
-		}
-		else{
-			glTranslatef(0,0,-100);
-			glMultMatrixf(&cena.m[0][0]);
-			glPopMatrix();
-		}
+        }
+        else{
+            glTranslatef(0,0,-100);
+            glMultMatrixf(&cena.m[0][0]);
+            glPopMatrix();
+        }
 
-		//propriedades das luzes
-		for(int i = 0; i < cena.lights.size(); i++)
-			glLightfv(GL_LIGHT0+i, GL_POSITION, cena.lights.at(i)->position);
-		glEnable(GL_NORMALIZE);
+        //propriedades das luzes
+        for(int i = 0; i < cena.lights.size(); i++)
+            glLightfv(GL_LIGHT0+i, GL_POSITION, cena.lights.at(i)->position);
+        glEnable(GL_NORMALIZE);
 
-		//desenha a cena
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-		glCallList(1);
-	if(ingame && !terminajogo)
-		drawScene(GL_RENDER);
-	else if(!ingame && !terminajogo)
-		drawMenu(GL_RENDER);
-	else
-		terminaJogo();
-	
-	if(ghost)
-		drawGhosts();
-	if(drawConf)
-		drawConfirmation();
+        //desenha a cena
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        glCallList(1);
+        if(ingame && !terminajogo)
+            drawScene(GL_RENDER);
+        else if(!ingame && !terminajogo)
+            drawMenu(GL_RENDER);
+        else
+            terminaJogo();
+        
+        if(ghost)
+            drawGhosts();
+        if(drawConf)
+            drawConfirmation();
 
-	if(drawNeg && negcount < 15)
-	{
-		negcount++;
-		if(negcount%2 == 0)
-			drawNegation();
-	}
-	glDisable(GL_NORMALIZE);
-		glDisable(GL_NORMALIZE);
-	
-		if(ingame)
+        if(drawNeg && negcount < 15){
+            negcount++;
+            if(negcount%2 == 0)
+                drawNegation();
+        }
+        glDisable(GL_NORMALIZE);
+        
+        if(ingame)
 			switch(viewSelected){
 				case 1:
 					showCamera("TOP VIEW");
@@ -689,9 +770,9 @@ void display(void)
 					break;
 			}
 
-		// swapping the buffers causes the rendering above to be shown
-		glutSwapBuffers();
-		glFlush();
+        // swapping the buffers causes the rendering above to be shown
+        glutSwapBuffers();
+        glFlush();
 }
 
 string getMatrixGame(){
@@ -800,26 +881,26 @@ void pecaAniSelect(int status){
 			break;
 		case 1:
 			mouseBlock = true;
-			if(pecaSelected->y-gameSpeed > 21.2){
+			if(pecaSelected->y-gameSpeed > 21.1){
 				pecaSelected->y-=gameSpeed;
 				glutTimerFunc(mili_secs, pecaAniSelect, 1);
 			}
 			else{
 				//end of play
-				pecaSelected->y=21.2;
+				pecaSelected->y=21.1;
 				mouseBlock=false;
 				changePlayer();
 			}
 			break;
 		case 2:
 			mouseBlock = true;
-			if(pecaSelected->y-gameSpeed > 21.2){
+			if(pecaSelected->y-gameSpeed > 21.1){
 				pecaSelected->y-=gameSpeed;
 				glutTimerFunc(mili_secs, pecaAniSelect, 2);
 			}
 			else{
 				//end of play
-				pecaSelected->y=21.2;
+				pecaSelected->y=21.1;
 				mouseBlock=false;
 			}
 			break;
@@ -951,8 +1032,13 @@ void verificaTermino()
 	envia(s2, strlen(s2));
 	char ans[1024];
 	recebe(ans);
+	//responde qual perdeu...
 	if(ans[0] == '1' || ans[0] == '2')
 	{
+		if(ans[0] == '1')
+			cout << "GANHOU O JOGADOR 2 :D " << endl;
+		else
+			cout << "GANHOU O JOGADOR 1 :D " << endl;
 		ingame = 0;
 		terminajogo = 1;
 	}
@@ -995,10 +1081,17 @@ void processPlay(float row, float column, float answerRow, float answerColumn, f
 			cout << "JOGADA INVALIDA!" << endl;
 			cout << "--------------------/JOGADA-----------------------" << endl;
 			pecaAniSelect(2);
-			negCol = answerColumn;
-			negRow = answerRow;
+			if(answer < 100){
+				negCol = answerColumn;
+				negRow = answerRow;
+			}
+			else{
+				negCol = column;
+				negRow = row;
+			}
 			drawNeg = 1;
 			negcount = 0;
+			
 			drawNegation();
 		}
 		pecaSelectedB = false;
@@ -1058,7 +1151,7 @@ void pickingAction(GLuint answer) {
 			if(ans[0] == '1')
 				processPlay(row, column, answerRow, answerColumn, answer);
 			else
-				processPlay(row, column, answerRow, answerColumn, 200);
+				processPlay(row, column, answerRow, answerColumn, answer);
 		}else if(player == 1 && flagJog) {
 			cout << "---------------------JOGADOR 1-----------------------" << endl;
 			cout << "Player1"<< endl<< "PECA: "<< answer << endl << "POS: "<< player1.at(i)->PosTab<< endl;
@@ -1408,6 +1501,8 @@ void inicializacao()
 	pixmap2.setTexture(102);
 	pixmap2.readBMPFile("textures/quit.bmp");
 	pixmap2.setTexture(103);
+	pixmap2.readBMPFile("textures/menu.bmp");
+	pixmap2.setTexture(104);
 	inicializacaoPecas();
 
 	matrixViewPlayer[0][0] = cos(angView);
