@@ -7,6 +7,7 @@
 #include <algorithm>
 #include <numeric>
 #include <iterator>
+#include <sstream>
 
 #include "RGBpixmap.h"
 #include "..\tinyxml.h"

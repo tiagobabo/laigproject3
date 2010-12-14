@@ -11,6 +11,9 @@ int firstGame = 0;
 int gameResolution = 202; //default 640x480
 int switchRecord = 208; //default off
 int switchFullScreen = 208; //default off
+int pontJog1 = 9;
+int pontJog2 = 9;
+
 
 float gameMatrix[gameRatio][gameRatio] = {{0,0,0,0,0,0,0,0,0},{0,0,0,0,0,0,0,0,0},{0,0,0,0,0,0,0,0,0},{0,0,0,0,0,0,0,0,0},{0,0,0,0,0,0,0,0,0},{0,0,0,0,0,0,0,0,0},{0,0,0,0,0,0,0,0,0},{0,0,0,0,0,0,0,0,0},{0,0,0,0,0,0,0,0,0}};
 
@@ -26,11 +29,13 @@ bool flagJog = true;
 
 class Peca{
 public:
+	bool active;
 	float x;
 	float y;
 	float z;
 	float PosTab;
 	Peca(float x, float y, float z, float pos){
+		active = true;
 		this->x=x;
 		this->y=y;
 		this->z=z;
@@ -41,14 +46,15 @@ public:
 
 vector<Peca*> player1;
 vector<Peca*> player2;
-
 //Peca a efectuar o movimento
 Peca* pecaSelected;
 bool pecaSelectedB = false;
+vector<Peca*> pecaConquest;
 //Movimentos a efectuar
 float movH;
 float movV;
 bool mouseBlock = false;
+bool animBlock = false;
 bool Pview = true;
 
 class Jogada{
@@ -58,6 +64,7 @@ public:
 	float fromColumn;
 	float toRow;
 	float toColumn;
+	vector<int> PecasConq;
 	Jogada(float Jog,float fromRow, float fromColumn, float toRow, float toColumn){
 		this->Jog = Jog;
 		this->fromRow = fromRow;
