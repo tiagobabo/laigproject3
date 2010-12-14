@@ -12,7 +12,7 @@ using namespace std;
 RGBpixmap pixmap2;
 
 // dimensoes e localizacao da janela
-#define DIMX 500
+#define DIMX 600
 #define DIMY 500
 #define INITIALPOS_X 200
 #define INITIALPOS_Y 200
@@ -174,7 +174,105 @@ void quit() {
 	recebe(ans);
 }
 
-//Utiliza as estruturas de dados com a informação do xml para construir o plano
+void calcPont(){
+int numPlayer1=0;
+int numPlayer2=0;
+
+	for(int i=0;i<player1.size(); i++)
+	{
+		if(player1.at(i)->active)
+			numPlayer1++;
+		if(player2.at(i)->active)
+			numPlayer2++;
+	}
+
+	pontJog1 = numPlayer1;
+	pontJog2 = numPlayer2;
+	cout << "PLAYER1: " << numPlayer1<< endl;
+	cout << "PLAYER2: " << numPlayer2<< endl;
+
+}
+
+string getMatrixGame(){
+	for(int i=0; i< gameRatio; i++){
+		for(int j=0; j< gameRatio; j++)
+			gameMatrix[i][j]=0;
+	}
+
+	for(int i=0; i<player1.size(); i++){
+		if(player1.at(i)->active){
+			int pos = player1.at(i)->PosTab;
+			int row = pos/10;
+			int column = pos%10;
+			gameMatrix[row][column] = 1;
+		}
+	}
+
+	for(int i=0; i<player2.size(); i++){
+		if(player2.at(i)->active){
+			int pos = player2.at(i)->PosTab;
+			int row = pos/10;
+			int column = pos%10;
+			gameMatrix[row][column] = 2;
+		}
+	}
+	string matrix;
+	matrix += '[';
+	int w = 0;
+	for(w = 0; w < 9; w++)
+	{
+		matrix +='[';
+		for(int z = 0; z < 9; z++)
+		{
+			if(gameMatrix[w][z] == 1)
+				matrix += '1';
+			else if(gameMatrix[w][z] == 2)
+				matrix += '2';
+			else
+				matrix +='0';
+			if(z != 8)
+				matrix += ',';
+		}
+		matrix += ']';
+		if(w != 8)
+			matrix += ',';
+	}
+	matrix += ']';
+	
+	return matrix;
+}
+
+void printMatrixGame(){
+	getMatrixGame();
+	for(int i=0; i< gameRatio; i++){
+		cout << "[";
+		for(int j=0; j< gameRatio; j++){
+			cout<< gameMatrix[i][j] << ",";
+		}
+		cout<< "]" << endl;
+	}
+
+}
+
+void verificaTermino()
+{
+	string matrix = getMatrixGame();
+	char s2[1024];
+	sprintf(s2,"terminouJogo(%s).\n",matrix.c_str());
+	envia(s2, strlen(s2));
+	char ans[1024];
+	recebe(ans);
+	//responde qual perdeu...
+	if(ans[0] == '1' || ans[0] == '2')
+	{
+		if(ans[0] == '1')
+			cout << "GANHOU O JOGADOR 2 :D " << endl;
+		else
+			cout << "GANHOU O JOGADOR 1 :D " << endl;
+		ingame = 0;
+		terminajogo = 1;
+	}
+}
 
 void showCamera(char* camera)
 {
@@ -190,6 +288,27 @@ void showCamera(char* camera)
 	for (int i = 0; i < len; i++)
 	{
 		glutBitmapCharacter(GLUT_BITMAP_HELVETICA_18, camera[i]);
+	}
+	glEnable( GL_LIGHTING );
+}
+
+void showPont(int p,char* pont)
+{
+	glDisable( GL_LIGHTING );  /* Disable lighting while we render text */
+	glMatrixMode( GL_PROJECTION );
+	glLoadIdentity();
+	gluOrtho2D( 0.0, 100.0, 0.0, 100.0  );
+	glMatrixMode( GL_MODELVIEW );
+	glLoadIdentity();
+	glColor3ub( 0.5, 0.3, 0.8 );
+	if(p == 1)
+		glRasterPos2i( 1.0, 1.0);
+	if(p == 2)
+		glRasterPos2i(96.0,1.0);
+	int len = strlen(pont);
+	for (int i = 0; i < len; i++)
+	{
+		glutBitmapCharacter(GLUT_BITMAP_HELVETICA_18, pont[i]);
 	}
 	glEnable( GL_LIGHTING );
 }
@@ -441,24 +560,30 @@ float rotY = 0, rotX = 0;
 
 	//Player1
 	for(int i = 0; i<player1.size(); i++){
+		if(player1.at(i)->active)
+		{		
 			if (mode == GL_SELECT)
-			glLoadName (100+i);
+				glLoadName (100+i);
 			glPushMatrix();
 			glTranslatef(player1.at(i)->x,player1.at(i)->y,player1.at(i)->z);
 			drawPiece(1, 0);
 			glPopMatrix();
 		}
+	}
 
 	//Player2
 	for(int i = 0; i<player2.size(); i++){
+		if(player2.at(i)->active)
+		{
 			if (mode == GL_SELECT)
-			glLoadName (200+i);
+				glLoadName (200+i);
 			glPushMatrix();
 			glTranslatef(player2.at(i)->x,player2.at(i)->y,player2.at(i)->z);
 			glRotatef(180.0, 0.0,1.0,0.0);
 			drawPiece(2, 0);
 			glPopMatrix();
 		}
+	}
 
 	glPopName();
 }
@@ -921,7 +1046,14 @@ void display(void)
         }
         glDisable(GL_NORMALIZE);
         
-        if(ingame)
+        if(ingame){
+			char pont1[2];
+			char pont2[2];
+			itoa(pontJog1, pont1, 10);
+			itoa(pontJog2, pont2, 10);
+			//sprintf(pont1,"%d",pontJog1);
+			showPont(1,pont1);
+			showPont(2,pont2);
 			switch(viewSelected){
 				case 1:
 					showCamera("TOP VIEW");
@@ -933,69 +1065,15 @@ void display(void)
 					break;
 			}
 
+		}
         // swapping the buffers causes the rendering above to be shown
         glutSwapBuffers();
         glFlush();
 }
 
-string getMatrixGame(){
-	for(int i=0; i< gameRatio; i++){
-		for(int j=0; j< gameRatio; j++)
-			gameMatrix[i][j]=0;
-	}
-
-	for(int i=0; i<player1.size(); i++){
-		int pos = player1.at(i)->PosTab;
-		int row = pos/10;
-		int column = pos%10;
-		gameMatrix[row][column] = 1;
-	}
-
-	for(int i=0; i<player2.size(); i++){
-		int pos = player2.at(i)->PosTab;
-		int row = pos/10;
-		int column = pos%10;
-		gameMatrix[row][column] = 2;
-	}
-	string matrix;
-	matrix += '[';
-	int w = 0;
-	for(w = 0; w < 9; w++)
-	{
-		matrix +='[';
-		for(int z = 0; z < 9; z++)
-		{
-			if(gameMatrix[w][z] == 1)
-				matrix += '1';
-			else if(gameMatrix[w][z] == 2)
-				matrix += '2';
-			else
-				matrix +='0';
-			if(z != 8)
-				matrix += ',';
-		}
-		matrix += ']';
-		if(w != 8)
-			matrix += ',';
-	}
-	matrix += ']';
-	
-	return matrix;
-}
-
-void printMatrixGame(){
-	getMatrixGame();
-	for(int i=0; i< gameRatio; i++){
-		cout << "[";
-		for(int j=0; j< gameRatio; j++){
-			cout<< gameMatrix[i][j] << ",";
-		}
-		cout<< "]" << endl;
-	}
-
-}
-
 void changePlayer(){
+	calcPont();
+	verificaTermino();
 	flagJog = !flagJog;
 	processView(0);
 }
@@ -1028,6 +1106,52 @@ Peca* getPiece(float row, float column){
 	return NULL;
 }
 
+
+void pecaAniConquest(int status){
+	animBlock=true;
+		switch(status){
+			case 0:
+				for(int i=0; i<pecaConquest.size();i++){
+					mouseBlock = true;
+					if(pecaConquest.at(i)->y+gameSpeed/2 < 30.0){
+						pecaConquest.at(i)->y+=gameSpeed/2;
+						glutTimerFunc(mili_secs, pecaAniConquest, 0);
+					}
+					else{
+						pecaConquest.at(i)->y=30.0;
+						mouseBlock = false;
+						pecaConquest.at(i)->active=false;
+						//end of play
+						if(i==pecaConquest.size()-1){
+							pecaConquest.clear();
+						}
+					}
+				}
+				break;
+			case 1:
+				for(int i=0; i<pecaConquest.size();i++){
+					cout << i << endl;
+					mouseBlock = true;
+					pecaConquest.at(i)->active=true;
+					if(pecaConquest.at(i)->y-gameSpeed/2 > 21.1){
+						pecaConquest.at(i)->y-=gameSpeed/2;
+						glutTimerFunc(mili_secs, pecaAniConquest, 1);
+					}
+					else{
+						pecaConquest.at(i)->y=21.1;
+						mouseBlock=false;
+						//end of play
+						if(i==pecaConquest.size()-1){
+							pecaConquest.clear();
+						}
+					}
+				}
+				break;
+		}
+		mouseBlock=false;
+	animBlock=false;
+}
+
 void pecaAniSelect(int status){
 	
 	switch(status){
@@ -1052,6 +1176,7 @@ void pecaAniSelect(int status){
 				//end of play
 				pecaSelected->y=21.1;
 				mouseBlock=false;
+				pecaAniConquest(0);
 				changePlayer();
 			}
 			break;
@@ -1065,6 +1190,7 @@ void pecaAniSelect(int status){
 				//end of play
 				pecaSelected->y=21.1;
 				mouseBlock=false;
+				pecaAniConquest(0);
 			}
 			break;
 	}
@@ -1108,45 +1234,47 @@ void pecaAniMovV(int status){
 
 }
 
-void removePiece(int pos){
+int removePiece(int pos)
+{
+	int i=0;
 	vector<Peca*>::iterator it;
 	for(it=player1.begin(); it!=player1.end();it++){
-		if((*it)->PosTab == pos){
-			if(it+1 == player1.end()){
-				player1.pop_back();
-				break;
+		if((*it)->active){
+			if((*it)->PosTab == pos){
+				pecaConquest.push_back(*it);
+				return i;
 			}
-			else
-				it=player1.erase(it);
 		}
+		i++;
 	}
 	
+	i=0;
 	vector<Peca*>::iterator it2;
 	for(it2=player2.begin(); it2!=player2.end();it2++){
-		cout << (*it2)->PosTab << "==" << pos<< endl;
-		if((*it2)->PosTab == pos){
-			if(it2+1 == player2.end()){
-				player2.pop_back();
-				break;
+		if((*it2)->active){
+			if((*it2)->PosTab == pos){
+				pecaConquest.push_back(*it2);
+				return i;
 			}
-			else
-				it2=player2.erase(it2);
 		}
+		i++;
 	}
 }
 
-void changeGameMatrix(float matrix[gameRatio][gameRatio])
+vector<int> changeGameMatrix(float matrix[gameRatio][gameRatio])
 {
+	vector<int> conq;
 	for(int i = 0; i < gameRatio; i++)
 		for(int j = 0; j < gameRatio; j++)
 			if(gameMatrix[i][j] != matrix[i][j]){
 				cout << "encontrei um diferente em: [" << i << "|" << j <<"]" << endl; 
 				int pos = i*10 + j;
-				removePiece(pos);
+				conq.push_back(removePiece(pos));
 			}
+	return conq;
 }
 
-void removePecasConquistadas()
+vector<int> removePecasConquistadas()
 {
 	string matrix = getMatrixGame();
 	char s2[1024];
@@ -1184,62 +1312,71 @@ void removePecasConquistadas()
 			cout << matrix_recebe[i][j] << "," ;
 		cout << endl;
 	}
-	changeGameMatrix(matrix_recebe);
+	return changeGameMatrix(matrix_recebe);
 }
 
-void verificaTermino()
-{
-	string matrix = getMatrixGame();
-	char s2[1024];
-	sprintf(s2,"terminouJogo(%s).\n",matrix.c_str());
-	envia(s2, strlen(s2));
-	char ans[1024];
-	recebe(ans);
-	//responde qual perdeu...
-	if(ans[0] == '1' || ans[0] == '2')
-	{
-		if(ans[0] == '1')
-			cout << "GANHOU O JOGADOR 2 :D " << endl;
-		else
-			cout << "GANHOU O JOGADOR 1 :D " << endl;
-		ingame = 0;
-		terminajogo = 1;
+void checkConquest(int jog, vector<int> conq){
+	cout << "Pecas Conquistadas: " << endl;
+	switch(jog){
+		case 1:
+			for(int i=0; i<conq.size(); i++){
+				pecaConquest.push_back(player2.at(conq.at(i)));
+				pecaAniConquest(1);
+			}
+			break;
+		case 2:
+			for(int j=0; j<conq.size(); j++){
+				pecaConquest.push_back(player1.at(conq.at(i)));
+				pecaAniConquest(1);
+			}
+			break;
+		default:
+			break;
 	}
+
 }
 
 void processPlay(float row, float column, float answerRow, float answerColumn, float answer) {
-	if(answer == -1)
+	if(answer == -1){
 		pecaSelected = getPiece(row,column);
+		pecaSelected->active=true;
+	}
 	Jogada* Jog = new Jogada(getJogador(row,column),row,column,answerRow,answerColumn);
 		if(answerColumn == column && answer < 100){
 			float mov = row - answerRow ;
 			movV = -mov*2 + pecaSelected->z;
 			pecaSelected->PosTab-=mov*10; 
 			cout << "--------------------/JOGADA-----------------------" << endl;
-			if(answer != -1)
-				jogo.insertJog(Jog);
 			confCol = answerColumn;
 			confRow = answerRow;
 			drawConf = 1;
 			drawConfirmation();
 			pecaAniMovV(0);
-			removePecasConquistadas();
+			Jog->PecasConq = removePecasConquistadas();
+			if(answer != -1)
+				jogo.insertJog(Jog);
+			if(!animBlock)
+				pecaAniConquest(0);
 			verificaTermino();
+			calcPont();
 		}else if(row == answerRow && answer < 100){
 			float mov = column - answerColumn ;
 			movH = -mov*2 + pecaSelected->x;
 			pecaSelected->PosTab-=mov*1; 
 			cout << "MOV: " << mov<< endl;
 			cout << "--------------------/JOGADA-----------------------" << endl;
-			if(answer != -1)
-				jogo.insertJog(Jog);
 			confCol = answerColumn;
 			confRow = answerRow;
 			drawConf = 1;
 			drawConfirmation();
 			pecaAniMovH(0);
-			removePecasConquistadas();
+			Jog->PecasConq = removePecasConquistadas();
+			if(answer != -1)
+				jogo.insertJog(Jog);
+			if(!animBlock)
+				pecaAniConquest(0);
 			verificaTermino();
+			calcPont();
 		}else{
 			cout << "JOGADA INVALIDA!" << endl;
 			cout << "--------------------/JOGADA-----------------------" << endl;
@@ -1384,10 +1521,15 @@ void pickingAction(GLuint answer) {
 				switchRecord = 208;
 		}
 		else if(answer == 8){
-			if(switchFullScreen == 208)
+			if(switchFullScreen == 208){
+				glutFullScreen();
 				switchFullScreen = 207;
-			else
+			}
+			else{
+				glutPositionWindow(INITIALPOS_X,INITIALPOS_Y);
+				glutReshapeWindow(DIMX, DIMY); 
 				switchFullScreen = 208;
+			}
 		}
 	}
 
@@ -1418,6 +1560,7 @@ void processHits (GLint hits, GLuint buffer[]) {
 		pickingAction(*answer);
 	
 }
+
 
 struct g_mouseState{
 	bool leftButton;
@@ -1502,6 +1645,7 @@ void processMouse(int button, int state, int x, int y) {
 
 float xant=0, yant = 0, xant2 = 0, yant2 = 0;
 float dir = 1, dir2 = 1;
+
 void processMouseMoved(int x, int y)
 {	
 	if(press == 1)
@@ -1579,7 +1723,6 @@ void reshape(int w, int h)
 	glutPostRedisplay();
 }
 
-
 void keyboard(unsigned char key, int x, int y)
 {
 	switch(key)
@@ -1624,6 +1767,7 @@ void keyboard(unsigned char key, int x, int y)
 	case 'z':
 		if(jogo.getJogo().size() != 0 && !mouseBlock){
 			processPlay(jogo.getJogo().back()->toRow, jogo.getJogo().back()->toColumn, jogo.getJogo().back()->fromRow, jogo.getJogo().back()->fromColumn, -1);
+			checkConquest(jogo.getJogo().back()->Jog,jogo.getJogo().back()->PecasConq);
 			jogo.retrieveLast();
 		}
 	  break;
@@ -1658,8 +1802,6 @@ void myGlutIdle( void )
 //  glui->sync_live();
 
 }
-
-
 
 void inicializacao()
 {
@@ -1817,44 +1959,8 @@ int main(int argc, char* argv[])
    glutMotionFunc(processMouseMoved);
    glutPassiveMotionFunc(processPassiveMouseMoved);   
    GLUI_Master.set_glutSpecialFunc( NULL );
+   GLUI_Master.set_glutIdleFunc(myGlutIdle);
    
-
-
-
-   if(!fullscreen){
-		/*** Create the bottom subwindow ***/
-		glui2 = GLUI_Master.create_glui_subwindow( main_window, GLUI_SUBWINDOW_BOTTOM );
-		glui2->set_main_gfx_window( main_window );
-
-	
-	/* We register the idle callback with GLUI, not with GLUT */
-	GLUI_Master.set_glutIdleFunc( myGlutIdle );
-   
-
-		GLUI_Rotation *view_rot = glui2->add_rotation( "Rotacao", view_rotate );
-		view_rot->set_spin( 1.0 );
-		glui2->add_column( false );
-
-
-		GLUI_Translation *trans_z = 
-		glui2->add_translation( "Zoom", GLUI_TRANSLATION_Z, &obj_pos[2] );
-		trans_z->set_speed( 2 );
-
-
-		/******** Add some controls for lights ********/
-		glui2->add_column( false );
-		for(int i = 0; i < cena.lights.size(); i++)
-		{
-				int ena = cena.lights.at(i)->enabled;
-				glui2->add_checkbox(const_cast<char*> (cena.lights.at(i)->id.c_str()), &ena,
-								200+i, control_cb );
-		}
-		glui2->add_column( false );
-		int enable = 1;
-		glui2->add_checkbox("Visibilidade", &enable,0, visib_control);
-		/* We register the idle callback with GLUI, not with GLUT */
-		GLUI_Master.set_glutIdleFunc( myGlutIdle );
-   }
 
 	inicializacao();
 	char *s = "comando(1, 2).\n";
