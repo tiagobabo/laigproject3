@@ -235,7 +235,7 @@ void processView(int dummy){
 }
 
 void aniStartGame(int status){
-	if(menuFade > 0)
+	if(menuFade > 0 && ingame)
 	{
 		menuFade-=viewSpeed;
 		glutTimerFunc(mili_secs, aniStartGame, 0);
@@ -519,87 +519,204 @@ void drawGhosts()
 	}
 }
 
+void enableTransparent(){
+	glEnable(GL_COLOR_MATERIAL);
+	glColor4f(1.0,1.0,1.0,0.0);
+	glEnable (GL_BLEND); glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	glDisable(GL_LIGHTING);
+}
+
+void disableTransparent(){
+	glEnable(GL_LIGHTING);
+	glDisable (GL_BLEND);
+	glDisable(GL_COLOR_MATERIAL);
+}
+
 void drawMenuBackground(){
-	/*
+	
 	glEnable(GL_TEXTURE_2D);
-	glBindTexture(GL_TEXTURE_2D, 104);
+	glBindTexture(GL_TEXTURE_2D, menuSelected);
 	glPushMatrix();
-	glTranslatef(0.0,45.0,30);
 	glRotatef(-45,1.0,0.0,0.0);
-	glTranslatef(0.0,40.0,0.0);
+	glTranslatef(0.0,0.0,-60.0);
 	glRotatef(90,1.0,0.0,0.0);
 	glBegin(GL_POLYGON);
 		glNormal3d(0.0,1.0,0.0);  // esta normal fica comum aos 4 vertices
-		glTexCoord2f(0.0,0.0); glVertex3d( -75.0, 0.0,  75.0);
-		glTexCoord2f(1.0,0.0); glVertex3d(75.0, 0.0,  75.0);
-		glTexCoord2f(1.0,1.0); glVertex3d(75.0, 0.0,  -75.0);
-		glTexCoord2f(0.0,1.0); glVertex3d(-75.0, 0.0,  -75.0);
+		glTexCoord2f(0.0,0.0); glVertex3d( -100.0, 0.0,  100.0);
+		glTexCoord2f(1.0,0.0); glVertex3d(100.0, 0.0,  100.0);
+		glTexCoord2f(1.0,1.0); glVertex3d(100.0, 0.0,  -100.0);
+		glTexCoord2f(0.0,1.0); glVertex3d(-100.0, 0.0,  -100.0);
 	glEnd();
 	glPopMatrix();
 	glDisable(GL_TEXTURE_2D);
-	*/
+	
 }
 void drawStartGameButton()
 {
-	glEnable(GL_TEXTURE_2D);
-	glBindTexture(GL_TEXTURE_2D, 101);
+	enableTransparent();
 	glPushMatrix();
-	//glTranslatef(0.0,0.0,60);
 	glRotatef(-45,1.0,0.0,0.0);
-	glTranslatef(0.0,45.0,30);
+	glTranslatef(0.0,25.0,30);
 	glRotatef(90,1.0,0.0,0.0);
 	glBegin(GL_POLYGON);
 		glNormal3d(0.0,1.0,0.0);  // esta normal fica comum aos 4 vertices
-		glTexCoord2f(0.0,0.375); glVertex3d( -40.0, 0.0,  10.0);
-		glTexCoord2f(1.0,0.375); glVertex3d(40.0, 0.0,  10.0);
-		glTexCoord2f(1.0,0.625); glVertex3d(40.0, 0.0,  -10.0);
-		glTexCoord2f(0.0,0.625); glVertex3d(-40.0, 0.0,  -10.0);
+		glTexCoord2f(0.0,0.375); glVertex3d( -25.0, 0.0,  5.0);
+		glTexCoord2f(1.0,0.375); glVertex3d(25.0, 0.0,  5.0);
+		glTexCoord2f(1.0,0.625); glVertex3d(25.0, 0.0,  -5.0);
+		glTexCoord2f(0.0,0.625); glVertex3d(-25.0, 0.0,  -5.0);
 	glEnd();
 	glPopMatrix();
-	glDisable(GL_TEXTURE_2D);
+	disableTransparent();
 }
 
 void drawOptionsGameButton()
 {
-	glEnable(GL_TEXTURE_2D);
-	glBindTexture(GL_TEXTURE_2D, 102);
+	enableTransparent();
 	glPushMatrix();
 	glRotatef(-45,1.0,0.0,0.0);
-	glTranslatef(0.0,20.0,30);
+	glTranslatef(0.0,10.0,30);
 	glRotatef(90,1.0,0.0,0.0);
 	glBegin(GL_POLYGON);
 		glNormal3d(0.0,1.0,0.0);  // esta normal fica comum aos 4 vertices
-		glTexCoord2f(0.0,0.375); glVertex3d( -40.0, 0.0,  10.0);
-		glTexCoord2f(1.0,0.375); glVertex3d(40.0, 0.0,  10.0);
-		glTexCoord2f(1.0,0.625); glVertex3d(40.0, 0.0,  -10.0);
-		glTexCoord2f(0.0,0.625); glVertex3d(-40.0, 0.0,  -10.0);
+		glTexCoord2f(0.0,0.375); glVertex3d( -25.0, 0.0,  5.0);
+		glTexCoord2f(1.0,0.375); glVertex3d(25.0, 0.0,  5.0);
+		glTexCoord2f(1.0,0.625); glVertex3d(25.0, 0.0,  -5.0);
+		glTexCoord2f(0.0,0.625); glVertex3d(-25.0, 0.0,  -5.0);
 	glEnd();
 	glPopMatrix();
-	glDisable(GL_TEXTURE_2D);
+	disableTransparent();
+}
 
+void drawHelpGameButton()
+{
+	enableTransparent();
+	glPushMatrix();
+	glRotatef(-45,1.0,0.0,0.0);
+	glTranslatef(0.0,0.0,30);
+	glRotatef(90,1.0,0.0,0.0);
+	glBegin(GL_POLYGON);
+		glNormal3d(0.0,1.0,0.0);  // esta normal fica comum aos 4 vertices
+		glTexCoord2f(0.0,0.375); glVertex3d( -15.0, 0.0,  5.0);
+		glTexCoord2f(1.0,0.375); glVertex3d(15.0, 0.0,  5.0);
+		glTexCoord2f(1.0,0.625); glVertex3d(15.0, 0.0,  -5.0);
+		glTexCoord2f(0.0,0.625); glVertex3d(-15.0, 0.0,  -5.0);
+	glEnd();
+	glPopMatrix();
+	disableTransparent();
+}
+
+void drawCreditsGameButton()
+{
+	enableTransparent();
+	glPushMatrix();
+	glRotatef(-45,1.0,0.0,0.0);
+	glTranslatef(0.0,-15.0,30);
+	glRotatef(90,1.0,0.0,0.0);
+	glBegin(GL_POLYGON);
+		glNormal3d(0.0,1.0,0.0);  // esta normal fica comum aos 4 vertices
+		glTexCoord2f(0.0,0.375); glVertex3d( -20.0, 0.0,  5.0);
+		glTexCoord2f(1.0,0.375); glVertex3d(20.0, 0.0,  5.0);
+		glTexCoord2f(1.0,0.625); glVertex3d(20.0, 0.0,  -5.0);
+		glTexCoord2f(0.0,0.625); glVertex3d(-20.0, 0.0,  -5.0);
+	glEnd();
+	glPopMatrix();
+	disableTransparent();
 }
 
 void drawQuitGameButton()
 {
-	//gluQuadricTexture(glQ, GL_TRUE);
-	glEnable(GL_TEXTURE_2D);
-	glBindTexture(GL_TEXTURE_2D, 103);
+	enableTransparent();
 	glPushMatrix();
 	glRotatef(-45,1.0,0.0,0.0);
-	glTranslatef(0.0,-5.0,30);
+	glTranslatef(0.0,-25.0,30);
 	glRotatef(90,1.0,0.0,0.0);
-	//glScalef(2.0,1.0,1.0);
-	//gluDisk(glQ,0.0,20,50,50);
 	glBegin(GL_POLYGON);
 		glNormal3d(0.0,1.0,0.0);  // esta normal fica comum aos 4 vertices
-		glTexCoord2f(0.0,0.375); glVertex3d( -40.0, 0.0,  10.0);
-		glTexCoord2f(1.0,0.375); glVertex3d(40.0, 0.0,  10.0);
-		glTexCoord2f(1.0,0.625); glVertex3d(40.0, 0.0,  -10.0);
-		glTexCoord2f(0.0,0.625); glVertex3d(-40.0, 0.0,  -10.0);
+		glTexCoord2f(0.0,0.375); glVertex3d( -25.0, 0.0,  5.0);
+		glTexCoord2f(1.0,0.375); glVertex3d(25.0, 0.0,  5.0);
+		glTexCoord2f(1.0,0.625); glVertex3d(25.0, 0.0,  -5.0);
+		glTexCoord2f(0.0,0.625); glVertex3d(-25.0, 0.0,  -5.0);
+	glEnd();
+	glPopMatrix();
+	disableTransparent();
+}
+
+void drawOptionScene()
+{
+	//enableTransparent();
+	glPushMatrix();
+	glRotatef(-45,1.0,0.0,0.0);
+	glTranslatef(20.0,11.0,30);
+	glRotatef(90,1.0,0.0,0.0);
+	glBegin(GL_POLYGON);
+		glNormal3d(0.0,1.0,0.0);  // esta normal fica comum aos 4 vertices
+		glTexCoord2f(0.0,0.375); glVertex3d( -20.0, 0.0,  3.0);
+		glTexCoord2f(1.0,0.375); glVertex3d(20.0, 0.0,  3.0);
+		glTexCoord2f(1.0,0.625); glVertex3d(20.0, 0.0,  -3.0);
+		glTexCoord2f(0.0,0.625); glVertex3d(-20.0, 0.0,  -3.0);
+	glEnd();
+	glPopMatrix();
+	//disableTransparent();
+}
+
+void drawOptionResolution()
+{
+	//enableTransparent();
+	glEnable(GL_TEXTURE_2D);
+	glBindTexture(GL_TEXTURE_2D, gameResolution);
+	glPushMatrix();
+	glRotatef(-45,1.0,0.0,0.0);
+	glTranslatef(20.0,3.0,30);
+	glRotatef(90,1.0,0.0,0.0);
+	glBegin(GL_POLYGON);
+		glNormal3d(0.0,1.0,0.0);  // esta normal fica comum aos 4 vertices
+		glTexCoord2f(0.0,0.0); glVertex3d( -20.0, 0.0,  3.0);
+		glTexCoord2f(1.0,0.0); glVertex3d(20.0, 0.0,  3.0);
+		glTexCoord2f(1.0,(38.0/256.0)); glVertex3d(20.0, 0.0,  -3.0);
+		glTexCoord2f(0.0,(38.0/256.0)); glVertex3d(-20.0, 0.0,  -3.0);
 	glEnd();
 	glPopMatrix();
 	glDisable(GL_TEXTURE_2D);
-	//gluQuadricTexture(glQ, GL_FALSE);
+	//disableTransparent();
+}
+
+void drawOptionBackForward(float x, float y)
+{
+	enableTransparent();
+	glPushMatrix();
+	glRotatef(-45,1.0,0.0,0.0);
+	glTranslatef(x,y,30);
+	glRotatef(90,1.0,0.0,0.0);
+	glBegin(GL_POLYGON);
+		glNormal3d(0.0,1.0,0.0);  // esta normal fica comum aos 4 vertices
+		glTexCoord2f(0.0,0.375); glVertex3d( -3.0, 0.0,  3.0);
+		glTexCoord2f(1.0,0.375); glVertex3d(3.0, 0.0,  3.0);
+		glTexCoord2f(1.0,0.625); glVertex3d(3.0, 0.0,  -3.0);
+		glTexCoord2f(0.0,0.625); glVertex3d(-3.0, 0.0,  -3.0);
+	glEnd();
+	glPopMatrix();
+	disableTransparent();
+}
+
+void drawOptionSwitch(float x, float y, int switchNum)
+{
+	//enableTransparent();
+	glEnable(GL_TEXTURE_2D);
+	glBindTexture(GL_TEXTURE_2D, switchNum);
+	glPushMatrix();
+	glRotatef(-45,1.0,0.0,0.0);
+	glTranslatef(x,y,30);
+	glRotatef(90,1.0,0.0,0.0);
+	glBegin(GL_POLYGON);
+		glNormal3d(0.0,1.0,0.0);  // esta normal fica comum aos 4 vertices
+		glTexCoord2f(0.0,14.0/128.0); glVertex3d( -6.0, 0.0,  3.0);
+		glTexCoord2f(104.0/128.0,14.0/128.0); glVertex3d(6.0, 0.0,  3.0);
+		glTexCoord2f(104.0/128.0,51.0/128.0); glVertex3d(6.0, 0.0,  -3.0);
+		glTexCoord2f(0.0,51.0/128.0); glVertex3d(-6.0, 0.0,  -3.0);
+	glEnd();
+	glPopMatrix();
+	glDisable(GL_TEXTURE_2D);
+	//disableTransparent();
 }
 
 void drawMenu(GLenum mode)
@@ -609,24 +726,68 @@ void drawMenu(GLenum mode)
 	glMatrixMode( GL_MODELVIEW );
 	glLoadIdentity();
 
-    glTranslatef( 0, 0, -100 ); 
+    glTranslatef( 0, 0, -menuFade ); 
 	glMultMatrixf(&cena.m[0][0]);
 	
 	if (mode == GL_SELECT)
 		glPushName(0);
 	drawMenuBackground();
+	if(menuSelected == 100){
 
-	if (mode == GL_SELECT)
-		glLoadName(1);
-	drawStartGameButton();	
+		if (mode == GL_SELECT)
+			glLoadName(1);
+		drawStartGameButton();	
 
-	if (mode == GL_SELECT)
-		glLoadName(2);
-	drawOptionsGameButton();
+		if (mode == GL_SELECT)
+			glLoadName(2);
+		drawOptionsGameButton();
 
-	if (mode == GL_SELECT)
-		glLoadName(3);
-	drawQuitGameButton();
+		if (mode == GL_SELECT)
+			glLoadName(3);
+		drawHelpGameButton();
+
+		if (mode == GL_SELECT)
+			glLoadName(4);
+		drawCreditsGameButton();
+
+		if (mode == GL_SELECT)
+			glLoadName(5);
+		drawQuitGameButton();
+
+	}
+	if(menuSelected == 101){
+		if (mode == GL_SELECT)
+			glLoadName(1);
+		drawOptionScene();
+
+		if (mode == GL_SELECT)
+			glLoadName(2);
+		drawOptionBackForward(-5.0,11.0);
+
+		if (mode == GL_SELECT)
+			glLoadName(3);
+		drawOptionBackForward(45.0,11.0);
+
+		if (mode == GL_SELECT)
+			glLoadName(4);
+		drawOptionResolution();
+
+		if (mode == GL_SELECT)
+			glLoadName(5);
+		drawOptionBackForward(-5.0,3.0);
+
+		if (mode == GL_SELECT)
+			glLoadName(6);
+		drawOptionBackForward(45.0,3.0);
+
+		if (mode == GL_SELECT)
+			glLoadName(7);
+		drawOptionSwitch(20.0,-6.0, switchRecord);
+
+		if (mode == GL_SELECT)
+			glLoadName(8);
+		drawOptionSwitch(20.0,-14.0, switchFullScreen);
+	}
 
 	glPopName();
 
@@ -738,9 +899,11 @@ void display(void)
 
         //desenha a cena
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        glCallList(1);
-        if(ingame && !terminajogo)
-            drawScene(GL_RENDER);
+        
+        if(ingame && !terminajogo){
+            glCallList(1);
+			drawScene(GL_RENDER);
+		}
         else if(!ingame && !terminajogo)
             drawMenu(GL_RENDER);
         else
@@ -1175,19 +1338,57 @@ void pickingAction(GLuint answer) {
 			verificaJogadasPossiveis(2, player2.at(i)->PosTab);
 		}
 	}
-	else{
+	else if(menuSelected == 100)
+	{
 		if(answer == 1){
-			aniStartGame(0);
+			player1.clear();
+			player2.clear();
+			inicializacaoPecas();
+			menuFade = 100;
+			viewSelected = 0;
 			ingame = true;
+			aniStartGame(0);
 			terminajogo = 0;
+			firstGame = 1;
 		}
 		else if(answer == 2)
-			cout << "OPTIONS!" << endl;
-		else if(answer == 3){
+			menuSelected = 101;
+		else if(answer == 3)
+			menuSelected = 102;
+		else if(answer == 4)
+			menuSelected = 103;
+		else if(answer == 5){
 			quit();
 			exit(0);
 		}
 
+	}
+	else if(menuSelected == 101)
+	{
+		if(answer == 5){
+			if(gameResolution > 202)
+				gameResolution--;
+			else
+				gameResolution = 206;
+		}
+		else if(answer == 6){
+			if(gameResolution < 206)
+				gameResolution++;
+			else
+				gameResolution = 202;
+		}
+		else if(answer == 7){
+			if(switchRecord == 208)
+				switchRecord = 207;
+			else
+				switchRecord = 208;
+		}
+		else if(answer == 8){
+			if(switchFullScreen == 208)
+				switchFullScreen = 207;
+			else
+				switchFullScreen = 208;
+		}
 	}
 
 }
@@ -1278,14 +1479,16 @@ void processMouse(int button, int state, int x, int y) {
 			glLoadIdentity ();
 			gluPickMatrix ((GLdouble) x, (GLdouble) (window_h - y), 1.0, 1.0, viewport);
 
-			if(ingame && !terminajogo)
+			if(ingame && !terminajogo){
 				drawScene(GL_SELECT);
+				glCallList(1);
+			}
 			else if(!ingame && !terminajogo)
 				drawMenu(GL_SELECT);
 			else
 				terminaJogo();
 			
-			glCallList(1);
+			
 
 			glMatrixMode (GL_PROJECTION);
 			glPopMatrix ();
@@ -1383,15 +1586,16 @@ void keyboard(unsigned char key, int x, int y)
 	{
      case 27:		// tecla de escape termina o programa
 		 mouseBlock=false;
-		 if(ingame){
-			ingame=false;
-			menuFade = 100;
+		 if(menuSelected != 100)
+			menuSelected = 100;
+		 else if(ingame){
+			 menuFade=100;
+			 ingame = false;
 		 }
-		 else{
-			 quit();
-			 exit(0);
+		 else if(firstGame!=0){
+			 menuFade=0;
+			 ingame=true;
 		 }
-        break;
 	 case 's':
 	  background_text++;
 	  break;
@@ -1501,14 +1705,35 @@ void inicializacao()
 	pixmap2.setTexture(2);
 	pixmap2.readBMPFile("textures/tiles.bmp");
 	pixmap2.setTexture(3);
-	pixmap2.readBMPFile("textures/start.bmp");
-	pixmap2.setTexture(101);
-	pixmap2.readBMPFile("textures/options.bmp");
-	pixmap2.setTexture(102);
-	pixmap2.readBMPFile("textures/quit.bmp");
-	pixmap2.setTexture(103);
 	pixmap2.readBMPFile("textures/menu.bmp");
-	pixmap2.setTexture(104);
+	pixmap2.setTexture(100);
+	pixmap2.readBMPFile("textures/opcoes.bmp");
+	pixmap2.setTexture(101);
+	pixmap2.readBMPFile("textures/regras.bmp");
+	pixmap2.setTexture(102);
+	pixmap2.readBMPFile("textures/creditos.bmp");
+	pixmap2.setTexture(103);
+
+
+	//options
+	pixmap2.readBMPFile("textures/res1.bmp");
+	pixmap2.setTexture(202);
+	pixmap2.readBMPFile("textures/res2.bmp");
+	pixmap2.setTexture(203);
+	pixmap2.readBMPFile("textures/res3.bmp");
+	pixmap2.setTexture(204);
+	pixmap2.readBMPFile("textures/res4.bmp");
+	pixmap2.setTexture(205);
+	pixmap2.readBMPFile("textures/res5.bmp");
+	pixmap2.setTexture(206);
+	pixmap2.readBMPFile("textures/switch_on.bmp");
+	pixmap2.setTexture(207);
+	pixmap2.readBMPFile("textures/switch_off.bmp");
+	pixmap2.setTexture(208);
+
+
+
+
 	inicializacaoPecas();
 
 	matrixViewPlayer[0][0] = cos(angView);

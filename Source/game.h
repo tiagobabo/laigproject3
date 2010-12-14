@@ -1,11 +1,16 @@
-#define gameRatio 9
-#define gameSpeed 0.5
-#define viewSpeed 2
-int viewSelected = 0;
-bool fullscreen = false;
-bool ingame = false;
-int menuFade = 100;
-int terminajogo = 0;
+#define gameRatio 9		//default 9
+#define gameSpeed 0.5	//default 0.5
+#define viewSpeed 2		//default 2
+int viewSelected = 0;	//default 0
+bool fullscreen = false;//default false
+bool ingame = false;	//default false
+int menuFade = 100;		//default 100
+int terminajogo = 0;	//default 0
+int menuSelected = 100;	//default 100
+int firstGame = 0;
+int gameResolution = 202; //default 640x480
+int switchRecord = 208; //default off
+int switchFullScreen = 208; //default off
 
 float gameMatrix[gameRatio][gameRatio] = {{0,0,0,0,0,0,0,0,0},{0,0,0,0,0,0,0,0,0},{0,0,0,0,0,0,0,0,0},{0,0,0,0,0,0,0,0,0},{0,0,0,0,0,0,0,0,0},{0,0,0,0,0,0,0,0,0},{0,0,0,0,0,0,0,0,0},{0,0,0,0,0,0,0,0,0},{0,0,0,0,0,0,0,0,0}};
 
