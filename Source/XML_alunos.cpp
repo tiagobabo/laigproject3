@@ -1478,6 +1478,8 @@ void pickingAction(GLuint answer) {
 	else if(menuSelected == 100)
 	{
 		if(answer == 1){
+			rotX = 0;
+			rotY = 0;
 			player1.clear();
 			player2.clear();
 			inicializacaoPecas();
@@ -1522,12 +1524,12 @@ void pickingAction(GLuint answer) {
 		}
 		else if(answer == 8){
 			if(switchFullScreen == 208){
-				glutFullScreen();
 				switchFullScreen = 207;
+				glutFullScreen();
 			}
 			else{
-				glutPositionWindow(INITIALPOS_X,INITIALPOS_Y);
 				glutReshapeWindow(DIMX, DIMY); 
+				glutPositionWindow(INITIALPOS_X,INITIALPOS_Y);
 				switchFullScreen = 208;
 			}
 		}
