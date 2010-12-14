@@ -12,7 +12,7 @@
     <geometry type="box" dx="40" dy="1" dz="30" />
   -->
   
-  <globals maxlights="3" maxobjects="100" maxtextures="15" maxmaterials="8" root="cena"/>
+  <globals maxlights="3" maxobjects="120" maxtextures="30" maxmaterials="30" root="cena"/>
 
 	<view near="0.1" far="1000.0" axisscale="0.0">
 		<translation x="0.0" z="-50.0" y="-15.0"/>
@@ -42,8 +42,11 @@
     <!-- s e t: factores de escala (ver notas finais) -->
     <texture id="board5" file="textures/board5.bmp" length_s="22.0" length_t="22.0" />
     <texture id="wood" file="textures/wood.bmp" length_s="40.0" length_t="30.0" />
-    <texture id="wall" file="textures/wall.bmp" length_s="25.0" length_t="25.0" />
-    <texture id="tile" file="textures/wood.bmp" length_s="25.0" length_t="25.0" />
+    <texture id="wall" file="textures/wall.bmp" length_s="40.0" length_t="40.0" />
+    <texture id="brick" file="textures/brick.bmp" length_s="40.0" length_t="40.0" />
+    <texture id="chao" file="textures/wall.bmp" length_s="40.0" length_t="40.0" />
+    <texture id="roof" file="textures/roof.bmp" length_s="40.0" length_t="40.0" />
+    <texture id="tile" file="textures/wood.bmp" length_s="40.0" length_t="40.0" />
     <texture id="muralhas" file="textures/muralhas.bmp" length_s="4.0" length_t="4.0" />
     <texture id="sandeman" file="textures/sandeman.bmp" length_s="4.0" length_t="4.0" />
     <texture id="malibu" file="textures/malibu.bmp" length_s="4.0" length_t="4.0" />
@@ -56,12 +59,47 @@
 	<materials>
 		<material id="rio">
 			<emission r="0.0" g="0.0" b="0.0" a="1.0"/>
-			<ambient  r="0.0" g="0.251" b="0.502" a="1.0"/>
-			<diffuse r="0.0" g="0.251" b="0.502" a="1.0"/>
-			<specular r="0.0" g="0.251" b="0.502" a="1.0"/>
+			<ambient  r="0.0" g="0.401" b="0.502" a="1.0"/>
+			<diffuse r="0.0" g="0.401" b="0.502" a="1.0"/>
+			<specular r="0.0" g="0.401" b="0.502" a="1.0"/>
 			<shininess value="128" />
-		</material> 
-		<material id="metal">
+		</material>
+    <material id="arco">
+      <emission r="0.0" g="0.0" b="0.0" a="1.0"/>
+      <ambient  r="0.27" g="0.15" b="0.10" a="1.0"/>
+      <diffuse r="0.27" g="0.15" b="0.10" a="1.0"/>
+      <specular r="0.27" g="0.15" b="0.10" a="1.0"/>
+      <shininess value="128" />
+    </material>
+    <material id="parede">
+      <emission r="0.0" g="0.0" b="0.0" a="1.0"/>
+      <ambient  r="0.91" g="0.62" b="0.20" a="1.0"/>
+      <diffuse r="0.91" g="0.62" b="0.20" a="1.0"/>
+      <specular r="0.91" g="0.62" b="0.20" a="1.0"/>
+      <shininess value="128" />
+    </material>
+    <material id="brick">
+      <emission r="0.0" g="0.0" b="0.0" a="1.0"/>
+      <ambient  r="0.41" g="0.41" b="0.41" a="1.0"/>
+      <diffuse r="0.2" g="0.2" b="0.2" a="1.0"/>
+      <specular r="0.2" g="0.2" b="0.2" a="1.0"/>
+      <shininess value="128" />
+    </material>
+    <material id="tabuleiro">
+      <emission r="0.0" g="0.0" b="0.0" a="1.0"/>
+      <ambient  r="0.9" g="0.9" b="0.9" a="1.0"/>
+      <diffuse r="0.2" g="0.2" b="0.2" a="1.0"/>
+      <specular r="0.2" g="0.2" b="0.2" a="1.0"/>
+      <shininess value="128" />
+    </material>
+    <material id="roof">
+      <emission r="0.0" g="0.0" b="0.0" a="1.0"/>
+      <ambient  r="0.2" g="0.2" b="0.2" a="1.0"/>
+      <diffuse r="0.1" g="0.1" b="0.1" a="1.0"/>
+      <specular r="0.3" g="0.3" b="0.3" a="1.0"/>
+      <shininess value="128" />
+    </material>
+    <material id="metal">
 			<emission r="0.0" g="0.0" b="0.0" a="1.0"/>
 			<ambient  r="0.5" g="0.5" b="0.5" a="1.0"/>
 			<diffuse r="0.5" g="0.5" b="0.5" a="1.0"/>
@@ -70,8 +108,8 @@
 		</material>
     <material id="VidroVerde">
       <emission r="0" g="0" b="0" a="1" />
-      <ambient  r="0.2588" g="0.4745" b="0.1843" a="0.4"/>
-      <diffuse r="0.2588" g="0.4745" b="0.1843" a="0.4"/>
+      <ambient  r="0.4088" g="0.4745" b="0.1843" a="0.4"/>
+      <diffuse r="0.4088" g="0.4745" b="0.1843" a="0.4"/>
       <specular r="1" g="1" b="1" a="0.5" />
       <shininess value="80" />
     </material>
@@ -140,13 +178,21 @@
     <object id="paredes" type="compound">
       <transformations>
       </transformations>
-      <material id="white"/>
-      <texture id="tile"/>
+      <material id="parede"/>
+      <texture id="clear"/>
       <children>
         <objectref id="paredeF"/>
         <objectref id="paredeT"/>
         <objectref id="paredeE"/>
         <objectref id="paredeD"/>
+        <objectref id="paredeDPoste"/>
+        <objectref id="paredeDArco"/>
+        <objectref id="paredeDArco2"/>
+        <objectref id="paredeEArco"/>
+        <objectref id="paredeEArco2"/>
+        <objectref id="paredeDPoste2"/>
+        <objectref id="paredeEPoste"/>
+        <objectref id="paredeEPoste2"/>
         <objectref id ="telhado"/>
       </children>
     </object>
@@ -194,7 +240,7 @@
 
     <object id="estante1" type="compound">
       <transformations>
-        <translation x="0.0" y="30.0" z="-70.0"/>
+        <translation x="0.0" y="40.0" z="-70.0"/>
       </transformations>
       <material id="metal"/>
       <texture id="clear"/>
@@ -206,7 +252,7 @@
 
     <object id="estante2" type="compound">
       <transformations>
-        <translation x="0.0" y="40.0" z="-70.0"/>
+        <translation x="0.0" y="50.0" z="-70.0"/>
       </transformations>
       <material id="metal"/>
       <texture id="clear"/>
@@ -266,7 +312,7 @@
 
     <object id="garrafa4" type="compound">
       <transformations>
-        <translation x="-25.0" y="0.0" z="0.0" />
+        <translation x="-40.0" y="0.0" z="0.0" />
       </transformations>
       <material id="null"/>
       <texture id="null"/>
@@ -633,7 +679,7 @@
         <translation x="0.0" y="10.0" z="-50.0"/>
       </transformations>
       <material id="null"/>
-      <texture id="wood"/>
+      <texture id="clear"/>
       <geometry type="box" dx="100" dy="20" dz="10" />
     </object>
 <!--/BALCAO-->
@@ -641,7 +687,7 @@
 <!--JUKEBOX-->
     <object id="jukebox" type="compound">
       <transformations>
-        <translation x="70.0" y="10.0" z="0.0"/>
+        <translation x="110.0" y="10.0" z="0.0"/>
         <rotation axis="y" angle="-90" />
       </transformations>
       <material id="white"/>
@@ -697,21 +743,21 @@
         <rotation axis="x" angle="-90" />
       </transformations>
       <material id="null"/>
-      <texture id="wall"/>
-      <geometry type="rectangle" x1="-75" y1="-75" x2="75" y2="75" />
+      <texture id="chao"/>
+      <geometry type="rectangle" x1="-120" y1="-120" x2="120" y2="120" />
     </object>
     <object id="telhado" type="simple">
       <transformations>
-        <translation x="0.0" y="50.0" z="0.0"/>
+        <translation x="0.0" y="80.0" z="0.0"/>
         <rotation axis="x" angle="90" />
       </transformations>
-      <material id="null"/>
-      <texture id="wall"/>
-      <geometry type="rectangle" x1="-75" y1="-75" x2="75" y2="75" />
+      <material id="roof"/>
+      <texture id="roof"/>
+      <geometry type="rectangle" x1="-120" y1="-120" x2="120" y2="120" />
     </object>
     <object id="socket1" type="simple">
       <transformations>
-        <translation x="-73.9" y="1.0" z="0.0"/>
+        <translation x="-118.9" y="1.0" z="0.0"/>
         <rotation axis="y" angle="90" />
       </transformations>
       <material id="null"/>
@@ -721,7 +767,7 @@
 
     <object id="televisao" type="simple">
       <transformations>
-        <translation x="74.0" y="35.0" z="40.0"/>
+        <translation x="110.0" y="40.0" z="0.0"/>
         <rotation axis="y" angle="-90" />
       </transformations>
       <material id="white"/>
@@ -731,79 +777,145 @@
 
     <object id="paredeT" type="simple">
       <transformations>
-        <translation x="0.0" y="25.0" z="75.0"/>
+        <translation x="0.0" y="40.0" z="120.0"/>
         <rotation axis="y" angle="180" />
       </transformations>
       <material id="null"/>
       <texture id="null"/>
-      <geometry type="rectangle" x1="-75" y1="-25" x2="75" y2="25" />
+      <geometry type="rectangle" x1="-120" y1="-40" x2="120" y2="40" />
     </object>
 
     <object id="rodapeT" type="simple">
       <transformations>
-        <translation x="0.0" y="1.0" z="74.5"/>
+        <translation x="0.0" y="1.0" z="119.5"/>
       </transformations>
       <material id="null"/>
       <texture id="null"/>
-      <geometry type="box" dx="150.0" dy="2.0" dz="1.0" />
+      <geometry type="box" dx="240.0" dy="2.0" dz="1.0" />
     </object>
 
     <object id="paredeF" type="simple">
       <transformations>
-        <translation x="0.0" y="25.0" z="-75.0"/>
+        <translation x="0.0" y="40.0" z="-120.0"/>
       </transformations>
       <material id="null"/>
       <texture id="null"/>
-      <geometry type="rectangle" x1="-75" y1="-25" x2="75" y2="25" />
+      <geometry type="rectangle" x1="-120" y1="-40" x2="120" y2="40" />
     </object>
 
     <object id="rodapeF" type="simple">
       <transformations>
-        <translation x="0.0" y="1.0" z="-74.5"/>
+        <translation x="0.0" y="1.0" z="-119.5"/>
       </transformations>
       <material id="null"/>
       <texture id="null"/>
-      <geometry type="box" dx="150.0" dy="2.0" dz="1.0" />
+      <geometry type="box" dx="240.0" dy="2.0" dz="1.0" />
     </object>
-      
-    <object id="paredeE" type="simple">
-      <transformations>
-        <translation x="-75.0" y="25.0" z="0.0"/>
-        <rotation axis="y" angle="90" />
-      </transformations>
-      <material id="null"/>
-      <texture id="null"/>
-      <geometry type="rectangle" x1="-75" y1="-25" x2="75" y2="25" />
-    </object>
-
     <object id="rodapeE" type="simple">
       <transformations>
-        <translation x="-74.5" y="1.0" z="0.0"/>
+        <translation x="-119.5" y="1.0" z="0.0"/>
         <rotation axis="y" angle="90" />
       </transformations>
       <material id="null"/>
       <texture id="null"/>
-      <geometry type="box" dx="150.0" dy="2.0" dz="1.0" />
-    </object>
-      
+      <geometry type="box" dx="240.0" dy="2.0" dz="1.0" />
+    </object>  
     <object id="paredeD" type="simple">
       <transformations>
-        <translation x="75.0" y="25.0" z="0.0"/>
+        <translation x="119.5" y="40.0" z="0.0"/>
         <rotation axis="y" angle="-90" />
       </transformations>
       <material id="null"/>
       <texture id="null"/>
-      <geometry type="rectangle" x1="-75" y1="-25" x2="75" y2="25" />
+      <geometry type="rectangle" x1="-120" y1="-40" x2="120" y2="40" />
     </object>
-
+    <object id="paredeDPoste2" type="simple">
+      <transformations>
+        <translation x="119.5" y="40.0" z="-60.0"/>
+        <rotation axis="y" angle="-90" />
+      </transformations>
+      <material id="brick"/>
+      <texture id="brick"/>
+      <geometry type="box" dx="20" dy="80" dz="10" />
+    </object>
+    
+    <object id="paredeDPoste" type="simple">
+      <transformations>
+        <translation x="119.5" y="40.0" z="60.0"/>
+        <rotation axis="y" angle="-90" />
+      </transformations>
+      <material id="brick"/>
+      <texture id="brick"/>
+      <geometry type="box" dx="20" dy="80" dz="10" />
+    </object>
+    <object id="paredeDArco" type="simple">
+      <transformations>
+      </transformations>
+      <material id="arco"/>
+      <texture id="brick"/>
+      <geometry type="triangle" x1="115.5" y1="80.0" z1="60.0" x3="115.5" y3="40.0" z3="60.0" x2="115.5" y2="80.0" z2="-60" />
+    </object>
+    <object id="paredeDArco2" type="simple">
+      <transformations>
+      </transformations>
+      <material id="arco"/>
+      <texture id="brick"/>
+      <geometry type="triangle" x1="115.5" y1="80.0" z1="60.0" x3="115.5" y3="40.0" z3="-60.0" x2="115.5" y2="80.0" z2="-60" />
+    </object>
+     <object id="paredeEArco" type="simple">
+      <transformations>
+        <translation x="-115.5" y="40.0" z="0.0"/>
+        <rotation axis="y" angle="180" />
+      </transformations>
+      <material id="arco"/>
+      <texture id="brick"/>
+      <geometry type="triangle" x1="0.0" y1="40.0" z1="60.0" x3="0.0" y3="0.0" z3="60.0" x2="0.0" y2="40.0" z2="-60" />
+    </object>
+    <object id="paredeEArco2" type="simple">
+      <transformations>
+        <translation x="-115.5" y="40.0" z="0.0"/>
+        <rotation axis="y" angle="180" />
+      </transformations>
+      <material id="arco"/>
+      <texture id="brick"/>
+      <geometry type="triangle" x1="0.0" y1="40.0" z1="60.0" x3="0.0" y3="0.0" z3="-60.0" x2="0.0" y2="40.0" z2="-60" />
+    </object>
+    <object id="paredeE" type="simple">
+      <transformations>
+        <translation x="-120.0" y="40.0" z="0.0"/>
+        <rotation axis="y" angle="90" />
+      </transformations>
+      <material id="null"/>
+      <texture id="null"/>
+      <geometry type="rectangle" x1="-120" y1="-40" x2="120" y2="40" />
+    </object>
+    <object id="paredeEPoste" type="simple">
+      <transformations>
+        <translation x="-118.0" y="40.0" z="60.0"/>
+        <rotation axis="y" angle="-90" />
+      </transformations>
+      <material id="brick"/>
+      <texture id="brick"/>
+      <geometry type="box" dx="20" dy="80" dz="10" />
+    </object>
+    <object id="paredeEPoste2" type="simple">
+      <transformations>
+        <translation x="-118.0" y="40.0" z="-60.0"/>
+        <rotation axis="y" angle="-90" />
+      </transformations>
+      <material id="brick"/>
+      <texture id="brick"/>
+      <geometry type="box" dx="20" dy="80" dz="10" />
+    </object>
+    
     <object id="rodapeD" type="simple">
       <transformations>
-        <translation x="74.5" y="1.0" z="0.0"/>
+        <translation x="119.5" y="1.0" z="0.0"/>
         <rotation axis="y" angle="-90" />
       </transformations>
       <material id="null"/>
       <texture id="null"/>
-      <geometry type="box" dx="150.0" dy="2.0" dz="1.0" />
+      <geometry type="box" dx="240.0" dy="2.0" dz="1.0" />
     </object>
 <!--/CHAO & PAREDES-->
     
@@ -811,7 +923,7 @@
 
     <object id="VanGogh" type="simple">
       <transformations>
-        <translation x="-74.9" y="35.0" z="0.0"/>
+        <translation x="-119.9" y="35.0" z="0.0"/>
         <rotation axis="y" angle="90" />
       </transformations>
       <material id="null"/>
@@ -826,7 +938,7 @@
 			<transformations>
 			<translation x="0.0" y="19.6" z="0.0"/>
 			</transformations>
-			<material id="metal"/>
+			<material id="tabuleiro"/>
 			<texture id="board5"/>
 			<geometry type="box" dx="22" dy="3.0" dz="22" />
 		</object>
