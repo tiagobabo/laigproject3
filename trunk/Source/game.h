@@ -64,7 +64,7 @@ public:
 	float fromColumn;
 	float toRow;
 	float toColumn;
-	vector<int> PecasConq;
+	vector<Peca*> PecasConq;
 	Jogada(float Jog,float fromRow, float fromColumn, float toRow, float toColumn){
 		this->Jog = Jog;
 		this->fromRow = fromRow;

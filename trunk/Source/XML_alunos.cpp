@@ -1093,6 +1093,20 @@ int getJogador(float row, float column)
 
 }
 
+int getJogador2(float pos)
+{
+	for(int i=0; i<player1.size(); i++){
+		if(player1.at(i)->PosTab == pos)
+			return 1;
+	}
+	for(int i=0; i<player2.size(); i++){
+		if(player2.at(i)->PosTab == pos)
+			return 2;
+	}
+	return 0;
+
+}
+
 Peca* getPiece(float row, float column){
 	float pos = 10*row + column;
 	for(int i=0; i<player1.size(); i++){
@@ -1119,31 +1133,29 @@ void pecaAniConquest(int status){
 					}
 					else{
 						pecaConquest.at(i)->y=30.0;
-						mouseBlock = false;
 						pecaConquest.at(i)->active=false;
-						//end of play
-						if(i==pecaConquest.size()-1){
+						if(i==pecaConquest.size()-1)
 							pecaConquest.clear();
-						}
+						mouseBlock = false;
+						//end of play
 					}
 				}
 				break;
 			case 1:
 				for(int i=0; i<pecaConquest.size();i++){
-					cout << i << endl;
+					cout << pecaConquest.at(i)->y << endl;
 					mouseBlock = true;
 					pecaConquest.at(i)->active=true;
-					if(pecaConquest.at(i)->y-gameSpeed/2 > 21.1){
-						pecaConquest.at(i)->y-=gameSpeed/2;
+					if(pecaConquest.at(i)->y-gameSpeed > 21.1){
+						pecaConquest.at(i)->y-=gameSpeed;
 						glutTimerFunc(mili_secs, pecaAniConquest, 1);
 					}
 					else{
 						pecaConquest.at(i)->y=21.1;
+						if(i==pecaConquest.size()-1)
+							pecaConquest.clear();
 						mouseBlock=false;
 						//end of play
-						if(i==pecaConquest.size()-1){
-							pecaConquest.clear();
-						}
 					}
 				}
 				break;
@@ -1234,7 +1246,7 @@ void pecaAniMovV(int status){
 
 }
 
-int removePiece(int pos)
+Peca* removePiece(int pos)
 {
 	int i=0;
 	vector<Peca*>::iterator it;
@@ -1242,7 +1254,7 @@ int removePiece(int pos)
 		if((*it)->active){
 			if((*it)->PosTab == pos){
 				pecaConquest.push_back(*it);
-				return i;
+				return (*it);
 			}
 		}
 		i++;
@@ -1254,16 +1266,16 @@ int removePiece(int pos)
 		if((*it2)->active){
 			if((*it2)->PosTab == pos){
 				pecaConquest.push_back(*it2);
-				return i;
+				return (*it2);
 			}
 		}
 		i++;
 	}
 }
 
-vector<int> changeGameMatrix(float matrix[gameRatio][gameRatio])
+vector<Peca*> changeGameMatrix(float matrix[gameRatio][gameRatio])
 {
-	vector<int> conq;
+	vector<Peca*> conq;
 	for(int i = 0; i < gameRatio; i++)
 		for(int j = 0; j < gameRatio; j++)
 			if(gameMatrix[i][j] != matrix[i][j]){
@@ -1274,7 +1286,7 @@ vector<int> changeGameMatrix(float matrix[gameRatio][gameRatio])
 	return conq;
 }
 
-vector<int> removePecasConquistadas()
+vector<Peca*> removePecasConquistadas()
 {
 	string matrix = getMatrixGame();
 	char s2[1024];
@@ -1315,31 +1327,23 @@ vector<int> removePecasConquistadas()
 	return changeGameMatrix(matrix_recebe);
 }
 
-void checkConquest(int jog, vector<int> conq){
-	cout << "Pecas Conquistadas: " << endl;
-	switch(jog){
-		case 1:
-			for(int i=0; i<conq.size(); i++){
-				pecaConquest.push_back(player2.at(conq.at(i)));
-				pecaAniConquest(1);
-			}
-			break;
-		case 2:
-			for(int j=0; j<conq.size(); j++){
-				pecaConquest.push_back(player1.at(conq.at(i)));
-				pecaAniConquest(1);
-			}
-			break;
-		default:
-			break;
+void checkConquest(vector<Peca*> conq){
+	cout << "Pecas Conquistadas: " << conq.size() << endl;
+	for(int i=0; i<conq.size(); i++){
+		int jog=getJogador2(conq.at(i)->PosTab);
+		if(jog==1)
+			pecaConquest.push_back(conq.at(i));
+		else if(jog==2)
+			pecaConquest.push_back(conq.at(i));
 	}
+	pecaAniConquest(1);
 
 }
 
 void processPlay(float row, float column, float answerRow, float answerColumn, float answer) {
 	if(answer == -1){
 		pecaSelected = getPiece(row,column);
-		pecaSelected->active=true;
+		//pecaSelected->active=true;
 	}
 	Jogada* Jog = new Jogada(getJogador(row,column),row,column,answerRow,answerColumn);
 		if(answerColumn == column && answer < 100){
@@ -1355,8 +1359,6 @@ void processPlay(float row, float column, float answerRow, float answerColumn, f
 			Jog->PecasConq = removePecasConquistadas();
 			if(answer != -1)
 				jogo.insertJog(Jog);
-			if(!animBlock)
-				pecaAniConquest(0);
 			verificaTermino();
 			calcPont();
 		}else if(row == answerRow && answer < 100){
@@ -1373,8 +1375,6 @@ void processPlay(float row, float column, float answerRow, float answerColumn, f
 			Jog->PecasConq = removePecasConquistadas();
 			if(answer != -1)
 				jogo.insertJog(Jog);
-			if(!animBlock)
-				pecaAniConquest(0);
 			verificaTermino();
 			calcPont();
 		}else{
@@ -1767,7 +1767,7 @@ void keyboard(unsigned char key, int x, int y)
 	case 'z':
 		if(jogo.getJogo().size() != 0 && !mouseBlock){
 			processPlay(jogo.getJogo().back()->toRow, jogo.getJogo().back()->toColumn, jogo.getJogo().back()->fromRow, jogo.getJogo().back()->fromColumn, -1);
-			checkConquest(jogo.getJogo().back()->Jog,jogo.getJogo().back()->PecasConq);
+			checkConquest(jogo.getJogo().back()->PecasConq);
 			jogo.retrieveLast();
 		}
 	  break;
