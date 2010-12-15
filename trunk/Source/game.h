@@ -13,6 +13,8 @@ int switchRecord = 208; //default off
 int switchFullScreen = 208; //default off
 int pontJog1 = 9;
 int pontJog2 = 9;
+int numPlayRecord = 0;
+bool Record = false;
 
 
 float gameMatrix[gameRatio][gameRatio] = {{0,0,0,0,0,0,0,0,0},{0,0,0,0,0,0,0,0,0},{0,0,0,0,0,0,0,0,0},{0,0,0,0,0,0,0,0,0},{0,0,0,0,0,0,0,0,0},{0,0,0,0,0,0,0,0,0},{0,0,0,0,0,0,0,0,0},{0,0,0,0,0,0,0,0,0},{0,0,0,0,0,0,0,0,0}};
@@ -81,6 +83,7 @@ public:
 	void printJogo(void);
 	vector<Jogada*> getJogo(void);
 	void retrieveLast(void);
+	void reset(void);
 	Jogo(){}
 
 };
@@ -105,4 +108,8 @@ vector<Jogada*> Jogo::getJogo(void){
 
 void Jogo::retrieveLast(void){
 	this->Jogadas.pop_back();
+}
+
+void Jogo::reset(void){
+	this->Jogadas.clear();
 }
