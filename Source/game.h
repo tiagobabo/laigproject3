@@ -16,7 +16,10 @@ int pontJog2 = 9;
 int numPlayRecord = 0;
 bool Record = false;
 bool RecordNext = false;
-
+int modoCPU = 1;
+int pedeJogadaCPU = 1;
+int CPUMode1 = 0;
+int CPUMode2 = 1;
 
 float gameMatrix[gameRatio][gameRatio] = {{0,0,0,0,0,0,0,0,0},{0,0,0,0,0,0,0,0,0},{0,0,0,0,0,0,0,0,0},{0,0,0,0,0,0,0,0,0},{0,0,0,0,0,0,0,0,0},{0,0,0,0,0,0,0,0,0},{0,0,0,0,0,0,0,0,0},{0,0,0,0,0,0,0,0,0},{0,0,0,0,0,0,0,0,0}};
 

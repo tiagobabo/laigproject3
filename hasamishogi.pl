@@ -465,6 +465,7 @@ server:-
 % wait for commands
 serverLoop(Stream) :-
 	repeat,
+	write('loop'),nl,
 	read(Stream, ClientMsg),
 	write('Received: '), write(ClientMsg), nl,
 	parse_input(ClientMsg, MyReply),
@@ -486,8 +487,8 @@ parse_input(jogadasPossiveis(Jog,X,Y,T), Res) :-
 	findall(Xf-Yf, verificaCaminho(Jog, X,Y,Xf,Yf, T), Res).	
 
 parse_input(conquistas(T), Res):-
-	conquistaPecas(T, TNovo, 1),
-	conquistaPecas(TNovo, Res, 2).
+	conquistaPecas(T, TNovo, 2),
+	conquistaPecas(TNovo, Res, 1),!.
 
 parse_input(terminouJogo(T), 1):-
 	terminouJogoaux(T,1,1,0,1), !.
@@ -500,25 +501,23 @@ parse_input(terminouJogo(_), 0).
 parse_input(jogada(J,X,Y,Xf,Yf,T) , Res):-
 	modificaT(J,X-Y-Xf-Yf,T,Res).
 
-parse_input(modoIntermedio(T, Jogador), Res):-
+parse_input(modoIntermedio(T, Jogador), M):-
 	greedy(T,L,1,X, Jogador),
 	((L == X,
 	findall(X-Y-Xf-Yf, verificaCaminho(Jogador, X,Y,Xf,Yf, T),L1),
-	choose(L1,M1),escolheNaoSuicida(T,Jogador,L1,M1,M));choose(L,M)),
-	modificaT(Jogador,M,T, Res), !.
+	choose(L1,M1),escolheNaoSuicida(T,Jogador,L1,M1,M));choose(L,M)), !.
 
-parse_input(modoFacil(T, Jogador), Res):-
+parse_input(modoFacil(T, Jogador), M):-
 	findall(X-Y-Xf-Yf, verificaCaminho(Jogador, X,Y,Xf,Yf, T), L),
-	choose(L, M), modificaT(Jogador,M,T, Res), !.
+	choose(L, M), !.
 	
-parse_input(modoDificil(T, Jogador), Res):-
+parse_input(modoDificil(T, Jogador), M):-
 	countPieces(Jogador,T,NPecas),
 	findall(X-Y-Xf-Yf, verificaCaminho(Jogador, X,Y,Xf,Yf, T),L),
 	shuffle(L,[Head|L2]),
 	if(NPecas < 5,
 	evaluate_and_choose(Jogador,L2,T,2,1,(Head,-1000),(M,_)),
-   	evaluate_and_choose(Jogador,L2,T,0,1,(Head,-1000),(M,_))),
-    modificaT(Jogador,M,T, Res), !.
+   	evaluate_and_choose(Jogador,L2,T,0,1,(Head,-1000),(M,_))), !.
 	
 parse_input(quit, ok-bye) :- !.
 

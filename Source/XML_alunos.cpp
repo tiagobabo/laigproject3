@@ -984,8 +984,53 @@ void terminaJogo()
 	terminajogo = 0;
 	menuFade = 100;
 }
-
-
+Peca* getPiece(float row, float column);
+void changePlayer();
+void processaJogadaCPU()
+{
+	pedeJogadaCPU = 0;
+	string matrix = getMatrixGame();
+	char s2[1024];
+	if(flagJog)
+	{
+		switch(CPUMode1)
+		{
+		case 0:
+			sprintf(s2,"modoFacil(%s,%d).\n",matrix.c_str(), 1);
+			break;
+		case 1:
+			sprintf(s2,"modoIntermedio(%s,%d).\n",matrix.c_str(), 1);
+			break;
+		case 3:
+			sprintf(s2,"modoDificil(%s,%d).\n",matrix.c_str(), 1);
+			break;
+		}
+	}
+	else
+	{
+		switch(CPUMode2)
+		{
+		case 0:
+			sprintf(s2,"modoFacil(%s,%d).\n",matrix.c_str(), 2);
+			break;
+		case 1:
+			sprintf(s2,"modoIntermedio(%s,%d).\n",matrix.c_str(), 2);
+			break;
+		case 3:
+			sprintf(s2,"modoDificil(%s,%d).\n",matrix.c_str(), 2);
+			break;
+		}
+	}
+	envia(s2, strlen(s2));
+	char ans[1024];
+	recebe(ans);
+	int column = atoi(&ans[0])-1;
+	int row = atoi(&ans[2])-1;
+	int column2 = atoi(&ans[4])-1;
+	int row2 = atoi(&ans[6])-1;
+	cout << row << endl << column << endl << row2 << endl << column2 << endl;
+	processPlay(row,column, row2, column2,-1);
+}
 void display(void)
 {
 	 glQ = gluNewQuadric();
@@ -1044,16 +1089,25 @@ void display(void)
         else
             terminaJogo();
         
-        if(ghost)
-            drawGhosts();
-        if(drawConf)
-            drawConfirmation();
+		if(ingame && modoCPU)
+		{
+			mouseBlock=false;
+			if(pedeJogadaCPU)
+				processaJogadaCPU();
+		}
+		else
+		{
+			if(ghost)
+				drawGhosts();
+			if(drawConf)
+				drawConfirmation();
 
-        if(drawNeg && negcount < 15){
-            negcount++;
-            if(negcount%2 == 0)
-                drawNegation();
-        }
+			if(drawNeg && negcount < 15){
+				negcount++;
+				if(negcount%2 == 0)
+					drawNegation();
+			}
+		}
         glDisable(GL_NORMALIZE);
         
         if(ingame){
@@ -1134,7 +1188,9 @@ void pecaAniConquest(int status){
 	animBlock=true;
 		switch(status){
 			case 0:
-				for(int i=0; i<pecaConquest.size();i++){
+				{
+				int i = 0;
+				for(i; i<pecaConquest.size();i++){
 					if(pecaConquest.at(i)->y+gameSpeed/2 < 30.0){
 						pecaConquest.at(i)->y+=gameSpeed/2;
 						glutTimerFunc(mili_secs, pecaAniConquest, 0);
@@ -1151,9 +1207,13 @@ void pecaAniConquest(int status){
 							pecaConquest.clear();
 							changePlayer();
 							mouseBlock=false;
+							//cout << "ENTREI" << endl;
+							pedeJogadaCPU = 1;
 						}
 						//end of play
 					}
+				}
+				if(i == 0) pedeJogadaCPU = 1;
 				}
 				break;
 			case 1:
