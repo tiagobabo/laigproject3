@@ -107,6 +107,10 @@ GLUquadric* glQ;	// nec. p/ criar sup. quadraticas (cilindros, esferas...)
 
 SOCKET m_socket;
 
+void processPlay(float row, float column, float answerRow, float answerColumn, float answer);
+void checkConquest(vector<Peca*> conq);
+
+
 bool socketConnect() {// Initialize Winsock.
     WSADATA wsaData;
     int iResult = WSAStartup(MAKEWORD(2,2), &wsaData);
@@ -924,6 +928,8 @@ void drawMenu(GLenum mode)
 int drawNeg = 0, negcount = 0;
 float negCol, negRow;
 
+
+//Draws the Negation of a movement
 void drawNegation()
 {
 	glPushMatrix();
@@ -941,6 +947,7 @@ void drawNegation()
 int drawConf = 0;
 float confCol, confRow;
 
+//Draws the Confirmations of a movement
 void drawConfirmation()
 {
 	glPushMatrix();
@@ -954,7 +961,7 @@ void drawConfirmation()
 	glPopMatrix();
 }
 
-
+//Initializes the pieces of the game
 void inicializacaoPecas()
 {
 	for(int i=0; i< gameRatio; i++){
@@ -965,6 +972,7 @@ void inicializacaoPecas()
 	}
 }
 
+//Ends the game in progress
 void terminaJogo()
 {
 	player1.clear();
@@ -975,6 +983,7 @@ void terminaJogo()
 	terminajogo = 0;
 	menuFade = 100;
 }
+
 
 void display(void)
 {
@@ -1120,7 +1129,6 @@ Peca* getPiece(float row, float column){
 	return NULL;
 }
 
-
 void pecaAniConquest(int status){
 	animBlock=true;
 		switch(status){
@@ -1134,8 +1142,12 @@ void pecaAniConquest(int status){
 					else{
 						pecaConquest.at(i)->y=30.0;
 						pecaConquest.at(i)->active=false;
-						if(i==pecaConquest.size()-1)
+						if(i==pecaConquest.size()-1){
+							if(Record && numPlayRecord < jogo.getJogo().size()){
+								processPlay(jogo.getJogo().at(numPlayRecord)->fromRow, jogo.getJogo().at(numPlayRecord)->fromColumn, jogo.getJogo().at(numPlayRecord)->toRow, jogo.getJogo().at(numPlayRecord)->toColumn, -1);
+							}
 							pecaConquest.clear();
+						}
 						mouseBlock = false;
 						//end of play
 					}
@@ -1188,6 +1200,10 @@ void pecaAniSelect(int status){
 				//end of play
 				pecaSelected->y=21.1;
 				mouseBlock=false;
+				numPlayRecord++;
+				if(pecaConquest.size()==0 && Record && numPlayRecord < jogo.getJogo().size()){
+					processPlay(jogo.getJogo().at(numPlayRecord)->fromRow, jogo.getJogo().at(numPlayRecord)->fromColumn, jogo.getJogo().at(numPlayRecord)->toRow, jogo.getJogo().at(numPlayRecord)->toColumn, -1);
+				}
 				pecaAniConquest(0);
 				changePlayer();
 			}
@@ -1416,6 +1432,40 @@ void verificaJogadasPossiveis(int jog, int pos)
 	ghosts = res;
 }
 
+//Starts a new game
+void startNewGame(int New)
+{
+	//resetDeclarations
+	terminajogo = 0;
+	firstGame = 1;
+	//resetPlayers
+	flagJog=1;
+	player1.clear();
+	player2.clear();
+	//resetCameras
+	rotX = 0;
+	rotY = 0;
+	viewSelected = 0;
+	menuFade = 100;
+	processView(0);
+	//startNewGame
+	if(New)
+		jogo.reset();
+	inicializacaoPecas();
+	ingame = true;
+	aniStartGame(0);
+}
+
+//Play the record of the game in progress
+void gameRecordPlay()
+{
+	startNewGame(0);
+	numPlayRecord = 0;
+	Record=true;
+		processPlay(jogo.getJogo().at(numPlayRecord)->fromRow, jogo.getJogo().at(numPlayRecord)->fromColumn, jogo.getJogo().at(numPlayRecord)->toRow, jogo.getJogo().at(numPlayRecord)->toColumn, -1);
+		checkConquest(jogo.getJogo().at(numPlayRecord)->PecasConq);
+}
+
 // ACÇÃO DO PICKING
 void pickingAction(GLuint answer) {
 	
@@ -1478,17 +1528,7 @@ void pickingAction(GLuint answer) {
 	else if(menuSelected == 100)
 	{
 		if(answer == 1){
-			rotX = 0;
-			rotY = 0;
-			player1.clear();
-			player2.clear();
-			inicializacaoPecas();
-			menuFade = 100;
-			viewSelected = 0;
-			ingame = true;
-			aniStartGame(0);
-			terminajogo = 0;
-			firstGame = 1;
+			startNewGame(1);
 		}
 		else if(answer == 2)
 			menuSelected = 101;
@@ -1571,8 +1611,8 @@ struct g_mouseState{
 	int x;
 	int y;
 } MouseState;
-int press = 0;
 /* Mouse handling */
+int press = 0;
 void processMouse(int button, int state, int x, int y) {
 	
 	if(!mouseBlock)
@@ -1741,38 +1781,42 @@ void keyboard(unsigned char key, int x, int y)
 			 menuFade=0;
 			 ingame=true;
 		 }
-	 case 's':
-	  background_text++;
-	  break;
+		 break;
+	case 's':
+		background_text++;
+		break;
 	case 'a':
 	  background_text--;
-	  break;
+		break;
 	case '-':
 		player1.at(0)->z-=1;
-	  break;
+		break;
 	case '+':
 		inicializacaoPecas();
-	  break;
+		break;
 	case 'p':
 		jogo.printJogo();
 		printMatrixGame();
-	  break;
+		break;
+	case 'r':
+		gameRecordPlay();
+		break;
 	case '1':
 		viewSelected = 0;
-	break;
+		break;
 	case '2':
 		viewSelected = 1;
-	break;
+		break;
 	case '3':
 		viewSelected = 2;
-	break;
+		break;
 	case 'z':
 		if(jogo.getJogo().size() != 0 && !mouseBlock){
 			processPlay(jogo.getJogo().back()->toRow, jogo.getJogo().back()->toColumn, jogo.getJogo().back()->fromRow, jogo.getJogo().back()->fromColumn, -1);
 			checkConquest(jogo.getJogo().back()->PecasConq);
 			jogo.retrieveLast();
 		}
-	  break;
+		break;
 	case 'i':
 		ingame = !ingame;
 		break;
