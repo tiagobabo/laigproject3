@@ -592,7 +592,6 @@ float rotY = 0, rotX = 0;
 	glPopName();
 }
 
-
 void drawBackground() {
 	glDisable(GL_COLOR_MATERIAL);
 	glMatrixMode(GL_PROJECTION);
@@ -680,6 +679,7 @@ void drawMenuBackground(){
 	glDisable(GL_TEXTURE_2D);
 	
 }
+
 void drawStartGameButton()
 {
 	enableTransparent();
@@ -1145,6 +1145,8 @@ void pecaAniConquest(int status){
 						if(i==pecaConquest.size()-1){
 							if(Record && numPlayRecord < jogo.getJogo().size()){
 								processPlay(jogo.getJogo().at(numPlayRecord)->fromRow, jogo.getJogo().at(numPlayRecord)->fromColumn, jogo.getJogo().at(numPlayRecord)->toRow, jogo.getJogo().at(numPlayRecord)->toColumn, -1);
+								if(numPlayRecord+1==jogo.getJogo().size())
+									Record=false;
 							}
 							pecaConquest.clear();
 						}
@@ -1201,11 +1203,13 @@ void pecaAniSelect(int status){
 				pecaSelected->y=21.1;
 				mouseBlock=false;
 				numPlayRecord++;
-				if(pecaConquest.size()==0 && Record && numPlayRecord < jogo.getJogo().size()){
-					processPlay(jogo.getJogo().at(numPlayRecord)->fromRow, jogo.getJogo().at(numPlayRecord)->fromColumn, jogo.getJogo().at(numPlayRecord)->toRow, jogo.getJogo().at(numPlayRecord)->toColumn, -1);
-				}
 				pecaAniConquest(0);
 				changePlayer();
+				if(pecaConquest.size()==0 && Record && numPlayRecord < jogo.getJogo().size()){
+					processPlay(jogo.getJogo().at(numPlayRecord)->fromRow, jogo.getJogo().at(numPlayRecord)->fromColumn, jogo.getJogo().at(numPlayRecord)->toRow, jogo.getJogo().at(numPlayRecord)->toColumn, -1);
+					if(numPlayRecord+1==jogo.getJogo().size())
+						Record=false;
+				}
 			}
 			break;
 		case 2:
@@ -1299,6 +1303,7 @@ vector<Peca*> changeGameMatrix(float matrix[gameRatio][gameRatio])
 				int pos = i*10 + j;
 				conq.push_back(removePiece(pos));
 			}
+			cout << "CONQ SIZE: " << conq.size()<< endl;
 	return conq;
 }
 
@@ -1457,13 +1462,37 @@ void startNewGame(int New)
 }
 
 //Play the record of the game in progress
-void gameRecordPlay()
+void gameRecordPlay(int type)
 {
-	startNewGame(0);
-	numPlayRecord = 0;
-	Record=true;
-		processPlay(jogo.getJogo().at(numPlayRecord)->fromRow, jogo.getJogo().at(numPlayRecord)->fromColumn, jogo.getJogo().at(numPlayRecord)->toRow, jogo.getJogo().at(numPlayRecord)->toColumn, -1);
-		checkConquest(jogo.getJogo().at(numPlayRecord)->PecasConq);
+	switch(type){
+		case 0:
+			startNewGame(0);
+			numPlayRecord = 0;
+			viewSelected= 1;
+			Record=false;
+			RecordNext=true;
+			break;
+		case 1:
+			if(!Record){
+				if(!RecordNext){
+					startNewGame(0);
+					numPlayRecord = 0;
+					viewSelected= 1;
+				}
+				Record=true;
+				if(jogo.getJogo().size() != 0)
+					processPlay(jogo.getJogo().at(numPlayRecord)->fromRow, jogo.getJogo().at(numPlayRecord)->fromColumn, jogo.getJogo().at(numPlayRecord)->toRow, jogo.getJogo().at(numPlayRecord)->toColumn, -1);
+			}
+			break;
+		case 2:
+			if(mouseBlock == false && numPlayRecord<jogo.getJogo().size())
+				processPlay(jogo.getJogo().at(numPlayRecord)->fromRow, jogo.getJogo().at(numPlayRecord)->fromColumn, jogo.getJogo().at(numPlayRecord)->toRow, jogo.getJogo().at(numPlayRecord)->toColumn, -1);
+			if(numPlayRecord==jogo.getJogo().size()-1)
+				RecordNext=false;
+			break;
+		default:
+			break;
+	}
 }
 
 // ACÇÃO DO PICKING
@@ -1603,7 +1632,7 @@ void processHits (GLint hits, GLuint buffer[]) {
 	
 }
 
-
+/* Mouse handling */
 struct g_mouseState{
 	bool leftButton;
 	bool rightButton;
@@ -1611,7 +1640,7 @@ struct g_mouseState{
 	int x;
 	int y;
 } MouseState;
-/* Mouse handling */
+
 int press = 0;
 void processMouse(int button, int state, int x, int y) {
 	
@@ -1798,8 +1827,14 @@ void keyboard(unsigned char key, int x, int y)
 		jogo.printJogo();
 		printMatrixGame();
 		break;
+	case 'u':
+		gameRecordPlay(0);
+		break;
+	case 'n':
+		gameRecordPlay(2);
+		break;
 	case 'r':
-		gameRecordPlay();
+		gameRecordPlay(1);
 		break;
 	case '1':
 		viewSelected = 0;
