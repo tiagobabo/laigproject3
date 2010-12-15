@@ -153,6 +153,7 @@ bool socketConnect() {// Initialize Winsock.
 
 void envia(char *s, int len) {
 	int bytesSent = send(m_socket, s, len, 0);
+	cout << "asked prolog: " << s << endl;
 	if(bytesSent == SOCKET_ERROR)
 		printf("Client: send() error %ld.\n", WSAGetLastError());
 }
@@ -1134,7 +1135,6 @@ void pecaAniConquest(int status){
 		switch(status){
 			case 0:
 				for(int i=0; i<pecaConquest.size();i++){
-					mouseBlock = true;
 					if(pecaConquest.at(i)->y+gameSpeed/2 < 30.0){
 						pecaConquest.at(i)->y+=gameSpeed/2;
 						glutTimerFunc(mili_secs, pecaAniConquest, 0);
@@ -1149,8 +1149,9 @@ void pecaAniConquest(int status){
 									Record=false;
 							}
 							pecaConquest.clear();
+							changePlayer();
+							mouseBlock=false;
 						}
-						mouseBlock = false;
 						//end of play
 					}
 				}
@@ -1201,14 +1202,16 @@ void pecaAniSelect(int status){
 			else{
 				//end of play
 				pecaSelected->y=21.1;
-				mouseBlock=false;
 				numPlayRecord++;
 				pecaAniConquest(0);
-				changePlayer();
-				if(pecaConquest.size()==0 && Record && numPlayRecord < jogo.getJogo().size()){
-					processPlay(jogo.getJogo().at(numPlayRecord)->fromRow, jogo.getJogo().at(numPlayRecord)->fromColumn, jogo.getJogo().at(numPlayRecord)->toRow, jogo.getJogo().at(numPlayRecord)->toColumn, -1);
-					if(numPlayRecord+1==jogo.getJogo().size())
-						Record=false;
+				if(pecaConquest.size()==0){
+					if(Record && numPlayRecord < jogo.getJogo().size()){
+						processPlay(jogo.getJogo().at(numPlayRecord)->fromRow, jogo.getJogo().at(numPlayRecord)->fromColumn, jogo.getJogo().at(numPlayRecord)->toRow, jogo.getJogo().at(numPlayRecord)->toColumn, -1);
+						if(numPlayRecord+1==jogo.getJogo().size())
+							Record=false;
+					}
+					changePlayer();
+					mouseBlock=false;
 				}
 			}
 			break;
@@ -1222,7 +1225,6 @@ void pecaAniSelect(int status){
 				//end of play
 				pecaSelected->y=21.1;
 				mouseBlock=false;
-				pecaAniConquest(0);
 			}
 			break;
 	}
@@ -1380,8 +1382,6 @@ void processPlay(float row, float column, float answerRow, float answerColumn, f
 			Jog->PecasConq = removePecasConquistadas();
 			if(answer != -1)
 				jogo.insertJog(Jog);
-			verificaTermino();
-			calcPont();
 		}else if(row == answerRow && answer < 100){
 			float mov = column - answerColumn ;
 			movH = -mov*2 + pecaSelected->x;
@@ -1396,8 +1396,6 @@ void processPlay(float row, float column, float answerRow, float answerColumn, f
 			Jog->PecasConq = removePecasConquistadas();
 			if(answer != -1)
 				jogo.insertJog(Jog);
-			verificaTermino();
-			calcPont();
 		}else{
 			cout << "JOGADA INVALIDA!" << endl;
 			cout << "--------------------/JOGADA-----------------------" << endl;
