@@ -15,6 +15,7 @@ int pontJog1 = 9;
 int pontJog2 = 9;
 int numPlayRecord = 0;
 bool Record = false;
+bool RecordNext = false;
 
 
 float gameMatrix[gameRatio][gameRatio] = {{0,0,0,0,0,0,0,0,0},{0,0,0,0,0,0,0,0,0},{0,0,0,0,0,0,0,0,0},{0,0,0,0,0,0,0,0,0},{0,0,0,0,0,0,0,0,0},{0,0,0,0,0,0,0,0,0},{0,0,0,0,0,0,0,0,0},{0,0,0,0,0,0,0,0,0},{0,0,0,0,0,0,0,0,0}};
@@ -98,6 +99,7 @@ void Jogo::printJogo(void){
 		cout << "- Jogador" << this->Jogadas.at(i)->Jog << " -"  << endl;
 		cout << "FROM: " << "[" <<this->Jogadas.at(i)->fromRow << "|" << this->Jogadas.at(i)->fromColumn<< "]" << endl;
 		cout << "TO:   " << "[" <<this->Jogadas.at(i)->toRow << "|" << this->Jogadas.at(i)->toColumn<< "]" << endl;
+		cout << "numPlayRecord: " << numPlayRecord<< endl;
 	}
 }
 
