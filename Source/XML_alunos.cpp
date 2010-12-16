@@ -1098,6 +1098,27 @@ void display(void)
 			if(pedeJogadaCPU)
 				processaJogadaCPU();
 		}
+		else if(modoCPUvsJogador && flagJog && pedeJogadaCPU)
+		{
+			mouseBlock=false;
+			pedeJogadaCPU = 0;
+			if(ghost)
+				drawGhosts();
+			if(drawConf)
+				drawConfirmation();
+
+			if(drawNeg && negcount < 15){
+				negcount++;
+				if(negcount%2 == 0)
+					drawNegation();
+			}
+		}
+		else if( modoCPUvsJogador && !flagJog)
+		{
+			mouseBlock=true;
+			if(pedeJogadaCPU)
+				processaJogadaCPU();
+		}
 		else
 		{
 			if(ghost)
@@ -1254,7 +1275,7 @@ void pecaAniSelect(int status){
 			else{
 				pecaSelected->y=23.0;
 				mouseBlock = false;
-				if(modoCPU)
+				if(modoCPU || (modoCPUvsJogador && !flagJog))
 					processPlay(row,column, row2, column2,-1);
 				continuaCPU = 1;
 			}
