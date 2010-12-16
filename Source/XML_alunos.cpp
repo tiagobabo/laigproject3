@@ -1919,6 +1919,8 @@ void keyboard(unsigned char key, int x, int y)
 		gameRecordPlay(2);
 		break;
 	case 'r':
+		modoCPU = 0;
+		modoCPUvsJogador = 0;
 		gameRecordPlay(1);
 		break;
 	case '1':
