@@ -947,7 +947,6 @@ void drawMenu(GLenum mode)
 			glLoadName(1);
 		drawBackMenu();
 		break;
-
 	default:
 		break;
 	}
