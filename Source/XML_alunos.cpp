@@ -109,6 +109,9 @@ SOCKET m_socket;
 
 void processPlay(float row, float column, float answerRow, float answerColumn, float answer);
 void checkConquest(vector<Peca*> conq);
+Peca* getPiece(float row, float column);
+void changePlayer();
+void pecaAniSelect(int status);
 
 
 bool socketConnect() {// Initialize Winsock.
@@ -364,6 +367,8 @@ void aniStartGame(int status){
 		menuFade-=viewSpeed;
 		glutTimerFunc(mili_secs, aniStartGame, 0);
 	}
+	else
+		startGame=true;
 }
 
 void drawPieceTop(){
@@ -661,6 +666,20 @@ void disableTransparent(){
 	glDisable(GL_COLOR_MATERIAL);
 }
 
+void enableSelected(){
+	glEnable(GL_COLOR_MATERIAL);
+	glColor4f(1.0,0.0,0.0,0.2);
+	glEnable (GL_BLEND); glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	glDisable(GL_LIGHTING);
+}
+
+void disableSelected(){
+	glColor4f(0.0,0.0,0.0,0.0);
+	glEnable(GL_LIGHTING);
+	glDisable (GL_BLEND);
+	glDisable(GL_COLOR_MATERIAL);
+}
+
 void drawMenuBackground(){
 	
 	glEnable(GL_TEXTURE_2D);
@@ -867,6 +886,66 @@ void drawBackMenu()
 	disableTransparent();
 }
 
+void drawGameModeButton(float x, float y){
+	enableTransparent();
+	glPushMatrix();
+	glRotatef(-45,1.0,0.0,0.0);
+	glTranslatef(x,y,30);
+	glRotatef(90,1.0,0.0,0.0);
+	glBegin(GL_POLYGON);
+		glNormal3d(0.0,1.0,0.0);  // esta normal fica comum aos 4 vertices
+		glTexCoord2f(0.0,0.0); glVertex3d( -15.0, 0.0,  3.0);
+		glTexCoord2f(1.0,0.0); glVertex3d(15.0, 0.0,  3.0);
+		glTexCoord2f(1.0,1.0); glVertex3d(15.0, 0.0,  -3.0);
+		glTexCoord2f(0.0,1.0); glVertex3d(-15.0, 0.0,  -3.0);
+	glEnd();
+	glPopMatrix();
+	disableTransparent();
+}
+
+
+void drawStartButton(float x, float y){
+	enableTransparent();
+	glPushMatrix();
+	glRotatef(-45,1.0,0.0,0.0);
+	glTranslatef(x,y,30);
+	glRotatef(90,1.0,0.0,0.0);
+	glBegin(GL_POLYGON);
+		glNormal3d(0.0,1.0,0.0);  // esta normal fica comum aos 4 vertices
+		glTexCoord2f(0.0,0.0); glVertex3d( -20.0, 0.0,  4.0);
+		glTexCoord2f(1.0,0.0); glVertex3d(20.0, 0.0,  4.0);
+		glTexCoord2f(1.0,1.0); glVertex3d(20.0, 0.0,  -4.0);
+		glTexCoord2f(0.0,1.0); glVertex3d(-20.0, 0.0,  -4.0);
+	glEnd();
+	glPopMatrix();
+	disableTransparent();
+}
+
+void drawDifficultyButton(float x, float y, bool selected)
+{
+	if(selected)
+		enableSelected();
+	else
+		enableTransparent();
+	glPushMatrix();
+	glRotatef(-45,1.0,0.0,0.0);
+	glTranslatef(x,y,30);
+	glRotatef(90,1.0,0.0,0.0);
+	glBegin(GL_POLYGON);
+		glNormal3d(0.0,1.0,0.0);  // esta normal fica comum aos 4 vertices
+		glTexCoord2f(0.0,0.0); glVertex3d( -7.0, 0.0,  3.0);
+		glTexCoord2f(1.0,0.0); glVertex3d(7.0, 0.0,  3.0);
+		glTexCoord2f(1.0,1.0); glVertex3d(7.0, 0.0,  -3.0);
+		glTexCoord2f(0.0,1.0); glVertex3d(-7.0, 0.0,  -3.0);
+	glEnd();
+	glPopMatrix();
+	if(selected)
+		disableSelected();
+	else
+		disableTransparent();
+	//disableTransparent();
+}
+
 void drawMenu(GLenum mode)
 {
 	glFrustum( -xy_aspect*0.04, xy_aspect*0.04, -0.04, 0.04, cena.near2, cena.far2);
@@ -882,73 +961,144 @@ void drawMenu(GLenum mode)
 	drawMenuBackground();
 	switch(menuSelected){
 		
-	case 100:
-		if (mode == GL_SELECT)
-			glLoadName(1);
-		drawStartGameButton();	
+		case 100:
+			if (mode == GL_SELECT)
+				glLoadName(1);
+			drawStartGameButton();	
 
-		if (mode == GL_SELECT)
-			glLoadName(2);
-		drawOptionsGameButton();
+			if (mode == GL_SELECT)
+				glLoadName(2);
+			drawOptionsGameButton();
 
-		if (mode == GL_SELECT)
-			glLoadName(3);
-		drawHelpGameButton();
+			if (mode == GL_SELECT)
+				glLoadName(3);
+			drawHelpGameButton();
 
-		if (mode == GL_SELECT)
-			glLoadName(4);
-		drawCreditsGameButton();
+			if (mode == GL_SELECT)
+				glLoadName(4);
+			drawCreditsGameButton();
 
-		if (mode == GL_SELECT)
-			glLoadName(5);
-		drawQuitGameButton();
-		break;
-	case 101:
-		if (mode == GL_SELECT)
-			glLoadName(1);
-		drawOptionScene();
+			if (mode == GL_SELECT)
+				glLoadName(5);
+			drawQuitGameButton();
+			break;
+		case 101:
+			if (mode == GL_SELECT)
+				glLoadName(1);
+			drawOptionScene();
 
-		if (mode == GL_SELECT)
-			glLoadName(2);
-		drawOptionBackForward(-5.0,11.0);
+			if (mode == GL_SELECT)
+				glLoadName(2);
+			drawOptionBackForward(-5.0,11.0);
 
-		if (mode == GL_SELECT)
-			glLoadName(3);
-		drawOptionBackForward(45.0,11.0);
+			if (mode == GL_SELECT)
+				glLoadName(3);
+			drawOptionBackForward(45.0,11.0);
 
-		if (mode == GL_SELECT)
-			glLoadName(4);
-		drawOptionResolution();
+			if (mode == GL_SELECT)
+				glLoadName(4);
+			drawOptionResolution();
 
-		if (mode == GL_SELECT)
-			glLoadName(5);
-		drawOptionBackForward(-5.0,3.0);
+			if (mode == GL_SELECT)
+				glLoadName(5);
+			drawOptionBackForward(-5.0,3.0);
 
-		if (mode == GL_SELECT)
-			glLoadName(6);
-		drawOptionBackForward(45.0,3.0);
+			if (mode == GL_SELECT)
+				glLoadName(6);
+			drawOptionBackForward(45.0,3.0);
 
-		if (mode == GL_SELECT)
-			glLoadName(7);
-		drawOptionSwitch(20.0,-6.0, switchRecord);
+			if (mode == GL_SELECT)
+				glLoadName(7);
+			drawOptionSwitch(20.0,-6.0, switchRecord);
 
-		if (mode == GL_SELECT)
-			glLoadName(8);
-		drawOptionSwitch(20.0,-14.0, switchFullScreen);
-		break;
+			if (mode == GL_SELECT)
+				glLoadName(8);
+			drawOptionSwitch(20.0,-14.0, switchFullScreen);
+			break;
 
-	case 102:
-		if (mode == GL_SELECT)
-			glLoadName(1);
-		drawBackMenu();
-		break;
-	case 103:
-		if (mode == GL_SELECT)
-			glLoadName(1);
-		drawBackMenu();
-		break;
-	default:
-		break;
+		case 102:
+			if (mode == GL_SELECT)
+				glLoadName(1);
+			drawBackMenu();
+			break;
+		case 103:
+			if (mode == GL_SELECT)
+				glLoadName(1);
+			drawBackMenu();
+			break;
+		case 104:
+			if (mode == GL_SELECT)
+				glLoadName(1);
+			drawBackMenu();
+
+			if (mode == GL_SELECT)
+				glLoadName(2);
+			drawGameModeButton(0.0,2.5);
+
+			if (mode == GL_SELECT)
+				glLoadName(3);
+			drawGameModeButton(0.0,-7.5);
+
+			if (mode == GL_SELECT)
+				glLoadName(4);
+			drawGameModeButton(0.0,-17.5);
+			break;
+		case 105:
+			if (mode == GL_SELECT)
+				glLoadName(1);
+			drawBackMenu();
+
+			if (mode == GL_SELECT)
+				glLoadName(2);
+			drawDifficultyButton(1.0,2.5,easySelected);
+
+			if (mode == GL_SELECT)
+				glLoadName(3);
+			drawDifficultyButton(1.0,-7.5,mediumSelected);
+
+			if (mode == GL_SELECT)
+				glLoadName(4);
+			drawDifficultyButton(2.0,-18.5,hardSelected);
+
+			if (mode == GL_SELECT)
+				glLoadName(5);
+			drawStartButton(0.0,-28.0);
+			break;
+		case 106:
+			if (mode == GL_SELECT)
+				glLoadName(1);
+			drawBackMenu();
+
+			if (mode == GL_SELECT)
+				glLoadName(2);
+			drawDifficultyButton(-14.0,2.5,easySelected);
+
+			if (mode == GL_SELECT)
+				glLoadName(3);
+			drawDifficultyButton(-14.0,-7.5,mediumSelected);
+
+			if (mode == GL_SELECT)
+				glLoadName(4);
+			drawDifficultyButton(-14.0,-17.5,hardSelected);
+
+			if (mode == GL_SELECT)
+				glLoadName(5);
+			drawDifficultyButton(18.0,2.5,easySelected2);
+
+			if (mode == GL_SELECT)
+				glLoadName(6);
+			drawDifficultyButton(18.0,-7.5,mediumSelected2);
+
+			if (mode == GL_SELECT)
+				glLoadName(7);
+			drawDifficultyButton(18.0,-17.5,hardSelected2);
+			
+			if (mode == GL_SELECT)
+				glLoadName(8);
+			drawStartButton(0.0,-28.0);
+			break;
+		default:
+			break;
 	}
 
 	glPopName();
@@ -1016,9 +1166,7 @@ void terminaJogo()
 	terminajogo = 0;
 	menuFade = 100;
 }
-Peca* getPiece(float row, float column);
-void changePlayer();
-void pecaAniSelect(int status);
+
 int row,column, row2, column2;
 void processaJogadaCPU()
 {
@@ -1035,7 +1183,7 @@ void processaJogadaCPU()
 		case 1:
 			sprintf(s2,"modoIntermedio(%s,%d).\n",matrix.c_str(), 1);
 			break;
-		case 3:
+		case 2:
 			sprintf(s2,"modoDificil(%s,%d).\n",matrix.c_str(), 1);
 			break;
 		}
@@ -1050,7 +1198,7 @@ void processaJogadaCPU()
 		case 1:
 			sprintf(s2,"modoIntermedio(%s,%d).\n",matrix.c_str(), 2);
 			break;
-		case 3:
+		case 2:
 			sprintf(s2,"modoDificil(%s,%d).\n",matrix.c_str(), 2);
 			break;
 		}
@@ -1124,7 +1272,7 @@ void display(void)
         else
             terminaJogo();
         
-		if(ingame && modoCPU)
+		if(ingame && modoCPU && startGame)
 		{
 			mouseBlock=true;
 			if(pedeJogadaCPU)
@@ -1678,7 +1826,8 @@ void pickingAction(GLuint answer) {
 		switch(menuSelected){
 			case 100:
 				if(answer == 1){
-					startNewGame(1);
+					menuSelected = 104;
+					//startNewGame(1);
 				}
 				else if(answer == 2)
 					menuSelected = 101; //opcoes
@@ -1729,6 +1878,143 @@ void pickingAction(GLuint answer) {
 			case 103:
 				if(answer == 1)
 					menuSelected=100;
+				break;
+			case 104:
+				if(answer == 1)
+					menuSelected=100;
+				if(answer == 2){
+					modoCPUvsJogador=0;
+					modoCPU=0;
+					startNewGame(1);
+					menuSelected = 100;
+				}
+				if(answer == 3)
+					menuSelected=105;
+				if(answer == 4)
+					menuSelected=106;
+				break;
+			case 105:
+				if(answer==1){
+					menuSelected=104;
+					easySelected=false;
+					mediumSelected = false;
+					hardSelected= false;
+				}
+				if(answer==2){
+					easySelected=true;
+					mediumSelected = false;
+					hardSelected= false;
+				}
+				if(answer==3){
+					easySelected = false;
+					mediumSelected = true;
+					hardSelected= false;
+				}
+				if(answer==4){
+					easySelected = false;
+					mediumSelected = false;
+					hardSelected= true;
+				}
+				if(answer == 5){
+					modoCPU=0;
+					modoCPUvsJogador = 1;
+					pedeJogadaCPU=1;
+					if(easySelected){
+						CPUMode2=0;
+						startNewGame(1);
+						easySelected = false;
+						menuSelected = 100;
+					}
+					else if(mediumSelected){
+						CPUMode2=1;
+						startNewGame(1);
+						mediumSelected = false;
+						menuSelected = 100;
+					}
+					else if(hardSelected){
+						CPUMode2=2;
+						startNewGame(1);
+						hardSelected = false;
+						menuSelected = 100;
+					}
+
+				}
+				break;
+			case 106:
+				if(answer==1){
+					menuSelected=104;
+					easySelected=false;
+					mediumSelected = false;
+					hardSelected= false;
+					easySelected2 = false;
+					mediumSelected2 = false;
+					hardSelected2= false;
+				}
+				if(answer==2){
+					easySelected=true;
+					mediumSelected = false;
+					hardSelected= false;
+				}
+				if(answer==3){
+					easySelected = false;
+					mediumSelected = true;
+					hardSelected= false;
+				}
+				if(answer==4){
+					easySelected = false;
+					mediumSelected = false;
+					hardSelected= true;
+				}
+				if(answer==5){
+					easySelected2=true;
+					mediumSelected2 = false;
+					hardSelected2= false;
+				}
+				if(answer==6){
+					easySelected2 = false;
+					mediumSelected2 = true;
+					hardSelected2= false;
+				}
+				if(answer==7){
+					easySelected2 = false;
+					mediumSelected2 = false;
+					hardSelected2= true;
+				}
+				if(answer==8){
+					modoCPUvsJogador = 0;
+					modoCPU = 1;
+					pedeJogadaCPU=1;
+					if((easySelected && easySelected2) ||  (easySelected && mediumSelected2) ||  (easySelected && hardSelected2) ||  (mediumSelected && easySelected2) || (mediumSelected && mediumSelected2) || (mediumSelected && hardSelected2) || (hardSelected && easySelected2) || (hardSelected && mediumSelected2) || (hardSelected && hardSelected2)){
+						
+						if(easySelected){
+							CPUMode1=0;
+						}
+						else if(mediumSelected){
+							CPUMode1=1;
+						}
+						else if(hardSelected){
+							CPUMode1=2;
+						}
+						
+						if(easySelected2){
+							CPUMode2=0;
+						}
+						else if(mediumSelected2){
+							CPUMode2=1;
+						}
+						else if(hardSelected2){
+							CPUMode2=2;
+						}
+						startNewGame(1);
+						easySelected=false;
+						mediumSelected = false;
+						hardSelected= false;
+						easySelected2 = false;
+						mediumSelected2 = false;
+						hardSelected2= false;
+						menuSelected = 100;
+					}
+				}
 				break;
 		}
 
@@ -1929,15 +2215,25 @@ void keyboard(unsigned char key, int x, int y)
 	{
      case 27:		// tecla de escape termina o programa
 		 mouseBlock=false;
-		 if(menuSelected != 100)
+		 if(menuSelected != 100 && !ingame){
 			menuSelected = 100;
+			easySelected=false;
+			mediumSelected = false;
+			hardSelected= false;
+			easySelected2 = false;
+			mediumSelected2 = false;
+			hardSelected2= false;
+		 }
 		 else if(ingame){
+			 menuSelected = 100;
 			 menuFade=100;
+			 startGame=false;
 			 ingame = false;
 		 }
 		 else if(firstGame!=0){
 			 menuFade=0;
 			 ingame=true;
+			 startGame=true;
 		 }
 		 break;
 	case 's':
@@ -2067,6 +2363,12 @@ void inicializacao()
 	pixmap2.setTexture(102);
 	pixmap2.readBMPFile("textures/creditos.bmp");
 	pixmap2.setTexture(103);
+	pixmap2.readBMPFile("textures/gameMode.bmp");
+	pixmap2.setTexture(104);
+	pixmap2.readBMPFile("textures/difficultyPvsCPU.bmp");
+	pixmap2.setTexture(105);
+	pixmap2.readBMPFile("textures/difficultyCPUvsCPU.bmp");
+	pixmap2.setTexture(106);
 
 
 	//options
