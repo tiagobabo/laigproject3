@@ -986,6 +986,8 @@ void terminaJogo()
 }
 Peca* getPiece(float row, float column);
 void changePlayer();
+void pecaAniSelect(int status);
+int row,column, row2, column2;
 void processaJogadaCPU()
 {
 	pedeJogadaCPU = 0;
@@ -1024,12 +1026,13 @@ void processaJogadaCPU()
 	envia(s2, strlen(s2));
 	char ans[1024];
 	recebe(ans);
-	int column = atoi(&ans[0])-1;
-	int row = atoi(&ans[2])-1;
-	int column2 = atoi(&ans[4])-1;
-	int row2 = atoi(&ans[6])-1;
+	column = atoi(&ans[0])-1;
+	row = atoi(&ans[2])-1;
+	column2 = atoi(&ans[4])-1;
+	row2 = atoi(&ans[6])-1;
+	pecaSelected = getPiece(row, column);
+	pecaAniSelect(0);
 	cout << row << endl << column << endl << row2 << endl << column2 << endl;
-	processPlay(row,column, row2, column2,-1);
 }
 void display(void)
 {
@@ -1091,7 +1094,7 @@ void display(void)
         
 		if(ingame && modoCPU)
 		{
-			mouseBlock=false;
+			mouseBlock=true;
 			if(pedeJogadaCPU)
 				processaJogadaCPU();
 		}
@@ -1251,6 +1254,9 @@ void pecaAniSelect(int status){
 			else{
 				pecaSelected->y=23.0;
 				mouseBlock = false;
+				if(modoCPU)
+					processPlay(row,column, row2, column2,-1);
+				continuaCPU = 1;
 			}
 			break;
 		case 1:
