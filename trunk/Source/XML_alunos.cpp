@@ -1195,7 +1195,8 @@ void changePlayer(){
 	calcPont();
 	verificaTermino();
 	flagJog = !flagJog;
-	processView(0);
+	if(!modoCPU && !modoCPUvsJogador)
+		processView(0);
 }
 
 int getJogador(float row, float column)
@@ -1239,14 +1240,12 @@ Peca* getPiece(float row, float column){
 	}
 	return NULL;
 }
-
+void requestCPUPlay(int i);
 void pecaAniConquest(int status){
 	animBlock=true;
 		switch(status){
 			case 0:
-				{
-				int i = 0;
-				for(i; i<pecaConquest.size();i++){
+				for(int i = 0; i<pecaConquest.size();i++){
 					if(pecaConquest.at(i)->y+gameSpeed/2 < 30.0){
 						pecaConquest.at(i)->y+=gameSpeed/2;
 						glutTimerFunc(mili_secs, pecaAniConquest, 0);
@@ -1263,13 +1262,10 @@ void pecaAniConquest(int status){
 							pecaConquest.clear();
 							changePlayer();
 							mouseBlock=false;
-							//cout << "ENTREI" << endl;
-							pedeJogadaCPU = 1;
+							glutTimerFunc(mili_secs, requestCPUPlay, 1);
 						}
 						//end of play
 					}
-				}
-				if(i == 0) pedeJogadaCPU = 1;
 				}
 				break;
 			case 1:
@@ -1295,6 +1291,11 @@ void pecaAniConquest(int status){
 	animBlock=false;
 }
 
+void requestCPUPlay(int i)
+{
+	pedeJogadaCPU = i;
+}
+
 void pecaAniSelect(int status){
 	
 	switch(status){
@@ -1308,7 +1309,7 @@ void pecaAniSelect(int status){
 				pecaSelected->y=23.0;
 				mouseBlock = false;
 				if(modoCPU || (modoCPUvsJogador && !flagJog))
-					processPlay(row,column, row2, column2,-1);
+					processPlay(row,column, row2, column2,1);
 				continuaCPU = 1;
 			}
 			break;
@@ -1331,6 +1332,7 @@ void pecaAniSelect(int status){
 					}
 					changePlayer();
 					mouseBlock=false;
+					glutTimerFunc(mili_secs, requestCPUPlay, 1); 
 				}
 			}
 			break;

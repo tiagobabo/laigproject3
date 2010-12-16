@@ -1,3 +1,4 @@
+#define getCurrentTime GetTickCount
 #define gameRatio 9		//default 9
 #define gameSpeed 0.5	//default 0.5
 #define viewSpeed 2		//default 2
