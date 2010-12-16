@@ -95,20 +95,19 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="C:\Users\Tiago\Documents\Visual Studio 2010\Projects\teste\teste\text3d.cpp" />
     <ClCompile Include="Source\Node.cpp" />
     <ClCompile Include="Source\RGBpixmap.cpp" />
     <ClCompile Include="Source\SceneLoader.cpp" />
+    <ClCompile Include="Source\text3d.cpp" />
     <ClCompile Include="Source\XML_alunos.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="C:\Users\Tiago\Documents\Visual Studio 2010\Projects\teste\teste\text3d.h" />
     <ClInclude Include="Source\game.h" />
     <ClInclude Include="Source\RGBpixmap.h" />
     <ClInclude Include="Source\SceneLoader.h" />
+    <ClInclude Include="Source\text3d.h" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="C:\Users\Tiago\Documents\Visual Studio 2010\Projects\teste\teste\charset" />
     <None Include="hasamiShogi.sgx">
       <SubType>Designer</SubType>
     </None>
