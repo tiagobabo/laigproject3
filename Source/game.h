@@ -32,6 +32,10 @@ int pedeJogadaCPU = 1;
 int CPUMode1 = 0;
 int CPUMode2 = 0;
 int continuaCPU = 0;
+int timeplay = 40;
+time_t start,endtime;
+int stopTime = 0;
+int modoJogVsJog = 0;
 
 
 float gameMatrix[gameRatio][gameRatio] = {{0,0,0,0,0,0,0,0,0},{0,0,0,0,0,0,0,0,0},{0,0,0,0,0,0,0,0,0},{0,0,0,0,0,0,0,0,0},{0,0,0,0,0,0,0,0,0},{0,0,0,0,0,0,0,0,0},{0,0,0,0,0,0,0,0,0},{0,0,0,0,0,0,0,0,0},{0,0,0,0,0,0,0,0,0}};

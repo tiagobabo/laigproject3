@@ -2,6 +2,8 @@
 //
 #include "SceneLoader.h"
 #include "game.h"
+#include "text3d.h"
+#include <time.h>
 
 #include <GL\glui.h>
 #include <math.h>
@@ -313,6 +315,9 @@ void showPont(int p,char* pont)
 		glRasterPos2i( 1.0, 1.0);
 	if(p == 2)
 		glRasterPos2i(96.0,1.0);
+	if(p == 3)
+		glRasterPos2i(1.0,96.0);
+
 	int len = strlen(pont);
 	for (int i = 0; i < len; i++)
 	{
@@ -326,6 +331,7 @@ void processView(int dummy){
 	switch(flagJog){
 		case 0:
 			if(angView < 180){
+				stopTime = 0;
 				angView+=viewSpeed;
 				matrixViewPlayer[0][0] = cos(angView*PI/180);
 				matrixViewPlayer[0][2] = -sin(angView*PI/180);
@@ -335,14 +341,17 @@ void processView(int dummy){
 			}
 			else{
 				angView = 180.0;
+				stopTime = 1;
 				matrixViewPlayer[0][0] = cos(angView*PI/180);
 				matrixViewPlayer[0][2] = -sin(angView*PI/180);
 				matrixViewPlayer[2][0] = sin(angView*PI/180);
 				matrixViewPlayer[2][2] = cos(angView*PI/180);
+				time(&start);
 			}
 			break;
 		case 1:
 			if(angView >0){
+				stopTime = 0;
 				angView-=viewSpeed;
 				matrixViewPlayer[0][0] = cos(angView*PI/180);
 				matrixViewPlayer[0][2] = -sin(angView*PI/180);
@@ -352,10 +361,12 @@ void processView(int dummy){
 			}
 			else{
 				angView = 0.0;
+				stopTime = 1;
 				matrixViewPlayer[0][0] = cos(angView*PI/180);
 				matrixViewPlayer[0][2] = -sin(angView*PI/180);
 				matrixViewPlayer[2][0] = sin(angView*PI/180);
 				matrixViewPlayer[2][2] = cos(angView*PI/180);
+				time(&start);
 			}
 			break;
 	}
@@ -1170,6 +1181,7 @@ void terminaJogo()
 int row,column, row2, column2;
 void processaJogadaCPU()
 {
+	stopTime = 0;
 	pedeJogadaCPU = 0;
 	string matrix = getMatrixGame();
 	char s2[1024];
@@ -1266,6 +1278,51 @@ void display(void)
         if(ingame && !terminajogo){
             glCallList(1);
 			drawScene(GL_RENDER);
+			if(modoJogVsJog)
+			{
+				glPushMatrix();
+				if(viewSelected==2)
+					glRotatef(-90.0,0.0,1.0,0.0);
+				else
+					glMultMatrixf( &matrixViewPlayer[0][0]);
+				glTranslatef(0.0, 30.0, -10.0);
+				glScalef(5.0, 5.0, 5.0);
+				stringstream timedisp;
+				time (&endtime);
+				int dif = timeplay;
+				if(stopTime)
+				{
+					int a = difftime (endtime,start);
+					dif = timeplay-a;
+					if(dif == -1)
+					{
+						CPUMode1 = 0;
+						modoCPU = 1;
+						processaJogadaCPU();
+						processView(0);
+						dif = 0;
+					}
+				}
+				timedisp << dif;
+				string res2;
+				timedisp >> res2;
+				t3dDraw3D(res2.c_str(), 0, 0, 0.2f);
+				glPopMatrix();
+			}
+			string res;
+			stringstream pontuacao;
+			pontuacao << 9-pontJog2 << "-" << 9-pontJog1;
+			pontuacao >> res;
+			glPushMatrix();
+			if(viewSelected==2)
+				glRotatef(-90.0,0.0,1.0,0.0);
+			else
+				glMultMatrixf( &matrixViewPlayer[0][0]);
+			glTranslatef(0.0, 24.5, -10.0);
+			glScalef(5.0, 5.0, 5.0);
+			t3dDraw3D(res.c_str(), 0, 0, 0.2f);
+			glPopMatrix();
+
 		}
         else if(!ingame && !terminajogo)
             drawMenu(GL_RENDER);
@@ -1315,19 +1372,12 @@ void display(void)
         glDisable(GL_NORMALIZE);
         
         if(ingame){
-			char pont1[2];
-			char pont2[2];
-			itoa(pontJog1, pont1, 10);
-			itoa(pontJog2, pont2, 10);
-			//sprintf(pont1,"%d",pontJog1);
-			showPont(1,pont1);
-			showPont(2,pont2);
 			switch(viewSelected){
 				case 1:
-					showCamera("TOP VIEW");
+					showCamera("");
 					break;
 				case 2:
-					showCamera("OBSERVER");
+					showCamera("");
 					break;
 				default:
 					break;
@@ -1409,6 +1459,8 @@ void pecaAniConquest(int status){
 							}
 							pecaConquest.clear();
 							changePlayer();
+							if(modoJogVsJog)
+								modoCPU = 0;
 							mouseBlock=false;
 							glutTimerFunc(mili_secs, requestCPUPlay, 1);
 						}
@@ -1478,6 +1530,8 @@ void pecaAniSelect(int status){
 						if(numPlayRecord+1==jogo.getJogo().size())
 							Record=false;
 					}
+					if(modoJogVsJog)
+						modoCPU = 0;
 					changePlayer();
 					mouseBlock=false;
 					glutTimerFunc(mili_secs, requestCPUPlay, 1); 
@@ -1726,6 +1780,7 @@ void startNewGame(int New)
 	inicializacaoPecas();
 	ingame = true;
 	aniStartGame(0);
+	time (&start);
 }
 
 //Play the record of the game in progress
@@ -1827,7 +1882,6 @@ void pickingAction(GLuint answer) {
 			case 100:
 				if(answer == 1){
 					menuSelected = 104;
-					//startNewGame(1);
 				}
 				else if(answer == 2)
 					menuSelected = 101; //opcoes
@@ -1885,6 +1939,7 @@ void pickingAction(GLuint answer) {
 				if(answer == 2){
 					modoCPUvsJogador=0;
 					modoCPU=0;
+					modoJogVsJog=1;
 					startNewGame(1);
 					menuSelected = 100;
 				}
@@ -1919,6 +1974,7 @@ void pickingAction(GLuint answer) {
 					modoCPU=0;
 					modoCPUvsJogador = 1;
 					pedeJogadaCPU=1;
+					modoJogVsJog=0;
 					if(easySelected){
 						CPUMode2=0;
 						startNewGame(1);
@@ -1983,6 +2039,7 @@ void pickingAction(GLuint answer) {
 				if(answer==8){
 					modoCPUvsJogador = 0;
 					modoCPU = 1;
+					modoJogVsJog=0;
 					pedeJogadaCPU=1;
 					if((easySelected && easySelected2) ||  (easySelected && mediumSelected2) ||  (easySelected && hardSelected2) ||  (mediumSelected && easySelected2) || (mediumSelected && mediumSelected2) || (mediumSelected && hardSelected2) || (hardSelected && easySelected2) || (hardSelected && mediumSelected2) || (hardSelected && hardSelected2)){
 						
@@ -2387,9 +2444,7 @@ void inicializacao()
 	pixmap2.readBMPFile("textures/switch_off.bmp");
 	pixmap2.setTexture(208);
 
-
-
-
+	t3dInit();
 	inicializacaoPecas();
 
 	matrixViewPlayer[0][0] = cos(angView);
