@@ -849,6 +849,24 @@ void drawOptionSwitch(float x, float y, int switchNum)
 	//disableTransparent();
 }
 
+void drawBackMenu()
+{
+	enableTransparent();
+	glPushMatrix();
+	glRotatef(-45,1.0,0.0,0.0);
+	glTranslatef(-45,-30,30);
+	glRotatef(90,1.0,0.0,0.0);
+	glBegin(GL_POLYGON);
+		glNormal3d(0.0,1.0,0.0);  // esta normal fica comum aos 4 vertices
+		glTexCoord2f(0.0,0.0); glVertex3d( -6.0, 0.0,  3.0);
+		glTexCoord2f(1.0,0.0); glVertex3d(6.0, 0.0,  3.0);
+		glTexCoord2f(1.0,1.0); glVertex3d(6.0, 0.0,  -3.0);
+		glTexCoord2f(0.0,1.0); glVertex3d(-6.0, 0.0,  -3.0);
+	glEnd();
+	glPopMatrix();
+	disableTransparent();
+}
+
 void drawMenu(GLenum mode)
 {
 	glFrustum( -xy_aspect*0.04, xy_aspect*0.04, -0.04, 0.04, cena.near2, cena.far2);
@@ -862,8 +880,9 @@ void drawMenu(GLenum mode)
 	if (mode == GL_SELECT)
 		glPushName(0);
 	drawMenuBackground();
-	if(menuSelected == 100){
-
+	switch(menuSelected){
+		
+	case 100:
 		if (mode == GL_SELECT)
 			glLoadName(1);
 		drawStartGameButton();	
@@ -883,9 +902,8 @@ void drawMenu(GLenum mode)
 		if (mode == GL_SELECT)
 			glLoadName(5);
 		drawQuitGameButton();
-
-	}
-	if(menuSelected == 101){
+		break;
+	case 101:
 		if (mode == GL_SELECT)
 			glLoadName(1);
 		drawOptionScene();
@@ -917,6 +935,21 @@ void drawMenu(GLenum mode)
 		if (mode == GL_SELECT)
 			glLoadName(8);
 		drawOptionSwitch(20.0,-14.0, switchFullScreen);
+		break;
+
+	case 102:
+		if (mode == GL_SELECT)
+			glLoadName(1);
+		drawBackMenu();
+		break;
+	case 103:
+		if (mode == GL_SELECT)
+			glLoadName(1);
+		drawBackMenu();
+		break;
+
+	default:
+		break;
 	}
 
 	glPopName();
@@ -1639,56 +1672,66 @@ void pickingAction(GLuint answer) {
 			verificaJogadasPossiveis(2, player2.at(i)->PosTab);
 		}
 	}
-	else if(menuSelected == 100)
+	else
 	{
-		if(answer == 1){
-			startNewGame(1);
-		}
-		else if(answer == 2)
-			menuSelected = 101;
-		else if(answer == 3)
-			menuSelected = 102;
-		else if(answer == 4)
-			menuSelected = 103;
-		else if(answer == 5){
-			quit();
-			exit(0);
+		switch(menuSelected){
+			case 100:
+				if(answer == 1){
+					startNewGame(1);
+				}
+				else if(answer == 2)
+					menuSelected = 101; //opcoes
+				else if(answer == 3)
+					menuSelected = 102; //help
+				else if(answer == 4)
+					menuSelected = 103; //credits
+				else if(answer == 5){ //exit
+					quit();
+					exit(0);
+				}
+				break;
+			case 101:
+				if(answer == 5){
+					if(gameResolution > 202)
+						gameResolution--;
+					else
+						gameResolution = 206;
+				}
+				else if(answer == 6){
+					if(gameResolution < 206)
+						gameResolution++;
+					else
+						gameResolution = 202;
+				}
+				else if(answer == 7){
+					if(switchRecord == 208)
+						switchRecord = 207;
+					else
+						switchRecord = 208;
+				}
+				else if(answer == 8){
+					if(switchFullScreen == 208){
+						switchFullScreen = 207;
+						glutFullScreen();
+					}
+					else{
+						glutReshapeWindow(DIMX, DIMY); 
+						glutPositionWindow(INITIALPOS_X,INITIALPOS_Y);
+						switchFullScreen = 208;
+					}
+				}
+				break;
+			case 102:
+				if(answer == 1)
+					menuSelected=100;
+				break;
+			case 103:
+				if(answer == 1)
+					menuSelected=100;
+				break;
 		}
 
 	}
-	else if(menuSelected == 101)
-	{
-		if(answer == 5){
-			if(gameResolution > 202)
-				gameResolution--;
-			else
-				gameResolution = 206;
-		}
-		else if(answer == 6){
-			if(gameResolution < 206)
-				gameResolution++;
-			else
-				gameResolution = 202;
-		}
-		else if(answer == 7){
-			if(switchRecord == 208)
-				switchRecord = 207;
-			else
-				switchRecord = 208;
-		}
-		else if(answer == 8){
-			if(switchFullScreen == 208){
-				switchFullScreen = 207;
-				glutFullScreen();
-			}
-			else{
-				glutReshapeWindow(DIMX, DIMY); 
-				glutPositionWindow(INITIALPOS_X,INITIALPOS_Y);
-				switchFullScreen = 208;
-			}
-		}
-	}
-
 }
 
 // processa os hits no picking
