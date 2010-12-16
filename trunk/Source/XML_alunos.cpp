@@ -1553,6 +1553,14 @@ void pecaAniSelect(int status){
 	}
 }
 
+double animFuncNorm(double x)
+{
+	return pow(x, 4);
+}
+clock_t startani = 0,endani;
+clock_t currentani;
+double posiani;
+
 void pecaAniMovH(int status){
 	mouseBlock = true;
 	if(pecaSelected->x-gameSpeed < movH  && movH < pecaSelected->x + gameSpeed){
@@ -1560,13 +1568,32 @@ void pecaAniMovH(int status){
 		pecaSelected->x = movH;
 		pecaAniSelect(1);
 		drawConf = 0;
+		startani = 0;
 	}
 	else if(movH > pecaSelected->x){
-		pecaSelected->x+=gameSpeed;
+		if(startani == 0)
+		{
+			startani = clock();
+			posiani = pecaSelected->x;
+			endani = startani+2000;
+		}
+		currentani = clock();
+		double val = animFuncNorm(difftime(startani,currentani)/difftime(startani,endani))*(movH-posiani);
+		//pecaSelected->x+=gameSpeed;
+		pecaSelected->x = posiani+val;
 		glutTimerFunc(mili_secs, pecaAniMovH, 0);
 	}
 	else if(movH < pecaSelected->x){
-		pecaSelected->x-=gameSpeed;
+		if(startani == 0)
+		{
+			startani = clock();
+			posiani = pecaSelected->x;
+			endani = startani+2000;
+		}
+		currentani = clock();
+		double val = animFuncNorm(difftime(startani,currentani)/difftime(startani,endani))*(movH-posiani);
+		//pecaSelected->x-=gameSpeed;
+		pecaSelected->x = posiani+val;
 		glutTimerFunc(mili_secs, pecaAniMovH, 0);
 	}
 
@@ -1579,13 +1606,30 @@ void pecaAniMovV(int status){
 		pecaSelected->z = movV;
 		pecaAniSelect(1);
 		drawConf = 0;
+		startani = 0;
 	}
 	else if(movV > pecaSelected->z){
-		pecaSelected->z+=gameSpeed;
+		if(startani == 0)
+		{
+			startani = clock();
+			posiani = pecaSelected->z;
+			endani = startani+2000;
+		}
+		currentani = clock();
+		double val = animFuncNorm(difftime(startani,currentani)/difftime(startani,endani))*(movV-posiani);
+		pecaSelected->z = posiani+val;
 		glutTimerFunc(mili_secs, pecaAniMovV, 0);
 	}
 	else if(movV < pecaSelected->z){
-		pecaSelected->z-=gameSpeed;
+		if(startani == 0)
+		{
+			startani = clock();
+			posiani = pecaSelected->z;
+			endani = startani+2000;
+		}
+		currentani = clock();
+		double val = animFuncNorm(difftime(startani,currentani)/difftime(startani,endani))*(movV-posiani);
+		pecaSelected->z = posiani+val;
 		glutTimerFunc(mili_secs, pecaAniMovV, 0);
 	}
 
@@ -2286,6 +2330,11 @@ void keyboard(unsigned char key, int x, int y)
 			 menuFade=100;
 			 startGame=false;
 			 ingame = false;
+			 if(modoCPU == 1)
+			 {
+				 modoCPU = 0;
+				firstGame = 0;				
+			 }
 		 }
 		 else if(firstGame!=0){
 			 menuFade=0;
