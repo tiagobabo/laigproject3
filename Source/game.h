@@ -36,6 +36,8 @@ int timeplay = 40;
 time_t start,endtime;
 int stopTime = 0;
 int modoJogVsJog = 0;
+int escSelected = 0;
+
 
 
 float gameMatrix[gameRatio][gameRatio] = {{0,0,0,0,0,0,0,0,0},{0,0,0,0,0,0,0,0,0},{0,0,0,0,0,0,0,0,0},{0,0,0,0,0,0,0,0,0},{0,0,0,0,0,0,0,0,0},{0,0,0,0,0,0,0,0,0},{0,0,0,0,0,0,0,0,0},{0,0,0,0,0,0,0,0,0},{0,0,0,0,0,0,0,0,0}};
