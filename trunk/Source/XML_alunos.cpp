@@ -472,7 +472,7 @@ void drawPiece(int player, int ghost){
 	//Topo
 	else if(ghost == 0)
 		glEnable(GL_TEXTURE_2D);
-	glBindTexture(GL_TEXTURE_2D, player);
+	glBindTexture(GL_TEXTURE_2D, (player+106));
 	glPushMatrix();
 	glTranslatef(0.0,0.2,0.0);
 	glTranslatef(0.0,0.0,0.5);
@@ -480,7 +480,6 @@ void drawPiece(int player, int ghost){
 	glTranslatef(0.0,0.0,-0.5);
 	drawPieceTop();
 	glPopMatrix();
-	glDisable(GL_TEXTURE_2D);
 
 	//Fundo
 	glPushMatrix();
@@ -526,6 +525,7 @@ void drawPiece(int player, int ghost){
 	glEnable(GL_LIGHTING);
 	glDisable (GL_BLEND);
 	glDisable(GL_COLOR_MATERIAL);
+	glDisable(GL_TEXTURE_2D);
 }
 float rotY = 0, rotX = 0;
  void drawScene(GLenum mode)
@@ -2475,6 +2475,10 @@ void inicializacao()
 	pixmap2.setTexture(105);
 	pixmap2.readBMPFile("textures/difficultyCPUvsCPU.bmp");
 	pixmap2.setTexture(106);
+	pixmap2.readBMPFile("textures/piece1.bmp");
+	pixmap2.setTexture(107);
+	pixmap2.readBMPFile("textures/piece2.bmp");
+	pixmap2.setTexture(108);
 
 
 	//options
