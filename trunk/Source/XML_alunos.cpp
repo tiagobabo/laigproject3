@@ -1266,14 +1266,35 @@ void display(void)
             glMultMatrixf(&cena.m[0][0]);
             glPopMatrix();
         }
+		//desenha a cena
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         //propriedades das luzes
         for(int i = 0; i < cena.lights.size(); i++)
+		{
             glLightfv(GL_LIGHT0+i, GL_POSITION, cena.lights.at(i)->position);
-        glEnable(GL_NORMALIZE);
+			if(ingame)
+			{
+				// ... e da esfera que a simboliza
+				glColor3f(1.0,1.0,0.0);		// cor amarela
+				gluQuadricOrientation( glQ, GLU_INSIDE);
+				glPushMatrix();
+				glTranslated(cena.lights.at(i)->position[0],cena.lights.at(i)->position[1],cena.lights.at(i)->position[2]);
+				gluSphere(glQ, 5, 20, 20);
+				glPopMatrix();
+				gluQuadricOrientation( glQ, GLU_OUTSIDE);
+			}
+		}
 
-        //desenha a cena
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		if(!ingame)
+		{
+			float ambient[] = {0.9,0.9,0.9};
+			glLightModelfv(GL_LIGHT_MODEL_AMBIENT, ambient);
+		}
+		else
+			glLightModelfv(GL_LIGHT_MODEL_AMBIENT, cena.ambient);
+
+        glEnable(GL_NORMALIZE);
         
         if(ingame && !terminajogo){
             glCallList(1);
@@ -2444,7 +2465,7 @@ void inicializacao()
 		glLightfv(GL_LIGHT0+i, GL_AMBIENT, cena.lights.at(i)->ambient);
 		glLightfv(GL_LIGHT0+i, GL_DIFFUSE, cena.lights.at(i)->diffuse);
 		glLightfv(GL_LIGHT0+i, GL_SPECULAR, cena.lights.at(i)->specular);
-		glLightf(GL_LIGHT0+i, GL_CONSTANT_ATTENUATION, 1.0f);
+		glLightf(GL_LIGHT0+i, GL_LINEAR_ATTENUATION, 0.15f);
 		if(cena.lights.at(i)->enabled)
 			glEnable(GL_LIGHT0+i);
 	}
@@ -2556,46 +2577,23 @@ int main(int argc, char* argv[])
 	glutInit(&argc, argv);
 	glutInitDisplayMode(GLUT_DEPTH | GLUT_DOUBLE | GLUT_RGBA);
 
-	if(fullscreen){
-		glutGameModeString( "1440x900:32@60" ); //the settings 
-		glutEnterGameMode(); //set glut to fullscreen using the 
-	}
-	else{
-		glutInitDisplayMode(GLUT_DEPTH | GLUT_DOUBLE | GLUT_RGBA);
-		glutInitWindowSize (DIMX, DIMY);
-		glutInitWindowPosition (INITIALPOS_X, INITIALPOS_Y);
-		main_window = glutCreateWindow (argv[0]);
-	}
+	glutInitDisplayMode(GLUT_DEPTH | GLUT_DOUBLE | GLUT_RGBA);
+	glutInitWindowSize (DIMX, DIMY);
+	glutInitWindowPosition (INITIALPOS_X, INITIALPOS_Y);
+	main_window = glutCreateWindow (argv[0]);
 
-
-	
-	
 	raiz = loadScene(&cena);
 	
-
-   glutDisplayFunc(display);
-   GLUI_Master.set_glutReshapeFunc(reshape);
-   GLUI_Master.set_glutKeyboardFunc (keyboard);
-   GLUI_Master.set_glutMouseFunc(processMouse);
-   glutMotionFunc(processMouseMoved);
-   glutPassiveMotionFunc(processPassiveMouseMoved);   
-   GLUI_Master.set_glutSpecialFunc( NULL );
-   GLUI_Master.set_glutIdleFunc(myGlutIdle);
+	glutDisplayFunc(display);
+	GLUI_Master.set_glutReshapeFunc(reshape);
+	GLUI_Master.set_glutKeyboardFunc (keyboard);
+	GLUI_Master.set_glutMouseFunc(processMouse);
+	glutMotionFunc(processMouseMoved);
+	glutPassiveMotionFunc(processPassiveMouseMoved);   
+	GLUI_Master.set_glutSpecialFunc( NULL );
+	GLUI_Master.set_glutIdleFunc(myGlutIdle);
    
-
 	inicializacao();
-	char *s = "comando(1, 2).\n";
-	char *s2 = "verificaCaminho(1,1,1,1,2,[[1,1],[0,0],[2,2]]).\n";
-	char *s3 = "jogadasPossiveis(1,1,1,[[1,1],[0,0],[2,2]]).\n";
-	char *s4 = "conquistas([[1,1,1,1,1,1,1,1,1],[0,1,2,1,0,0,0,0,0],[0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0],[2,2,2,2,2,2,2,2,2]]).\n";
-	char *s5 = "terminouJogo([[1,1,1,1,1,1,1,1,1],[0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0],[2,2,2,2,2,2,2,2,2]]).\n";
-	char *s6 = "jogada(1,1,1,1,2,[[1,1],[0,0],[2,2]]).\n";
-	char *s7 = "modoIntermedio([[1,1,1,1,1,1,1,1,1],[0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0],[2,2,2,2,2,2,2,2,2]], 1).\n";
-	char *s8 = "modoFacil([[1,1,1,1,1,1,1,1,1],[0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0],[2,2,2,2,2,2,2,2,2]], 1).\n";
-	char *s9 = "modoDificil([[1,1,1,1,1,1,1,1,1],[0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0],[2,2,2,2,2,2,2,2,2]], 1).\n";
-	//envia(s8, strlen(s8));
-	char ans[1024];
-	//recebe(ans);
 	glutMainLoop();
 
 	quit();

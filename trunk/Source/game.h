@@ -3,7 +3,6 @@
 #define gameSpeed 0.5	//default 0.5
 #define viewSpeed 2		//default 2
 int viewSelected = 0;	//default 0
-bool fullscreen = false;//default false
 bool ingame = false;	//default false
 int menuFade = 100;		//default 100
 int terminajogo = 0;	//default 0
