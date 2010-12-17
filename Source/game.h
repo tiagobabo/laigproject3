@@ -10,6 +10,7 @@ int terminajogo = 0;	//default 0
 int menuSelected = 100;	//default 100
 int firstGame = 0;
 int gameResolution = 202; //default 640x480
+int gameScene = 301; //default 301
 int switchRecord = 208; //default off
 int switchFullScreen = 208; //default off
 int pontJog1 = 9;

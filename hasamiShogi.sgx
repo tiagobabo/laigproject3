@@ -12,7 +12,7 @@
     <geometry type="box" dx="40" dy="1" dz="30" />
   -->
   
-  <globals maxlights="3" maxobjects="120" maxtextures="30" maxmaterials="30" root="cena"/>
+  <globals maxlights="3" maxobjects="150" maxtextures="30" maxmaterials="30" root="cena"/>
 
 	<view near="0.1" far="1000.0" axisscale="0.0">
 		<translation x="0.0" z="-55.0" y="-15.0"/>
@@ -42,11 +42,11 @@
     <!-- s e t: factores de escala (ver notas finais) -->
     <texture id="board5" file="textures/board5.bmp" length_s="22.0" length_t="22.0" />
     <texture id="wood" file="textures/wood.bmp" length_s="40.0" length_t="30.0" />
-    <texture id="wall" file="textures/wall.bmp" length_s="40.0" length_t="40.0" />
+    <texture id="door" file="textures/door.bmp" length_s="20.0" length_t="40.0" />
+    <texture id="wall" file="textures/wall3.bmp" length_s="40.0" length_t="80.0" />
     <texture id="brick" file="textures/brick.bmp" length_s="40.0" length_t="40.0" />
-    <texture id="chao" file="textures/wall.bmp" length_s="40.0" length_t="40.0" />
+    <texture id="chao" file="textures/floor.bmp" length_s="40.0" length_t="40.0" />
     <texture id="roof" file="textures/roof.bmp" length_s="40.0" length_t="40.0" />
-    <texture id="tile" file="textures/wood.bmp" length_s="40.0" length_t="40.0" />
     <texture id="muralhas" file="textures/muralhas.bmp" length_s="4.0" length_t="4.0" />
     <texture id="sandeman" file="textures/sandeman.bmp" length_s="4.0" length_t="4.0" />
     <texture id="malibu" file="textures/malibu.bmp" length_s="4.0" length_t="4.0" />
@@ -55,6 +55,7 @@
     <texture id="socket" file="textures/socket.bmp" length_s="2.0" length_t="2.0" />
     <texture id="vangogh" file="textures/vangogh.bmp" length_s="20.0" length_t="20.0" />
     <texture id="tv" file="textures/tv.bmp" length_s="25.0" length_t="15.0" />
+    <texture id="sofa" file="textures/wall5.bmp" length_s="30.0" length_t="16.0" />
 	</textures>
 	<materials>
 		<material id="rio">
@@ -165,6 +166,7 @@
       <material id="white"/>
       <texture id="clear"/>
       <children>
+        <objectref id="sofa"/>
         <objectref id="jukebox"/>
         <objectref id="bar"/>
         <objectref id="chao"/>
@@ -172,14 +174,16 @@
         <objectref id="paredes"/>
         <objectref id="quadros"/>
         <objectref id="televisao"/>
+        <objectref id="porta" />
+        <objectref id="cabide"/>
       </children>
     </object>
 
     <object id="paredes" type="compound">
       <transformations>
       </transformations>
-      <material id="parede"/>
-      <texture id="clear"/>
+      <material id="null"/>
+      <texture id="wall"/>
       <children>
         <objectref id="paredeF"/>
         <objectref id="paredeT"/>
@@ -679,7 +683,7 @@
         <translation x="0.0" y="10.0" z="-50.0"/>
       </transformations>
       <material id="null"/>
-      <texture id="clear"/>
+      <texture id="roof"/>
       <geometry type="box" dx="100" dy="20" dz="10" />
     </object>
 <!--/BALCAO-->
@@ -737,6 +741,204 @@
     </object>
 
     <!--/JUKEBOX-->
+    
+<!--PORTA-->
+
+    <object id="porta" type="simple">
+      <transformations>
+        <translation x="0.0" y="20.0" z="118.4"/>
+        <rotation axis="y" angle="180" />
+      </transformations>
+      <material id="null"/>
+      <texture id="door"/>
+      <geometry type="rectangle" x1="-10" y1="-20" x2="10" y2="20" />
+    </object>
+    
+<!--/PORTA-->
+    
+<!--SOFA-->
+
+    <object id="sofa" type="compound">
+      <transformations>
+        <translation x="-40.0" y="0.0" z="110.0"/>
+      </transformations>
+      <material id="null"/>
+      <texture id="sofa"/>
+      <children>
+        <objectref id="almofadaSofa"/>
+        <objectref id="suporteSofa"/>
+      </children>
+    </object>
+
+    <object id="suporteSofa" type="compound">
+      <transformations>
+      </transformations>
+      <material id="null"/>
+      <texture id="roof"/>
+      <children>
+        <objectref id="lateralSofa"/>
+        <objectref id="baseSofa"/>
+        <objectref id="trasSofa"/>
+      </children>
+    </object>
+
+    <object id="lateralSofa" type="compound">
+      <transformations>
+      </transformations>
+      <material id="null"/>
+      <texture id="null"/>
+      <children>
+        <objectref id="lateralSofa1"/>
+        <objectref id="lateralSofa2"/>
+      </children>
+    </object>
+
+    <object id="lateralSofa1" type="simple">
+      <transformations>
+        <translation x="0.0" y="7.5" z="0.0"/>
+      </transformations>
+      <material id="null"/>
+      <texture id="null"/>
+      <geometry type="box" dx="4.0" dy="15.0" dz="15.0" />
+    </object>
+
+    <object id="lateralSofa2" type="simple">
+      <transformations>
+        <translation x="-35.0" y="7.5" z="0.0"/>
+      </transformations>
+      <material id="null"/>
+      <texture id="null"/>
+      <geometry type="box" dx="4.0" dy="15.0" dz="15.0" />
+    </object>
+
+    <object id="baseSofa" type="simple">
+      <transformations>
+        <translation x="-17.5" y="5.0" z="0.0"/>
+      </transformations>
+      <material id="null"/>
+      <texture id="null"/>
+      <geometry type="box" dx="35.0" dy="5.0" dz="15.0" />
+    </object>
+
+    <object id="trasSofa" type="simple">
+      <transformations>
+        <translation x="-17.5" y="11.0" z="8.75"/>
+      </transformations>
+      <material id="null"/>
+      <texture id="null"/>
+      <geometry type="box" dx="35.0" dy="22.0" dz="2.5" />
+    </object>
+
+    <object id="almofadaSofa" type="simple">
+      <transformations>
+        <translation x="-17.5" y="8.0" z="0.0"/>
+      </transformations>
+      <material id="white"/>
+      <texture id="sofa"/>
+      <geometry type="box" dx="31.0" dy="3.0" dz="16.0" />
+    </object>
+    
+<!--/SOFA-->
+<!--CABIDE-->
+    <object id="cabide" type="compound">
+      <transformations>
+        <translation x="25.0" y="0.0" z="110.0"/>
+      </transformations>
+      <material id="null"/>
+      <texture id="roof"/>
+      <children>
+        <objectref id="baseCabide"/>
+        <objectref id="suporteCabide"/>
+        <objectref id="cabideTopo"/>
+        <objectref id="suporteCabideTotal"/>
+      </children>
+    </object>
+
+    <object id="baseCabide" type="compound">
+      <transformations>
+      </transformations>
+      <material id="null"/>
+      <texture id="null"/>
+      <children>
+        <objectref id="baseCabide1"/>
+        <objectref id="baseCabide2"/>
+      </children>
+    </object>
+
+    <object id="baseCabide1" type="simple">
+      <transformations>
+      </transformations>
+      <material id="null"/>
+      <texture id="null"/>
+      <geometry type="box" dx="10.0" dy="0.5" dz="1.0" />
+    </object>
+
+    <object id="baseCabide2" type="simple">
+      <transformations>
+        <rotation axis="y" angle="90" />
+      </transformations>
+      <material id="null"/>
+      <texture id="null"/>
+      <geometry type="box" dx="10.0" dy="0.5" dz="1.0" />
+    </object>
+
+    <object id="suporteCabide" type="simple">
+      <transformations>
+        <translation x="0.0" y="15.0" z="0.0"/>
+      </transformations>
+      <material id="null"/>
+      <texture id="null"/>
+      <geometry type="box" dx="1.0" dy="30.0" dz="1.0" />
+    </object>
+
+    <object id="suporteCabideTotal" type="compound">
+      <transformations>
+      </transformations>
+      <material id="null"/>
+      <texture id="null"/>
+      <children>
+        <objectref id="suporteCabideTotal1"/>
+        <objectref id="suporteCabideTotal2"/>
+      </children>
+    </object>
+    
+    <object id="suporteCabideTotal1" type="simple">
+      <transformations>
+        <translation x="0.0" y="25.0" z="0.0"/>
+        <translation x="-3.2" y="0.0" z="0.0"/>
+        <rotation axis="z" angle="-45" />
+        <translation x="2.5" y="0.0" z="0.0"/>
+      </transformations>
+      <material id="null"/>
+      <texture id="null"/>
+      <geometry type="box" dx="5.0" dy="0.5" dz="1.0" />
+    </object>
+
+    <object id="suporteCabideTotal2" type="simple">
+      <transformations>
+        <rotation axis="y" angle="180" />
+        <translation x="0.0" y="25.0" z="0.0"/>
+        <translation x="-3.2" y="0.0" z="0.0"/>
+        <rotation axis="z" angle="-45" />
+        <translation x="2.5" y="0.0" z="0.0"/>
+      </transformations>
+      <material id="null"/>
+      <texture id="null"/>
+      <geometry type="box" dx="5.0" dy="0.5" dz="1.0" />
+    </object>
+
+    <object id="cabideTopo" type="simple">
+      <transformations>
+        <translation x="0.0" y="30.0" z="0.0"/>
+      </transformations>
+      <material id="null"/>
+      <texture id="null"/>
+      <geometry type="box" dx="3.0" dy="1.0" dz="3.0" />
+    </object>
+    
+    
+    
+<!--/CABIDE-->    
 <!--CHAO & PAREDES-->
     <object id="chao" type="simple">
       <transformations>
