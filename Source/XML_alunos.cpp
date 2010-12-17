@@ -341,7 +341,6 @@ void processView(int dummy){
 	switch(flagJog){
 		case 0:
 			if(angView < 180){
-				stopTime = 0;
 				angView+=viewSpeed;
 				matrixViewPlayer[0][0] = cos(angView*PI/180);
 				matrixViewPlayer[0][2] = -sin(angView*PI/180);
@@ -351,17 +350,16 @@ void processView(int dummy){
 			}
 			else{
 				angView = 180.0;
-				stopTime = 1;
 				matrixViewPlayer[0][0] = cos(angView*PI/180);
 				matrixViewPlayer[0][2] = -sin(angView*PI/180);
 				matrixViewPlayer[2][0] = sin(angView*PI/180);
 				matrixViewPlayer[2][2] = cos(angView*PI/180);
 				time(&start);
+				stopTime = 1;
 			}
 			break;
 		case 1:
 			if(angView >0){
-				stopTime = 0;
 				angView-=viewSpeed;
 				matrixViewPlayer[0][0] = cos(angView*PI/180);
 				matrixViewPlayer[0][2] = -sin(angView*PI/180);
@@ -371,12 +369,12 @@ void processView(int dummy){
 			}
 			else{
 				angView = 0.0;
-				stopTime = 1;
 				matrixViewPlayer[0][0] = cos(angView*PI/180);
 				matrixViewPlayer[0][2] = -sin(angView*PI/180);
 				matrixViewPlayer[2][0] = sin(angView*PI/180);
 				matrixViewPlayer[2][2] = cos(angView*PI/180);
 				time(&start);
+				stopTime = 1;
 			}
 			break;
 	}
@@ -389,7 +387,11 @@ void aniStartGame(int status){
 		glutTimerFunc(mili_secs, aniStartGame, 0);
 	}
 	else
+	{
 		startGame=true; 
+		stopTime = 1;
+		time(&start);
+	}
 }
 
 void drawPieceTop(){
@@ -534,6 +536,7 @@ void drawPiece(int player, int ghost){
 	glPopMatrix();
 	glEnable(GL_LIGHTING);
 	glDisable (GL_BLEND);
+	glColor4f(1.0,1.0,1.0,1.0);
 	glDisable(GL_COLOR_MATERIAL);
 	glDisable(GL_TEXTURE_2D);
 }
@@ -1187,12 +1190,19 @@ void drawWidget(GLenum mode)
 	glMultMatrixf(&cena.m[0][0]);
 
 	if (mode == GL_SELECT)
+		glPushName(1);
+
+	if (mode == GL_SELECT)
 		glLoadName(500);
-	drawWidgetButton(10,0,menuTexture);
+	drawWidgetButton(10,-4,menuTexture);
 
 	if (mode == GL_SELECT)
 		glLoadName(501);
-	drawWidgetButton(6,0,undoTexture);
+	drawWidgetButton(6,-4,undoTexture);
+
+	if (mode == GL_SELECT)
+		glLoadName(502);
+	drawWidgetButton(2,-4,stopCameraTexture);
 
 	glDisable(GL_COLOR_MATERIAL);
 
@@ -1238,7 +1248,7 @@ void drawConfirmation()
 //Initializes the pieces of the game
 void inicializacaoPecas()
 {
-	for(int i=0; i< gameRatio; i++){
+	for(int i=0; i< 4; i++){
 		Peca* p1 = new Peca(-8.0+(2*i),21.1,8.0, 80+i);
 		Peca* p2 = new Peca(-8.0+(2*i),21.1,-8.0,i);
 		player1.push_back(p1);
@@ -1315,7 +1325,7 @@ void display(void)
         glMatrixMode( GL_PROJECTION );
         glLoadIdentity();
         glFrustum( -xy_aspect*0.04, xy_aspect*0.04, -0.04, 0.04, cena.near2, cena.far2);
-        //inicializacoes da matriz de transformacoes geometricas
+
         glMatrixMode( GL_MODELVIEW );
         glLoadIdentity();
 		glTranslatef( obj_pos[0], obj_pos[1], -obj_pos[2] );
@@ -1346,8 +1356,8 @@ void display(void)
             glMultMatrixf(&cena.m[0][0]);
             glPopMatrix();
         }
-		//desenha a cena
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+		//inicializacoes da matriz de transformacoes geometrica
 
         //propriedades das luzes
         for(int i = 0; i < cena.lights.size(); i++)
@@ -1360,7 +1370,7 @@ void display(void)
 				gluQuadricOrientation( glQ, GLU_INSIDE);
 				glPushMatrix();
 				glTranslated(cena.lights.at(i)->position[0],cena.lights.at(i)->position[1],cena.lights.at(i)->position[2]);
-				gluSphere(glQ, 5, 20, 20);
+				//gluSphere(glQ, 5, 20, 20);
 				glPopMatrix();
 				gluQuadricOrientation( glQ, GLU_OUTSIDE);
 			}
@@ -1377,7 +1387,7 @@ void display(void)
         glEnable(GL_NORMALIZE);
         
         if(ingame && !terminajogo){
-			//drawWidget(GL_RENDER);
+			drawWidget(GL_RENDER);
 			drawScene(GL_RENDER);
 			glCallList(1);
 			if(modoJogVsJog)
@@ -1401,7 +1411,12 @@ void display(void)
 						CPUMode1 = 0;
 						modoCPU = 1;
 						processaJogadaCPU();
-						processView(0);
+						if(!stopCamera) processView(0);
+						else
+						{
+							time(&start);
+							stopTime = 1;
+						}
 						dif = 0;
 					}
 				}
@@ -1496,7 +1511,12 @@ void changePlayer(){
 	verificaTermino();
 	flagJog = !flagJog;
 	if(!modoCPU && !modoCPUvsJogador)
-		processView(0);
+		if(!stopCamera) processView(0);
+		else
+		{
+			time(&start);
+			stopTime = 1;
+		}
 }
 
 int getJogador(float row, float column)
@@ -1675,6 +1695,7 @@ void pecaAniMovH(int status){
 	else if(movH > pecaSelected->x){
 		if(startani == 0)
 		{
+			stopTime = 0;
 			startani = clock();
 			posiani = pecaSelected->x;
 			endani = startani+2000;
@@ -1711,6 +1732,7 @@ void pecaAniMovV(int status){
 	else if(movV > pecaSelected->z){
 		if(startani == 0)
 		{
+			stopTime = 0;
 			startani = clock();
 			posiani = pecaSelected->z;
 			endani = startani+2000;
@@ -1846,6 +1868,7 @@ void processPlay(float row, float column, float answerRow, float answerColumn, f
 			confRow = answerRow;
 			drawConf = 1;
 			drawConfirmation();
+			stopTime = 0;
 			pecaAniMovV(0);
 			Jog->PecasConq = removePecasConquistadas();
 			if(answer != -1)
@@ -1860,6 +1883,7 @@ void processPlay(float row, float column, float answerRow, float answerColumn, f
 			confRow = answerRow;
 			drawConf = 1;
 			drawConfirmation();
+			stopTime = 0;
 			pecaAniMovH(0);
 			Jog->PecasConq = removePecasConquistadas();
 			if(answer != -1)
@@ -1920,14 +1944,14 @@ void startNewGame(int New)
 	rotY = 0;
 	viewSelected = 0;
 	menuFade = 100;
-	processView(0);
+	if(!stopCamera) processView(0);
 	//startNewGame
 	if(New)
 		jogo.reset();
 	inicializacaoPecas();
 	ingame = true;
+	stopTime = 0;
 	aniStartGame(0);
-	time (&start);
 }
 
 //Play the record of the game in progress
@@ -1991,6 +2015,8 @@ void pickingAction(GLuint answer) {
 				jogo.retrieveLast();
 			}
 		}
+		else if(answer == 502)
+			stopCamera = !stopCamera;
 		else{
 
 			int player = answer/100;
@@ -2349,7 +2375,7 @@ void processMouse(int button, int state, int x, int y) {
 			gluPickMatrix ((GLdouble) x, (GLdouble) (window_h - y), 1.0, 1.0, viewport);
 
 			if(ingame && !terminajogo){
-				//drawWidget(GL_SELECT);
+				drawWidget(GL_SELECT);
 				drawScene(GL_SELECT);
 				glCallList(1);
 			}
@@ -2358,8 +2384,6 @@ void processMouse(int button, int state, int x, int y) {
 			else
 				terminaJogo();
 			
-			
-
 			glMatrixMode (GL_PROJECTION);
 			glPopMatrix ();
 			glFlush ();
