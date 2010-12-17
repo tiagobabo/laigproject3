@@ -100,6 +100,10 @@
     <texture id="sofa" file="textures/wall5.bmp" length_s="30.0" length_t="16.0" />
     <texture id="madeira" file="textures/madeira.bmp" length_s="1.0" length_t="1.0" />
     <texture id="verde" file="textures/verde.bmp" length_s="1.0" length_t="1.0" />
+    <texture id="balcao" file="textures/balcao.bmp" length_s="20" length_t="20.0" />
+    <texture id="estante" file="textures/chao.bmp" length_s="20" length_t="20.0" />
+    <texture id="assento" file="textures/metal.bmp" length_s="20" length_t="20.0" />
+    <texture id="almofada" file="textures/almofada.bmp" length_s="50" length_t="0.0" />
 	</textures>
 	<materials>
 		<material id="rio">
@@ -452,8 +456,8 @@
     <object id="banco" type="compound">
       <transformations>
       </transformations>
-      <material id="null"/>
-      <texture id="null"/>
+      <material id="metal"/>
+      <texture id="assento"/>
       <children>
         <objectref id="base"/>  
         <objectref id="suporte"/>
@@ -467,7 +471,7 @@
         <translation x="-40.0" y="0.0" z="-38.0" />
       </transformations>
       <material id="metal"/>
-      <texture id="clear"/>
+      <texture id="null"/>
       <children>
         <objectref id="banco"/>
       </children>
@@ -478,7 +482,7 @@
         <translation x="-20.0" y="0.0" z="-38.0" />
       </transformations>
       <material id="metal"/>
-      <texture id="clear"/>
+      <texture id="null"/>
       <children>
         <objectref id="banco"/>
       </children>
@@ -489,7 +493,7 @@
         <translation x="0.0" y="0.0" z="-38.0" />
       </transformations>
       <material id="metal"/>
-      <texture id="clear"/>
+      <texture id="null"/>
       <children>
         <objectref id="banco"/>
       </children>
@@ -500,7 +504,7 @@
         <translation x="20.0" y="0.0" z="-38.0" />
       </transformations>
       <material id="metal"/>
-      <texture id="clear"/>
+      <texture id="null"/>
       <children>
         <objectref id="banco"/>
       </children>
@@ -511,7 +515,7 @@
         <translation x="40.0" y="0.0" z="-38.0" />
       </transformations>
       <material id="metal"/>
-      <texture id="clear"/>
+      <texture id="null"/>
       <children>
         <objectref id="banco"/>
       </children>
@@ -524,7 +528,7 @@
       <transformations>
       </transformations>
       <material id="null"/>
-      <texture id="null"/>
+      <texture id="estante"/>
       <geometry type="box" dx="100" dy="1" dz="10" />
     </object>
     
@@ -703,7 +707,7 @@
         <scale x="1.0" y="0.5" z="1.0"/>
       </transformations>
       <material id="red"/>
-      <texture id="null"/>
+      <texture id="almofada"/>
       <children>
         <objectref id="assentoDiskB"/>
         <objectref id="assentoDiskC"/>
@@ -715,7 +719,7 @@
       <transformations>
       </transformations>
       <material id="null"/>
-      <texture id="null"/>
+      <texture id="assento"/>
       <children>
         <objectref id="assentoDiskB"/>
         <objectref id="assentoDiskC"/>
@@ -748,8 +752,8 @@
         <translation x="0.0" y="15.0" z="0.0"/>
         <rotation axis="x" angle="-90" />
       </transformations>
-      <material id="null"/>
-      <texture id="null"/>
+      <material id="metal"/>
+      <texture id="assento"/>
       <geometry type="cylinder" base="5" top="5" height="2" slices="20" stacks="20" />
     </object>
     
@@ -761,7 +765,7 @@
         <translation x="0.0" y="10.0" z="-50.0"/>
       </transformations>
       <material id="null"/>
-      <texture id="roof"/>
+      <texture id="balcao"/>
       <geometry type="box" dx="100" dy="20" dz="10" />
     </object>
 <!--/BALCAO-->
