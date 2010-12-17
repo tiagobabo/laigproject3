@@ -276,9 +276,19 @@ void verificaTermino()
 	if(ans[0] == '1' || ans[0] == '2')
 	{
 		if(ans[0] == '1')
-			cout << "GANHOU O JOGADOR 2 :D " << endl;
-		else
-			cout << "GANHOU O JOGADOR 1 :D " << endl;
+		{
+			if(modoCPUvsJogador || modoCPU)
+				gameWon=404;
+			else
+				gameWon=402;
+		}
+		else{
+			if(modoCPU)
+				gameWon=403;
+			else
+				gameWon=401;
+
+		}
 		ingame = 0;
 		terminajogo = 1;
 	}
@@ -527,6 +537,22 @@ void drawPiece(int player, int ghost){
 	glDisable(GL_COLOR_MATERIAL);
 	glDisable(GL_TEXTURE_2D);
 }
+
+void drawWidgetButton(float x, float y, int texture)
+{
+	//enableTransparent();
+	glEnable(GL_TEXTURE_2D);
+	glBindTexture(GL_TEXTURE_2D, texture);
+	glPushMatrix();
+	glTranslatef(x,y,2.0);
+	glRotatef(-45,1.0,0.0,0.0);
+	glTranslatef(0.0,10.0,30);
+	gluDisk(glQ,0.0,1.0,20,20);
+	glPopMatrix();
+	glDisable(GL_TEXTURE_2D);
+	//disableTransparent();
+}
+
 float rotY = 0, rotX = 0;
  void drawScene(GLenum mode)
 {
@@ -932,6 +958,24 @@ void drawStartButton(float x, float y){
 	disableTransparent();
 }
 
+void drawPlayerName(float x, float y){
+	glEnable(GL_TEXTURE_2D);
+	glBindTexture(GL_TEXTURE_2D, gameWon);
+	glPushMatrix();
+	glRotatef(-45,1.0,0.0,0.0);
+	glTranslatef(x,y,30);
+	glRotatef(90,1.0,0.0,0.0);
+	glBegin(GL_POLYGON);
+		glNormal3d(0.0,1.0,0.0);  // esta normal fica comum aos 4 vertices
+		glTexCoord2f(0.0,0.0); glVertex3d( -18.0, 0.0,  5.0);
+		glTexCoord2f(1.0,0.0); glVertex3d(18.0, 0.0,  5.0);
+		glTexCoord2f(1.0,91.0/256.0); glVertex3d(18.0, 0.0,  -5.0);
+		glTexCoord2f(0.0,91.0/256.0); glVertex3d(-18.0, 0.0,  -5.0);
+	glEnd();
+	glPopMatrix();
+	glDisable(GL_TEXTURE_2D);
+}
+
 void drawDifficultyButton(float x, float y, bool selected)
 {
 	if(selected)
@@ -1108,11 +1152,47 @@ void drawMenu(GLenum mode)
 				glLoadName(8);
 			drawStartButton(0.0,-28.0);
 			break;
+
+		case 110:
+			if (mode == GL_SELECT)
+				glLoadName(1);
+			drawOptionBackForward(-18.0,-15.0);
+
+			if (mode == GL_SELECT)
+				glLoadName(2);
+			drawOptionBackForward(19.0,-15.0);
+
+			drawPlayerName(2.0,18.0);
+			break;
 		default:
 			break;
 	}
 
 	glPopName();
+
+	glDisable(GL_COLOR_MATERIAL);
+
+	glPopName();
+}
+
+
+void drawWidget(GLenum mode)
+{
+	glFrustum( -xy_aspect*0.04, xy_aspect*0.04, -0.04, 0.04, cena.near2, cena.far2);
+
+	glMatrixMode( GL_MODELVIEW );
+	glLoadIdentity();
+
+    glTranslatef( 0, 0, -menuFade ); 
+	glMultMatrixf(&cena.m[0][0]);
+
+	if (mode == GL_SELECT)
+		glLoadName(500);
+	drawWidgetButton(10,0,menuTexture);
+
+	if (mode == GL_SELECT)
+		glLoadName(501);
+	drawWidgetButton(6,0,undoTexture);
 
 	glDisable(GL_COLOR_MATERIAL);
 
@@ -1176,6 +1256,7 @@ void terminaJogo()
 	viewSelected = 0;
 	terminajogo = 0;
 	menuFade = 100;
+	menuSelected = 110;
 }
 
 int row,column, row2, column2;
@@ -1229,7 +1310,6 @@ void processaJogadaCPU()
 void display(void)
 {
 	 glQ = gluNewQuadric();
-        
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         // inicializacoes da matriz de visualizacao
         glMatrixMode( GL_PROJECTION );
@@ -1297,8 +1377,9 @@ void display(void)
         glEnable(GL_NORMALIZE);
         
         if(ingame && !terminajogo){
-            glCallList(1);
+			//drawWidget(GL_RENDER);
 			drawScene(GL_RENDER);
+			glCallList(1);
 			if(modoJogVsJog)
 			{
 				glPushMatrix();
@@ -1832,6 +1913,8 @@ void startNewGame(int New)
 	flagJog=1;
 	player1.clear();
 	player2.clear();
+	pontJog1 = 9;
+	pontJog2 = 9;
 	//resetCameras
 	rotX = 0;
 	rotY = 0;
@@ -1885,59 +1968,85 @@ void gameRecordPlay(int type)
 void pickingAction(GLuint answer) {
 	
 	if(ingame){
-		int player = answer/100;
-		int i = answer%10;
 
-		if(pecaSelectedB){
-			ghost = 0;
-
-			int pos = pecaSelected->PosTab;
-			int column = pos%10;
-			int answerColumn = answer%10;
-			int row = pos/10;
-			int answerRow = answer/10;
-		
-			cout << "---------------------JOGADA-----------------------" << endl;
-			cout << "FROM: "<<  pecaSelected->PosTab<< endl;
-			cout << "TO: " << answer << endl;
-			cout << "From Column: " << column<< endl << "To Column: " << answerColumn<<endl;
-			cout << "From Row: " << row << endl << "To Row: " << answerRow<<endl;
-			char s2[1024];
-			string matrix = getMatrixGame();
-			if(flagJog)
-				sprintf(s2,"verificaCaminho(%d,%d,%d,%d,%d,%s).\n",1, column+1, row+1, answerColumn+1, answerRow+1, matrix.c_str());
-			else
-				sprintf(s2,"verificaCaminho(%d,%d,%d,%d,%d,%s).\n",2, column+1, row+1, answerColumn+1, answerRow+1, matrix.c_str());
-			cout << s2;
-			envia(s2, strlen(s2));
-			char ans[1024];
-			recebe(ans);
-			cout << endl << ans << endl;
-			if(ans[0] == '1')
-				processPlay(row, column, answerRow, answerColumn, answer);
-			else if(answer < 89)
-				processPlay(row, column, answerRow, answerColumn, 300);
-			else
-			{
-				answerColumn = (int) player1.at(i)->PosTab%10;
-				answerRow = (int) player1.at(i)->PosTab/10;
-				processPlay(row, column, answerRow, answerColumn, 300);
-			}
-		}else if(player == 1 && flagJog) {
-			cout << "---------------------JOGADOR 1-----------------------" << endl;
-			cout << "Player1"<< endl<< "PECA: "<< answer << endl << "POS: "<< player1.at(i)->PosTab<< endl;
-			pecaSelected = player1.at(i);
-			pecaSelectedB = true;
-			pecaAniSelect(0);
-			verificaJogadasPossiveis(1, player1.at(i)->PosTab);
+		if(answer == 500){
+			 menuSelected = 100;
+			 menuFade=100;
+			 startGame=false;
+			 ingame = false;
+			 if(modoCPU == 1)
+			 {
+				 modoCPU = 0;
+				firstGame = 0;				
+			 }
+			 if(Record){
+				Record = false;
+				firstGame=0;
+			 }
 		}
-		else if(player == 2 && !flagJog) {
-			cout << "---------------------JOGADOR 2-----------------------" << endl;
-			cout << "Player2"<< endl<< "PECA: "<< answer << endl << "POS: "<< player2.at(i)->PosTab<< endl;
-			pecaSelected = player2.at(i);
-			pecaSelectedB = true;
-			pecaAniSelect(0);
-			verificaJogadasPossiveis(2, player2.at(i)->PosTab);
+		else if(answer == 501){
+			if(jogo.getJogo().size() != 0 && !mouseBlock){
+				processPlay(jogo.getJogo().back()->toRow, jogo.getJogo().back()->toColumn, jogo.getJogo().back()->fromRow, jogo.getJogo().back()->fromColumn, -1);
+				checkConquest(jogo.getJogo().back()->PecasConq);
+				jogo.retrieveLast();
+			}
+		}
+		else{
+
+			int player = answer/100;
+			int i = answer%10;
+
+			if(pecaSelectedB){
+				ghost = 0;
+
+				int pos = pecaSelected->PosTab;
+				int column = pos%10;
+				int answerColumn = answer%10;
+				int row = pos/10;
+				int answerRow = answer/10;
+		
+				cout << "---------------------JOGADA-----------------------" << endl;
+				cout << "FROM: "<<  pecaSelected->PosTab<< endl;
+				cout << "TO: " << answer << endl;
+				cout << "From Column: " << column<< endl << "To Column: " << answerColumn<<endl;
+				cout << "From Row: " << row << endl << "To Row: " << answerRow<<endl;
+				char s2[1024];
+				string matrix = getMatrixGame();
+				if(flagJog)
+					sprintf(s2,"verificaCaminho(%d,%d,%d,%d,%d,%s).\n",1, column+1, row+1, answerColumn+1, answerRow+1, matrix.c_str());
+				else
+					sprintf(s2,"verificaCaminho(%d,%d,%d,%d,%d,%s).\n",2, column+1, row+1, answerColumn+1, answerRow+1, matrix.c_str());
+				cout << s2;
+				envia(s2, strlen(s2));
+				char ans[1024];
+				recebe(ans);
+				cout << endl << ans << endl;
+				if(ans[0] == '1')
+					processPlay(row, column, answerRow, answerColumn, answer);
+				else if(answer < 89)
+					processPlay(row, column, answerRow, answerColumn, 300);
+				else
+				{
+					answerColumn = (int) player1.at(i)->PosTab%10;
+					answerRow = (int) player1.at(i)->PosTab/10;
+					processPlay(row, column, answerRow, answerColumn, 300);
+				}
+			}else if(player == 1 && flagJog) {
+				cout << "---------------------JOGADOR 1-----------------------" << endl;
+				cout << "Player1"<< endl<< "PECA: "<< answer << endl << "POS: "<< player1.at(i)->PosTab<< endl;
+				pecaSelected = player1.at(i);
+				pecaSelectedB = true;
+				pecaAniSelect(0);
+				verificaJogadasPossiveis(1, player1.at(i)->PosTab);
+			}
+			else if(player == 2 && !flagJog) {
+				cout << "---------------------JOGADOR 2-----------------------" << endl;
+				cout << "Player2"<< endl<< "PECA: "<< answer << endl << "POS: "<< player2.at(i)->PosTab<< endl;
+				pecaSelected = player2.at(i);
+				pecaSelectedB = true;
+				pecaAniSelect(0);
+				verificaJogadasPossiveis(2, player2.at(i)->PosTab);
+			}
 		}
 	}
 	else
@@ -2137,6 +2246,16 @@ void pickingAction(GLuint answer) {
 					}
 				}
 				break;
+			case 110:
+				if(answer==1){
+					modoCPU = 0;
+					modoCPUvsJogador = 0;
+					gameRecordPlay(1);
+				}
+				else if(answer == 2)
+					menuSelected = 100;
+
+				break;
 		}
 
 	}
@@ -2230,6 +2349,7 @@ void processMouse(int button, int state, int x, int y) {
 			gluPickMatrix ((GLdouble) x, (GLdouble) (window_h - y), 1.0, 1.0, viewport);
 
 			if(ingame && !terminajogo){
+				//drawWidget(GL_SELECT);
 				drawScene(GL_SELECT);
 				glCallList(1);
 			}
@@ -2354,6 +2474,10 @@ void keyboard(unsigned char key, int x, int y)
 			 {
 				 modoCPU = 0;
 				firstGame = 0;				
+			 }
+			 if(Record){
+				Record = false;
+				firstGame=0;
 			 }
 		 }
 		 else if(firstGame!=0){
@@ -2499,6 +2623,8 @@ void inicializacao()
 	pixmap2.setTexture(107);
 	pixmap2.readBMPFile("textures/piece2.bmp");
 	pixmap2.setTexture(108);
+	pixmap2.readBMPFile("textures/end.bmp");
+	pixmap2.setTexture(110);
 
 
 	//options
@@ -2517,6 +2643,15 @@ void inicializacao()
 	pixmap2.readBMPFile("textures/switch_off.bmp");
 	pixmap2.setTexture(208);
 
+
+	pixmap2.readBMPFile("textures/player1.bmp");
+	pixmap2.setTexture(401);
+	pixmap2.readBMPFile("textures/player2.bmp");
+	pixmap2.setTexture(402);
+	pixmap2.readBMPFile("textures/cpu1.bmp");
+	pixmap2.setTexture(403);
+	pixmap2.readBMPFile("textures/cpu2.bmp");
+	pixmap2.setTexture(404);
 	t3dInit();
 	inicializacaoPecas();
 
