@@ -12,7 +12,7 @@
     <geometry type="box" dx="40" dy="1" dz="30" />
   -->
   
-  <globals maxlights="20" maxobjects="150" maxtextures="30" maxmaterials="30" root="cena"/>
+  <globals maxlights="20" maxobjects="150" maxtextures="40" maxmaterials="30" root="cena"/>
 
 	<view near="0.1" far="1000.0" axisscale="0.0">
 		<translation x="0.0" z="-55.0" y="-15.0"/>
@@ -98,6 +98,8 @@
     <texture id="vangogh" file="textures/vangogh.bmp" length_s="20.0" length_t="20.0" />
     <texture id="tv" file="textures/tv.bmp" length_s="25.0" length_t="15.0" />
     <texture id="sofa" file="textures/wall5.bmp" length_s="30.0" length_t="16.0" />
+    <texture id="madeira" file="textures/madeira.bmp" length_s="1.0" length_t="1.0" />
+    <texture id="verde" file="textures/verde.bmp" length_s="1.0" length_t="1.0" />
 	</textures>
 	<materials>
 		<material id="rio">
@@ -184,7 +186,41 @@
       <specular r="1.0" g="1.0" b="1.0" a="1.0"/>
       <shininess value="128" />
     </material>
-
+    <material id="vermelho">
+      <emission r="0.0" g="0.0" b="0.0" a="1.0"/>
+      <ambient  r="0.7" g="0.0" b="0.0" a="1.0"/>
+      <diffuse r="0.7" g="0.0" b="0.0" a="1.0"/>
+      <specular r="0.7" g="0.0" b="0.0" a="1.0"/>
+      <shininess value="128" />
+    </material>
+    <material id="azul">
+      <emission r="0.0" g="0.0" b="0.0" a="1.0"/>
+      <ambient  r="0.0" g="0.0" b="0.7" a="1.0"/>
+      <diffuse r="0.0" g="0.0" b="0.7" a="1.0"/>
+      <specular r="0.0" g="0.0" b="0.7" a="1.0"/>
+      <shininess value="128" />
+    </material>
+    <material id="verde">
+      <emission r="0.0" g="0.0" b="0.0" a="1.0"/>
+      <ambient  r="0.0" g="0.7" b="0.0" a="1.0"/>
+      <diffuse r="0.0" g="0.7" b="0.0" a="1.0"/>
+      <specular r="0.0" g="0.7" b="0.0" a="1.0"/>
+      <shininess value="128" />
+    </material>
+    <material id="amarelo">
+      <emission r="0.0" g="0.0" b="0.0" a="1.0"/>
+      <ambient  r="0.7" g="0.7" b="0.0" a="1.0"/>
+      <diffuse r="0.7" g="0.7" b="0.0" a="1.0"/>
+      <specular r="0.7" g="0.7" b="0.0" a="1.0"/>
+      <shininess value="128" />
+    </material>
+    <material id="castanho">
+      <emission r="0.0" g="0.0" b="0.0" a="1.0"/>
+      <ambient  r="1.0" g="1.0" b="1.0" a="1.0"/>
+      <diffuse r="1.0" g="1.0" b="1.0" a="1.0"/>
+      <specular r="1.0" g="1.0" b="1.0"  a="1.0"/>
+      <shininess value="128" />
+      </material>
   </materials>
 
 <!-- SCENE -->	
@@ -196,7 +232,7 @@
 			<texture id="clear"/>
 			<children>
         <objectref id="sala"/>
-        <!--<objectref id="mesa"/>-->
+        <objectref id="bilhar"/>
         <objectref id="tabuleiro"/> 
       </children>
 		</object>
@@ -1186,69 +1222,361 @@
 			<texture id="board5"/>
 			<geometry type="box" dx="22" dy="3.0" dz="22" />
 		</object>
-		<object id="mesa" type="compound">
-			<transformations>
-				<translation x="0.0" y="20.1" z="0.0"/>
-			</transformations>
-			<material id="white"/>
-			<texture id="wood"/>
-			<children>
-				<objectref id="tampo"/>
-				<objectref id="pernas"/>
-			</children>
-		</object>
-		
-		<object id="tampo" type="simple">
-			<transformations>
-			</transformations>
-			<material id="null"/>
-			<texture id="null"/>
-			<geometry type="box" dx="40" dy="1" dz="30" />
-		</object>
-		<object id="pernas" type="compound">
-			<transformations>
-			</transformations>
-			<material id="null"/>
-			<texture id="null"/>
-			<children>
-				<objectref id="perna1"/>
-				<objectref id="perna2"/>
-				<objectref id="perna3"/>
-				<objectref id="perna4"/>
-			</children>
-		</object>
-		<object id="perna1" type="simple">
-			<transformations>
-			<translation x="-19.5" y="-10.1" z="14.5"/>
-			</transformations>
-			<material id="null"/>
-			<texture id="null"/>
-			<geometry type="box" dx="1" dy="20" dz="1" />
-		</object>
-		<object id="perna2" type="simple">
-			<transformations>
-			<translation x="19.5" y="-10.1" z="14.5"/>
-			</transformations>
-			<material id="null"/>
-			<texture id="null"/>
-			<geometry type="box" dx="1" dy="20" dz="1" />
-		</object>
-		<object id="perna3" type="simple">
-			<transformations>
-			<translation x="19.5" y="-10.1" z="-14.5"/>
-			</transformations>
-			<material id="null"/>
-			<texture id="null"/>
-			<geometry type="box" dx="1" dy="20" dz="1" />
-		</object>
-		<object id="perna4" type="simple">
-			<transformations>
-			<translation x="-19.5" y="-10.1" z="-14.5"/>
-			</transformations>
-			<material id="null"/>
-			<texture id="null"/>
-			<geometry type="box" dx="1" dy="20" dz="1" />
-		</object>
 <!--/TABULEIRO & MESA-->
+    
+<!-- BILHAR -->
+
+
+    <!-- PERNAS DA MESA  -->
+    <object id="perna1" type="simple">
+      <transformations>
+        <translation x="-25" y="0.0" z="-10.0" />
+        <rotation axis="x" angle="-90.0" />
+      </transformations>
+
+      <material id="null" />
+
+      <texture id="null" />
+
+      <geometry type="cylinder" base="2.0" top="3.0" height="25.0" slices="10" stacks="10" />
+
+    </object>
+    <object id="perna2" type="simple">
+      <transformations>
+        <translation x="25" y="0.0" z="-10.0" />
+        <rotation axis="x" angle="-90.0" />
+      </transformations>
+
+      <material id="null" />
+
+      <texture id="null" />
+
+      <geometry type="cylinder" base="2.0" top="3.0" height="25.0" slices="10" stacks="10" />
+
+    </object>
+    <object id="perna3" type="simple">
+      <transformations>
+        <translation x="25" y="0.0" z="10.0" />
+        <rotation axis="x" angle="-90.0" />
+      </transformations>
+
+      <material id="null" />
+
+      <texture id="null" />
+
+      <geometry type="cylinder" base="2.0" top="3.0" height="25.0" slices="10" stacks="10" />
+    </object>
+    <object id="perna4" type="simple">
+      <transformations>
+        <translation x="-25" y="0.0" z="10.0" />
+        <rotation axis="x" angle="-90.0" />
+      </transformations>
+
+      <material id="null" />
+
+      <texture id="null" />
+
+      <geometry type="cylinder" base="2.0" top="3.0" height="25.0" slices="10" stacks="10" />
+    </object>
+
+    <object id="PaiPerna" type="compound">
+      <transformations>
+
+      </transformations>
+      <material id="null" />
+      <texture id="madeira" />
+
+
+      <children>
+        <objectref id="perna1" />
+        <objectref id="perna2" />
+        <objectref id="perna3" />
+        <objectref id="perna4" />
+
+      </children>
+    </object>
+    <!-- CUBO PARA A MESA-->
+    <object id="cubo_frente" type="compound">
+      <transformations>
+        <translation x="0.0" y="0.0" z=".5" />
+      </transformations>
+
+      <material id="null" />
+
+      <texture id="null" />
+
+      <children>
+        <objectref id="quadrado" />
+      </children>
+    </object>
+
+    <object id="cubo_tras" type="compound">
+      <transformations>
+        <translation x="0.0" y="0.0" z="-.5" />
+        <rotation axis="y" angle="180.0" />
+      </transformations>
+
+      <material id="null" />
+
+      <texture id="null" />
+
+      <children>
+        <objectref id="quadrado" />
+      </children>
+    </object>
+
+    <object id="cubo_esquerda" type="compound">
+      <transformations>
+
+        <translation x="-.5" y="0.0" z="0.0" />
+        <rotation axis="y" angle="-90.0" />
+      </transformations>
+
+      <material id="null" />
+
+      <texture id="null" />
+
+      <children>
+        <objectref id="quadrado" />
+      </children>
+    </object>
+
+    <object id="cubo_direita" type="compound">
+      <transformations>
+
+        <translation x=".5" y="0.0" z="0.0" />
+        <rotation axis="y" angle="90.0" />
+      </transformations>
+
+      <material id="null" />
+
+      <texture id="null" />
+
+      <children>
+        <objectref id="quadrado" />
+      </children>
+    </object>
+    <object id="cubo_cima" type="compound">
+      <transformations>
+
+        <translation x="0.0" y=".5" z="0.0" />
+        <rotation axis="x" angle="-90.0" />
+      </transformations>
+
+      <material id="null" />
+
+      <texture id="null" />
+
+      <children>
+        <objectref id="quadrado" />
+      </children>
+    </object>
+
+    <object id="cubo_baixo" type="compound">
+      <transformations>
+
+        <translation x="0.0" y="-.5" z="0.0" />
+        <rotation axis="x" angle="90.0" />
+      </transformations>
+
+      <material id="null" />
+
+      <texture id="null" />
+
+      <children>
+        <objectref id="quadrado" />
+      </children>
+    </object>
+
+    <object id="cubo" type="compound">
+      <transformations>
+
+      </transformations>
+
+      <material id="null" />
+
+      <texture id="null" />
+
+      <children>
+        <objectref id="cubo_frente" />
+        <objectref id="cubo_tras" />
+        <objectref id="cubo_direita" />
+        <objectref id="cubo_esquerda" />
+        <objectref id="cubo_cima" />
+        <objectref id="cubo_baixo" />
+      </children>
+    </object>
+
+    <object id="quadrado" type="simple">
+      <transformations>
+      </transformations>
+
+      <material id="null" />
+
+      <texture id="null" />
+
+      <geometry type="rectangle" x1=".5" y1=".5" x2="-.5" y2="-.5" />
+
+    </object>
+    <!-- CAIXA DA MESA  -->
+    <object id="PaiCaixa" type="compound">
+      <transformations>
+        <translation x="0.0" y="25.0" z="-0.0" />
+      </transformations>
+      <material id="null" />
+      <texture id="madeira" />
+      <children>
+        <objectref id="caixa" />
+        <objectref id="cuboDireita" />
+        <objectref id="cuboEsquerda" />
+        <objectref id="cuboFrente" />
+        <objectref id="cuboTras" />
+        <objectref id="tampo" />
+
+      </children>
+    </object>
+    <object id="tampo" type="simple">
+      <transformations>
+
+        <translation x="0.0" y="3.6" z="-0.0" />
+        <rotation axis="x" angle="-90.0" />
+      </transformations>
+
+      <material id="null" />
+
+      <texture id="verde" />
+
+      <geometry type="rectangle" x1="-30.0" y1="-15" x2="30.0" y2="15" />
+
+    </object>
+    <object id="caixa" type="compound">
+      <transformations>
+
+        <scale x="60.0" y="7.0" z="30.0" />
+      </transformations>
+      <material id="null" />
+      <texture id="null" />
+      <children>
+        <objectref id="cubo" />
+      </children>
+    </object>
+    <object id="cuboDireita" type="compound">
+      <transformations>
+        <translation x="30.0" y="3.50" z="-0.0" />
+        <scale x="5.0" y="3.5" z="30.0" />
+      </transformations>
+      <material id="null" />
+      <texture id="null" />
+      <children>
+        <objectref id="cubo" />
+      </children>
+    </object>
+    <object id="cuboEsquerda" type="compound">
+      <transformations>
+        <translation x="-30.0" y="3.50" z="-0.0" />
+        <scale x="5.0" y="3.5" z="30.0" />
+      </transformations>
+      <material id="null" />
+      <texture id="null" />
+      <children>
+        <objectref id="cubo" />
+      </children>
+    </object>
+    <object id="cuboFrente" type="compound">
+      <transformations>
+        <translation x="0.0" y="3.50" z="15.0" />
+        <scale x="65.0" y="3.5" z="5.0" />
+      </transformations>
+      <material id="null" />
+      <texture id="null" />
+      <children>
+        <objectref id="cubo" />
+      </children>
+    </object>
+    <object id="cuboTras" type="compound">
+      <transformations>
+        <translation x="0.0" y="3.50" z="-15.0" />
+        <scale x="65.0" y="3.5" z="5.0" />
+      </transformations>
+      <material id="null" />
+      <texture id="null" />
+      <children>
+        <objectref id="cubo" />
+      </children>
+    </object>
+    <!-- BOLAS DE BILHAR-->
+    <object id="bolas" type="compound">
+      <transformations>
+
+      </transformations>
+      <material id="null" />
+      <texture id="null" />
+      <children>
+        <objectref id="bolaazul" />
+        <objectref id="bolaverde" />
+        <objectref id="bolaamarela" />
+        <objectref id="bolacastanha" />
+        <objectref id="bolavermelha1" />
+
+      </children>
+    </object>
+    <object id="bolaazul" type="simple">
+      <transformations>
+        <translation x="0.0" y="29.0" z="-0.0" />
+      </transformations>
+      <material id="azul" />
+      <texture id="null" />
+      <geometry type="sphere" radius="1.0" slices="8" stacks="8" />
+    </object>
+    <object id="bolavermelha1" type="simple">
+      <transformations>
+        <translation x="-12.5" y="29.0" z="-0.0" />
+      </transformations>
+      <material id="vermelho" />
+      <texture id="null" />
+      <geometry type="sphere" radius="1.0" slices="8" stacks="8" />
+    </object>
+    <object id="bolaverde" type="simple">
+      <transformations>
+        <translation x="12.5" y="29.0" z="6.0" />
+      </transformations>
+      <material id="verde" />
+      <texture id="null" />
+      <geometry type="sphere" radius="1.0" slices="8" stacks="8" />
+    </object>
+    <object id="bolaamarela" type="simple">
+      <transformations>
+        <translation x="12.5" y="29.0" z="-6.0" />
+      </transformations>
+      <material id="amarelo" />
+      <texture id="null" />
+      <geometry type="sphere" radius="1.0" slices="8" stacks="8" />
+    </object>
+    <object id="bolacastanha" type="simple">
+      <transformations>
+        <translation x="12.5" y="29.0" z="0.0" />
+      </transformations>
+      <material id="castanho" />
+      <texture id="null" />
+      <geometry type="sphere" radius="1.0" slices="8" stacks="8" />
+    </object>
+
+    <!-- ROOT DA CENA-->
+    <object id="bilhar" type="compound">
+      <transformations>
+        <translation x="50.0" y="0.0" z="50.0" />
+        <scale x="0.7" y="0.7" z="0.7" />
+      </transformations>
+      <material id="castanho" />
+      <texture id="clear" />
+      <children>
+        <objectref id="bolas" />
+        <objectref id="PaiCaixa" />
+        <objectref id="PaiPerna" />
+      </children>
+    </object>
+
+
+
   </objects>
 </sgx>
