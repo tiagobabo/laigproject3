@@ -20,8 +20,6 @@
  * www.videotutorialsrock.com
  */
 
-
-
 #ifndef TEXT_3D_H_INCLUDED
 #define TEXT_3D_H_INCLUDED
 
@@ -101,14 +99,5 @@ class T3DLoadException {
 		T3DLoadException(std::string message1);
 		std::string message() const;
 };
-
-
-
-
-
-
-
-
-
 
 #endif
