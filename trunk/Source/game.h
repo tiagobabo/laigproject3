@@ -17,6 +17,9 @@ int pontJog2 = 9;
 int numPlayRecord = 0;
 bool Record = false;
 bool RecordNext = false;
+int gameWon = 401; // default 401 (player1)
+int menuTexture = 2;
+int undoTexture = 2;
 
 //Game Modes
 bool easySelected = false;
