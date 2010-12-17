@@ -20,6 +20,8 @@ bool RecordNext = false;
 int gameWon = 401; // default 401 (player1)
 int menuTexture = 2;
 int undoTexture = 2;
+int stopCameraTexture = 2;
+int stopCamera = 0;
 
 //Game Modes
 bool easySelected = false;
