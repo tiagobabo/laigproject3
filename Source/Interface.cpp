@@ -1,188 +1,6 @@
 // G1_Ilum.cpp : Defines the entry point for the console application.
 //
-#include "SceneLoader.h"
-#include "game.h"
-#include "text3d.h"
-#include <time.h>
-
-#include <GL\glui.h>
-#include <math.h>
-#include <winsock2.h>
-
-using namespace std;
-
-RGBpixmap pixmap2;
-
-// dimensoes e localizacao da janela
-#define DIMX 600
-#define DIMY 500
-#define INITIALPOS_X 200
-#define INITIALPOS_Y 200
-#define mili_secs 20
-#define PI 3.14159265
-#define BUFSIZE 512
-
-#define IPADDRESS "127.0.0.1"
-#define PORT 60070
-
-#define VLENGTH 3
-
-float xy_aspect;		// aspect ratio da area de visualizacao
-int window_w=DIMX;
-int window_h=DIMY;
-
-// picking
-GLuint selectBuf[BUFSIZE];
-
-Node* raiz;
-Scene cena;
-Jogo jogo;
-
-// matriz de transf. geometrica utilizada pelo botao esferico
-float view_rotate[16] =	{ 1,0,0,0,
-						  0,1,0,0,
-						  0,0,1,0,
-						  0,0,0,1 };
-
-
-
-// vector de posicao utilizado pelo botao de afastamento
-float obj_pos[] = { 0.0, 0.0, 0.0 };
-
-// declarações para os tres eixos (cilindros)
-double axis_radius_begin =  0.2;
-double axis_radius_end   =  0.0;
-double axis_lenght       = 1.0;
-int axis_nslices = 8;
-int axis_nstacks = 1;
-
-// declaracoes para a esfera de origem de coordenadas
-double orig_radius = 0.5;
-int orig_slices = 8;
-int orig_stacks =16;
-	
-// declaracoes para o plano e caixa
-float mat1_shininess[] = {128.0}; 
-
-//float mat1_specular[] = {1.0,1.0,1.0};	/* specular reflection. */
-float mat1_specular[] = {0.4, 0.4, 0.4, 1.0};	/* specular reflection. */
-//float mat1_diffuse[] =  {0.0, 0.0, 0.0, 1.0};	/* diffuse reflection. */
-float mat1_diffuse[] =  {0.6, 0.6, 0.6, 1.0};	/* diffuse reflection. */
-float mat1_ambient[] =  {0.6, 0.6, 0.6, 1.0};	/* ambient reflection. */
-double dimx= 6.0;
-double dimy= 2.0;
-double dimz=10.0;
-
-float light0_kc=0.0;
-float light0_kl=0.0;
-float light0_kq=0.1;
-
-// declarações para as stripes que formam o plano
-double i,j;
-double di, limi=dimx, divisoes_i = 60;	//60
-double dj, limj=dimz, divisoes_j = 100;	//100
-
-// declarações para a fonte de luz LIGHT0;
-float light0_position[]  = {0.0, 3.0, 4.0, 1.0}; // nao necessaria...
-float light0_ambient[] =   {0.0, 0.0, 0.0, 1.0}; // sem componente ambiente
-//float light0_diffuse[] =   {1.0, 1.0, 0.0, 0.0};
-float light0_diffuse[] =   {0.8, 0.8, 0.8, 1.0};
-//float light0_specular[] =  {0.0, 0.0, 0.0, 0.0};
-float light0_specular[] =  {0.8, 0.8, 0.8, 1.0};
-double light0x = dimx/2.0;
-double light0y = 1;
-double light0z = dimz/4.0;
-double symb_light0_radius = 0.2;	// esfera que
-int symb_light0_slices = 8;			// simboliza a
-int symb_light0_stacks =16;			// fonte de luz light0
-
-// fonte (global) de luz ambiente 
-//float light_ambient[] = {0.0, 0.0, 0.0, 1.0}; /* Set the background ambient lighting. */
-float light_ambient[] = {0.2, 0.2, 0.2, 1.0}; /* Set the background ambient lighting. */
-
-// variaveis para a janela
-int main_window;
-GLUI  *glui2;
-int background_text=0;
-
-GLUquadric* glQ;	// nec. p/ criar sup. quadraticas (cilindros, esferas...)
-
-SOCKET m_socket;
-
-void processPlay(float row, float column, float answerRow, float answerColumn, float answer);
-void checkConquest(vector<Peca*> conq);
-Peca* getPiece(float row, float column);
-void changePlayer();
-void pecaAniSelect(int status);
-
-
-bool socketConnect() {// Initialize Winsock.
-    WSADATA wsaData;
-    int iResult = WSAStartup(MAKEWORD(2,2), &wsaData);
-    if (iResult != NO_ERROR)
-		printf("Client: Error at WSAStartup().\n");
-    else
-        printf("Client: WSAStartup() is OK.\n");
-
-	// Create a socket.
-    m_socket = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
-    if (m_socket == INVALID_SOCKET) {
-        printf("Client: socket() - Error at socket(): %ld\n", WSAGetLastError());
-        WSACleanup();
-        return false;
-    }
-	else
-       printf("Client: socket() is OK.\n");
-
-    // Connect to a server.
-    sockaddr_in clientService;
-    clientService.sin_family = AF_INET;
-    // Just test using the localhost, you can try other IP address
-    clientService.sin_addr.s_addr = inet_addr("127.0.0.1");
-    clientService.sin_port = htons(60070);
-
-    if (connect(m_socket, (SOCKADDR*)&clientService, sizeof(clientService)) == SOCKET_ERROR) {
-        printf("Client: connect() - Failed to connect.\n");
-        WSACleanup();
-        return false;
-    }
-    else {
-       printf("Client: connect() is OK.\n");
-       printf("Client: Can start sending and receiving data...\n");
-    }
-
-    // Send and receive data.
-	printf("Connected\n");
-	return true;
-}
-
-void envia(char *s, int len) {
-	int bytesSent = send(m_socket, s, len, 0);
-	cout << "asked prolog: " << s << endl;
-	if(bytesSent == SOCKET_ERROR)
-		printf("Client: send() error %ld.\n", WSAGetLastError());
-}
-
-void recebe(char *ans) {
-	int bytesRecv = SOCKET_ERROR;
-	int pos = 0;
-	while (true) {
-		recv(m_socket, &ans[pos], 1, 0);
-		if (ans[pos] == '\n')
-			break;
-		pos++;
-	}
-	ans[pos] = 0;
-	cout << "prolog answered: " << ans << endl;
-}
-
-void quit() {
-	cout << "Asking prolog to quit" << endl;
-	char buff[] = "quit.\n";
-	envia(buff, 6);
-	char ans[1024];
-	recebe(ans);
-}
+#include "Interface.h"
 
 void calcPont(){
 int numPlayer1=0;
@@ -269,9 +87,9 @@ void verificaTermino()
 	string matrix = getMatrixGame();
 	char s2[1024];
 	sprintf(s2,"terminouJogo(%s).\n",matrix.c_str());
-	envia(s2, strlen(s2));
+	m_socket->envia(s2, strlen(s2));
 	char ans[1024];
-	recebe(ans);
+	m_socket->recebe(ans);
 	//responde qual perdeu...
 	if(ans[0] == '1' || ans[0] == '2')
 	{
@@ -556,7 +374,6 @@ void drawWidgetButton(float x, float y, int texture)
 	//disableTransparent();
 }
 
-float rotY = 0, rotX = 0;
  void drawScene(GLenum mode)
 {
 	glFrustum( -xy_aspect*0.04, xy_aspect*0.04, -0.04, 0.04, cena.near2, cena.far2);
@@ -668,9 +485,6 @@ void drawBackground() {
 	glMatrixMode(GL_MODELVIEW);
 
 }
-
-int ghost = 0;
-string ghosts;
 
 void drawGhosts()
 {
@@ -1248,7 +1062,7 @@ void drawConfirmation()
 //Initializes the pieces of the game
 void inicializacaoPecas()
 {
-	for(int i=0; i< 4; i++){
+	for(int i=0; i< gameRatio; i++){
 		Peca* p1 = new Peca(-8.0+(2*i),21.1,8.0, 80+i);
 		Peca* p2 = new Peca(-8.0+(2*i),21.1,-8.0,i);
 		player1.push_back(p1);
@@ -1306,9 +1120,9 @@ void processaJogadaCPU()
 			break;
 		}
 	}
-	envia(s2, strlen(s2));
+	m_socket->envia(s2, strlen(s2));
 	char ans[1024];
-	recebe(ans);
+	m_socket->recebe(ans);
 	column = atoi(&ans[0])-1;
 	row = atoi(&ans[2])-1;
 	column2 = atoi(&ans[4])-1;
@@ -1803,9 +1617,9 @@ vector<Peca*> removePecasConquistadas()
 	string matrix = getMatrixGame();
 	char s2[1024];
 	sprintf(s2,"conquistas(%s).\n",matrix.c_str());
-	envia(s2, strlen(s2));
+	m_socket->envia(s2, strlen(s2));
 	char ans[1024];
-	recebe(ans);
+	m_socket->recebe(ans);
 	string resp;
 	resp = ans;
 	replace( resp.begin(), resp.end(), '[', ' ');
@@ -1914,9 +1728,9 @@ void verificaJogadasPossiveis(int jog, int pos)
 	string matrix = getMatrixGame();
 	char s2[1024];
 	sprintf(s2,"jogadasPossiveis(%d,%d,%d,%s).\n",jog, pos%10+1, pos/10+1, matrix.c_str());
-	envia(s2, strlen(s2));
+	m_socket->envia(s2, strlen(s2));
 	char ans[1024];
-	recebe(ans);
+	m_socket->recebe(ans);
 	cout << endl << ans << endl;
 	string res;
 	for(int i = 0; ans[i] != '\0'; i++)
@@ -2043,9 +1857,9 @@ void pickingAction(GLuint answer) {
 				else
 					sprintf(s2,"verificaCaminho(%d,%d,%d,%d,%d,%s).\n",2, column+1, row+1, answerColumn+1, answerRow+1, matrix.c_str());
 				cout << s2;
-				envia(s2, strlen(s2));
+				m_socket->envia(s2, strlen(s2));
 				char ans[1024];
-				recebe(ans);
+				m_socket->recebe(ans);
 				cout << endl << ans << endl;
 				if(ans[0] == '1')
 					processPlay(row, column, answerRow, answerColumn, answer);
@@ -2089,7 +1903,7 @@ void pickingAction(GLuint answer) {
 				else if(answer == 4)
 					menuSelected = 103; //credits
 				else if(answer == 5){ //exit
-					quit();
+					m_socket->quit();
 					exit(0);
 				}
 				break;
@@ -2728,7 +2542,7 @@ void visib_control( int control )
 int main(int argc, char* argv[])
 {
 	
-	if(socketConnect() == false) 
+	if(m_socket->socketConnect() == false) 
 	{
 		system("pause");
 		return -1;
@@ -2755,6 +2569,6 @@ int main(int argc, char* argv[])
 	inicializacao();
 	glutMainLoop();
 
-	quit();
+	m_socket->quit();
 	return 0;
 }
