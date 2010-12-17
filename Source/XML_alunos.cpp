@@ -36,8 +36,6 @@ GLuint selectBuf[BUFSIZE];
 
 Node* raiz;
 Scene cena;
-Node* raiz2;
-Scene cena2;
 Jogo jogo;
 
 // matriz de transf. geometrica utilizada pelo botao esferico
@@ -381,7 +379,7 @@ void aniStartGame(int status){
 		glutTimerFunc(mili_secs, aniStartGame, 0);
 	}
 	else
-		startGame=true;
+		startGame=true; 
 }
 
 void drawPieceTop(){
@@ -806,11 +804,29 @@ void drawQuitGameButton()
 void drawOptionScene()
 {
 	//enableTransparent();
-	glEnable(GL_TEXTURE_2D);
-	glBindTexture(GL_TEXTURE_2D, gameScene);
 	glPushMatrix();
 	glRotatef(-45,1.0,0.0,0.0);
-	glTranslatef(20.0,8.0,30);
+	glTranslatef(20.0,11.0,30);
+	glRotatef(90,1.0,0.0,0.0);
+	glBegin(GL_POLYGON);
+		glNormal3d(0.0,1.0,0.0);  // esta normal fica comum aos 4 vertices
+		glTexCoord2f(0.0,0.375); glVertex3d( -20.0, 0.0,  3.0);
+		glTexCoord2f(1.0,0.375); glVertex3d(20.0, 0.0,  3.0);
+		glTexCoord2f(1.0,0.625); glVertex3d(20.0, 0.0,  -3.0);
+		glTexCoord2f(0.0,0.625); glVertex3d(-20.0, 0.0,  -3.0);
+	glEnd();
+	glPopMatrix();
+	//disableTransparent();
+}
+
+void drawOptionResolution()
+{
+	//enableTransparent();
+	glEnable(GL_TEXTURE_2D);
+	glBindTexture(GL_TEXTURE_2D, gameResolution);
+	glPushMatrix();
+	glRotatef(-45,1.0,0.0,0.0);
+	glTranslatef(20.0,3.0,30);
 	glRotatef(90,1.0,0.0,0.0);
 	glBegin(GL_POLYGON);
 		glNormal3d(0.0,1.0,0.0);  // esta normal fica comum aos 4 vertices
@@ -844,6 +860,7 @@ void drawOptionBackForward(float x, float y)
 
 void drawOptionSwitch(float x, float y, int switchNum)
 {
+	//enableTransparent();
 	glEnable(GL_TEXTURE_2D);
 	glBindTexture(GL_TEXTURE_2D, switchNum);
 	glPushMatrix();
@@ -859,6 +876,7 @@ void drawOptionSwitch(float x, float y, int switchNum)
 	glEnd();
 	glPopMatrix();
 	glDisable(GL_TEXTURE_2D);
+	//disableTransparent();
 }
 
 void drawBackMenu()
@@ -936,6 +954,7 @@ void drawDifficultyButton(float x, float y, bool selected)
 		disableSelected();
 	else
 		disableTransparent();
+	//disableTransparent();
 }
 
 void drawMenu(GLenum mode)
@@ -981,23 +1000,31 @@ void drawMenu(GLenum mode)
 
 			if (mode == GL_SELECT)
 				glLoadName(2);
-			drawOptionBackForward(-5.0,8.0);
+			drawOptionBackForward(-5.0,11.0);
 
 			if (mode == GL_SELECT)
 				glLoadName(3);
-			drawOptionBackForward(45.0,8.0);
+			drawOptionBackForward(45.0,11.0);
+
+			if (mode == GL_SELECT)
+				glLoadName(4);
+			drawOptionResolution();
+
+			if (mode == GL_SELECT)
+				glLoadName(5);
+			drawOptionBackForward(-5.0,3.0);
+
+			if (mode == GL_SELECT)
+				glLoadName(6);
+			drawOptionBackForward(45.0,3.0);
 
 			if (mode == GL_SELECT)
 				glLoadName(7);
-			drawOptionSwitch(20.0,-2.0, switchRecord);
+			drawOptionSwitch(20.0,-6.0, switchRecord);
 
 			if (mode == GL_SELECT)
 				glLoadName(8);
-			drawOptionSwitch(20.0,-10.0, switchFullScreen);
-
-			if (mode == GL_SELECT)
-				glLoadName(9);
-			drawBackMenu();
+			drawOptionSwitch(20.0,-14.0, switchFullScreen);
 			break;
 
 		case 102:
@@ -1552,7 +1579,6 @@ void pecaAniMovH(int status){
 		}
 		currentani = clock();
 		double val = animFuncNorm(difftime(startani,currentani)/difftime(startani,endani))*(movH-posiani);
-		//pecaSelected->x+=gameSpeed;
 		pecaSelected->x = posiani+val;
 		glutTimerFunc(mili_secs, pecaAniMovH, 0);
 	}
@@ -1565,7 +1591,6 @@ void pecaAniMovH(int status){
 		}
 		currentani = clock();
 		double val = animFuncNorm(difftime(startani,currentani)/difftime(startani,endani))*(movH-posiani);
-		//pecaSelected->x-=gameSpeed;
 		pecaSelected->x = posiani+val;
 		glutTimerFunc(mili_secs, pecaAniMovH, 0);
 	}
@@ -1706,6 +1731,7 @@ void checkConquest(vector<Peca*> conq){
 void processPlay(float row, float column, float answerRow, float answerColumn, float answer) {
 	if(answer == -1){
 		pecaSelected = getPiece(row,column);
+		startani = 0;
 		//pecaSelected->active=true;
 	}
 	Jogada* Jog = new Jogada(getJogador(row,column),row,column,answerRow,answerColumn);
@@ -1912,18 +1938,19 @@ void pickingAction(GLuint answer) {
 				}
 				break;
 			case 101:
-				if(answer == 2){
-					if(gameScene > 301)
-						gameScene--;
+				if(answer == 5){
+					if(gameResolution > 202)
+						gameResolution--;
 					else
-						gameScene = 303;
+						gameResolution = 206;
 				}
-				else if(answer == 3){
-					if(gameScene < 303)
-						gameScene++;
+				else if(answer == 6){
+					if(gameResolution < 206)
+						gameResolution++;
 					else
-						gameScene = 301;
-				}else if(answer == 7){
+						gameResolution = 202;
+				}
+				else if(answer == 7){
 					if(switchRecord == 208)
 						switchRecord = 207;
 					else
@@ -1940,8 +1967,6 @@ void pickingAction(GLuint answer) {
 						switchFullScreen = 208;
 					}
 				}
-				else if(answer == 9)
-					menuSelected=100;
 				break;
 			case 102:
 				if(answer == 1)
@@ -2471,12 +2496,6 @@ void inicializacao()
 	pixmap2.readBMPFile("textures/switch_off.bmp");
 	pixmap2.setTexture(208);
 
-	pixmap2.readBMPFile("textures/set1.bmp");
-	pixmap2.setTexture(301);
-	pixmap2.readBMPFile("textures/set2.bmp");
-	pixmap2.setTexture(302);
-	pixmap2.readBMPFile("textures/noset.bmp");
-	pixmap2.setTexture(303);
 	t3dInit();
 	inicializacaoPecas();
 
@@ -2548,8 +2567,12 @@ int main(int argc, char* argv[])
 		main_window = glutCreateWindow (argv[0]);
 	}
 
+
+	
+	
 	raiz = loadScene(&cena);
 	
+
    glutDisplayFunc(display);
    GLUI_Master.set_glutReshapeFunc(reshape);
    GLUI_Master.set_glutKeyboardFunc (keyboard);
