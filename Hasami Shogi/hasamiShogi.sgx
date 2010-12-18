@@ -27,49 +27,25 @@
 		<background r="0.0" g="0.0" b="0.0" a="1.0" />
 		<lights>
 			<light id="luzbalcao1" enabled="1" >
-				<position x="0.0" y="40.0" z="-50.0" w="1.0" />
+				<position x="-40.0" y="50.0" z="-50.0" w="1.0" />
 				<ambient r="1.0" g="1.0" b="1.0" a="1.0" />
 				<diffuse r="1.0" g="1.0" b="1.0" a="1.0" />
 				<specular r="1.0" g="1.0" b="1.0" a="1.0" />
 			</light>
       <light id="luzbalcao2" enabled="1" >
-        <position x="30.0" y="40.0" z="-50.0" w="1.0" />
+        <position x="0.0" y="50.0" z="-50.0" w="1.0" />
         <ambient r="1.0" g="1.0" b="1.0" a="1.0" />
         <diffuse r="1.0" g="1.0" b="1.0" a="1.0" />
         <specular r="1.0" g="1.0" b="1.0" a="1.0" />
       </light>
       <light id="luzbalcao3" enabled="1" >
-        <position x="-30.0" y="40.0" z="-50.0" w="1.0" />
+        <position x="40.0" y="50.0" z="-50.0" w="1.0" />
         <ambient  r="1.0" g="1.0" b="1.0" a="1.0" />
         <diffuse r="1.0" g="1.0" b="1.0" a="1.0" />
         <specular r="1.0" g="1.0" b="1.0" a="1.0" />
       </light>
       <light id="cimaTabuleiro" enabled="1" >
         <position x="0.0" y="25.0" z="0.0" w="1.0" />
-        <ambient r="1.0" g="1.0" b="1.0" a="1.0" />
-        <diffuse r="1.0" g="1.0" b="1.0" a="1.0" />
-        <specular r="1.0" g="1.0" b="1.0" a="1.0" />
-      </light>
-      <light id="paredeDireita1" enabled="1" >
-        <position x="110.0" y="30.0" z="80.0" w="1.0" />
-        <ambient r="1.0" g="1.0" b="1.0" a="1.0" />
-        <diffuse r="1.0" g="1.0" b="1.0" a="1.0" />
-        <specular r="1.0" g="1.0" b="1.0" a="1.0" />
-      </light>
-      <light id="paredeDireita2" enabled="1" >
-        <position x="110.0" y="30.0" z="-80.0" w="1.0" />
-        <ambient r="1.0" g="1.0" b="1.0" a="1.0" />
-        <diffuse r="1.0" g="1.0" b="1.0" a="1.0" />
-        <specular r="1.0" g="1.0" b="1.0" a="1.0" />
-      </light>
-      <light id="paredeEsquerda2" enabled="1" >
-        <position x="-110.0" y="30.0" z="-80.0" w="1.0" />
-        <ambient r="1.0" g="1.0" b="1.0" a="1.0" />
-        <diffuse r="1.0" g="1.0" b="1.0" a="1.0" />
-        <specular r="1.0" g="1.0" b="1.0" a="1.0" />
-      </light>
-      <light id="paredeEsquerda3" enabled="1" >
-        <position x="-110.0" y="30.0" z="80.0" w="1.0" />
         <ambient r="1.0" g="1.0" b="1.0" a="1.0" />
         <diffuse r="1.0" g="1.0" b="1.0" a="1.0" />
         <specular r="1.0" g="1.0" b="1.0" a="1.0" />
@@ -104,7 +80,7 @@
     <texture id="estante" file="textures/chao.bmp" length_s="20" length_t="20.0" />
     <texture id="assento" file="textures/metal.bmp" length_s="20" length_t="20.0" />
     <texture id="almofada" file="textures/almofada.bmp" length_s="50" length_t="0.0" />
-	</textures>
+  </textures>
 	<materials>
 		<material id="rio">
 			<emission r="0.0" g="0.0" b="0.0" a="1.0"/>
@@ -258,6 +234,7 @@
         <objectref id="televisao"/>
         <objectref id="porta" />
         <objectref id="cabide"/>
+        <objectref id="candeeiros"/>
       </children>
     </object>
 
@@ -659,6 +636,173 @@
     </object>
 
 <!--/GARRAFA-->
+
+<!--CANDEEIROS-->
+
+    <object id="candeeiros" type="compound">
+      <transformations>
+      </transformations>
+      <material id="glass"/>
+      <texture id="null"/>
+      <children>
+        <objectref id="candeeiroPD1"/>
+        <objectref id="candeeiroPD2"/>
+        <objectref id="candeeiroPE1"/>
+        <objectref id="candeeiroPE2"/>
+        <objectref id="candeeiroPT1"/>
+        <objectref id="candeeiroPT2"/>
+        <objectref id="candeeirosBar"/>
+      </children>
+    </object>
+
+    <object id="candeeirosBar" type="compound">
+      <transformations>
+      </transformations>
+      <material id="metal"/>
+      <texture id="null"/>
+      <children>
+        <objectref id="candeeiroBar1"/>
+        <objectref id="candeeiroBar2"/>
+        <objectref id="candeeiroBar3"/>
+      </children>
+    </object>
+
+    <object id="candeeiroBar1" type="compound">
+      <transformations>
+        <translation x="-40.0" y="50.0" z="-50.0"/>
+      </transformations>
+      <material id="null"/>
+      <texture id="clear"/>
+      <children>
+        <objectref id="candeeiroBar"/>
+      </children>
+    </object>
+
+    <object id="candeeiroBar2" type="compound">
+      <transformations>
+        <translation x="0.0" y="50.0" z="-50.0"/>
+      </transformations>
+      <material id="null"/>
+      <texture id="clear"/>
+      <children>
+        <objectref id="candeeiroBar"/>
+      </children>
+    </object>
+
+    <object id="candeeiroBar3" type="compound">
+      <transformations>
+        <translation x="40.0" y="50.0" z="-50.0"/>
+      </transformations>
+      <material id="null"/>
+      <texture id="clear"/>
+      <children>
+        <objectref id="candeeiroBar"/>
+      </children>
+    </object>
+    
+    <object id="candeeiroBar" type="compound">
+      <transformations>
+      </transformations>
+      <material id="null"/>
+      <texture id="clear"/>
+      <children>
+        <objectref id="candeeiroBarBase"/>
+        <objectref id="candeeiroBarBase2"/>
+        <objectref id="candeeiroBarSuporte"/>
+      </children>
+    </object>
+
+    <object id="candeeiroBarSuporte" type="simple">
+      <transformations>
+        <translation x="0.0" y="5.0" z="0.0"/>
+        <rotation axis="x" angle="-90" />
+      </transformations>
+      <material id="null"/>
+      <texture id="clear"/>
+      <geometry type="cylinder" base="0.5" top="0.5" height="25" slices="20" stacks="20" />
+    </object>
+
+    <object id="candeeiroBarBase" type="simple">
+      <transformations>
+        <rotation axis="x" angle="-90" />
+      </transformations>
+      <material id="red"/>
+      <texture id="clear"/>
+      <geometry type="cylinder" base="6" top="6" height="5" slices="20" stacks="20" />
+    </object>
+
+    <object id="candeeiroBarBase2" type="simple">
+      <transformations>
+        <translation x="0.0" y="5.0" z="0.0"/>
+        <scale x="-1.0" z="-1.0" y="-1.0" />
+        <rotation axis="x" angle="-90" />
+      </transformations>
+      <material id="null"/>
+      <texture id="clear"/>
+      <geometry type="cylinder" base="6" top="6" height="5" slices="20" stacks="20" />
+    </object>
+
+    <object id="candeeiroPD1" type="simple">
+      <transformations>
+        <translation x="120.0" y="50.0" z="90.0"/>
+        <rotation axis="x" angle="-90" />
+      </transformations>
+      <material id="null"/>
+      <texture id="clear"/>
+      <geometry type="cylinder" base="6" top="6" height="5" slices="20" stacks="20" />
+    </object>
+
+    <object id="candeeiroPD2" type="simple">
+      <transformations>
+        <translation x="120.0" y="50.0" z="-90.0"/>
+        <rotation axis="x" angle="-90" />
+      </transformations>
+      <material id="null"/>
+      <texture id="clear"/>
+      <geometry type="cylinder" base="6" top="6" height="5" slices="20" stacks="20" />
+    </object>
+
+    <object id="candeeiroPE1" type="simple">
+      <transformations>
+        <translation x="-120.0" y="50.0" z="90.0"/>
+        <rotation axis="x" angle="-90" />
+      </transformations>
+      <material id="null"/>
+      <texture id="clear"/>
+      <geometry type="cylinder" base="6" top="6" height="5" slices="20" stacks="20" />
+    </object>
+
+    <object id="candeeiroPE2" type="simple">
+      <transformations>
+        <translation x="-120.0" y="50.0" z="-90.0"/>
+        <rotation axis="x" angle="-90" />
+      </transformations>
+      <material id="null"/>
+      <texture id="clear"/>
+      <geometry type="cylinder" base="6" top="6" height="5" slices="20" stacks="20" />
+    </object>
+
+    <object id="candeeiroPT1" type="simple">
+      <transformations>
+        <translation x="-90.0.0" y="50.0" z="120.0"/>
+        <rotation axis="x" angle="-90" />
+      </transformations>
+      <material id="null"/>
+      <texture id="clear"/>
+      <geometry type="cylinder" base="6" top="6" height="5" slices="20" stacks="20" />
+    </object>
+
+    <object id="candeeiroPT2" type="simple">
+      <transformations>
+        <translation x="90.0" y="50.0" z="120.0"/>
+        <rotation axis="x" angle="-90" />
+      </transformations>
+      <material id="null"/>
+      <texture id="clear"/>
+      <geometry type="cylinder" base="6" top="6" height="5" slices="20" stacks="20" />
+    </object>
+      
+<!--/CANDEEIROS-->
     
 <!--COPO-->
     <object id="corpoCopo" type="simple">
