@@ -1030,9 +1030,14 @@ void inicializacaoPecas()
 //Ends the game in progress
 void terminaJogo()
 {
+	stopCameraTexture = 111;
+	stopCamera = 0;
+	flagJog=true;
+	processView(1);
 	player1.clear();
 	player2.clear();
 	inicializacaoPecas();
+	firstGame=0;
 	ingame = false;
 	viewSelected = 0;
 	terminajogo = 0;
@@ -1331,7 +1336,7 @@ Peca* getPiece(float row, float column){
 	}
 	return NULL;
 }
-void requestCPUPlay(int i);
+
 void pecaAniConquest(int status){
 	animBlock=true;
 		switch(status){
@@ -1388,7 +1393,7 @@ void requestCPUPlay(int i)
 {
 	pedeJogadaCPU = i;
 }
-void pickingAction(GLuint answer);
+
 void pecaAniSelect(int status){
 	
 	switch(status){
@@ -1716,7 +1721,10 @@ void startNewGame(int New)
 	rotY = 0;
 	viewSelected = 0;
 	menuFade = 100;
-	if(!stopCamera) processView(0);
+	angView=0;
+	processView(0);
+	stopCameraTexture = 111;
+	stopCamera = 0;
 	//startNewGame
 	if(New)
 		jogo.reset();
@@ -2326,33 +2334,6 @@ void keyboard(unsigned char key, int x, int y)
 			 startGame=true;
 		 }
 		 break;
-	case 's':
-		background_text++;
-		break;
-	case 'a':
-	  background_text--;
-		break;
-	case '-':
-		player1.at(0)->z-=1;
-		break;
-	case '+':
-		inicializacaoPecas();
-		break;
-	case 'p':
-		jogo.printJogo();
-		printMatrixGame();
-		break;
-	case 'u':
-		gameRecordPlay(0);
-		break;
-	case 'n':
-		gameRecordPlay(2);
-		break;
-	case 'r':
-		modoCPU = 0;
-		modoCPUvsJogador = 0;
-		gameRecordPlay(1);
-		break;
 	case '1':
 		viewSelected = 0;
 		break;
@@ -2361,16 +2342,6 @@ void keyboard(unsigned char key, int x, int y)
 		break;
 	case '3':
 		viewSelected = 2;
-		break;
-	case 'z':
-		if(jogo.getJogo().size() != 0 && !mouseBlock){
-			processPlay(jogo.getJogo().back()->toRow, jogo.getJogo().back()->toColumn, jogo.getJogo().back()->fromRow, jogo.getJogo().back()->fromColumn, -1);
-			checkConquest(jogo.getJogo().back()->PecasConq);
-			jogo.retrieveLast();
-		}
-		break;
-	case 'i':
-		ingame = !ingame;
 		break;
    }
 }
