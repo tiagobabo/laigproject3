@@ -132,5 +132,7 @@ void checkConquest(vector<Peca*> conq);
 Peca* getPiece(float row, float column);
 void changePlayer();
 void pecaAniSelect(int status);
+void pickingAction(GLuint answer);
+void requestCPUPlay(int i);
 
 #endif
