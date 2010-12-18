@@ -58,7 +58,7 @@
     <!-- (até ao máximo declarado em "globals") -->
     <!-- Os identificadores "id" nao podem ser repetidos -->
     <!-- s e t: factores de escala (ver notas finais) -->
-    <texture id="board5" file="textures/board5.bmp" length_s="22.0" length_t="22.0" />
+    <texture id="board1" file="textures/board1.bmp" length_s="22.0" length_t="22.0" />
     <texture id="wood" file="textures/wood.bmp" length_s="40.0" length_t="30.0" />
     <texture id="door" file="textures/door.bmp" length_s="20.0" length_t="40.0" />
     <texture id="wall" file="textures/wall3.bmp" length_s="40.0" length_t="80.0" />
@@ -80,6 +80,8 @@
     <texture id="estante" file="textures/chao.bmp" length_s="20" length_t="20.0" />
     <texture id="assento" file="textures/metal.bmp" length_s="20" length_t="20.0" />
     <texture id="almofada" file="textures/almofada.bmp" length_s="50" length_t="0.0" />
+    <texture id="marble" file="textures/marble.bmp" length_s="22.0" length_t="3.0" />
+    <texture id="cloth" file="textures/cloth.bmp" length_s="5.0" length_t="5.0" />
   </textures>
 	<materials>
 		<material id="rio">
@@ -726,8 +728,8 @@
       <transformations>
         <rotation axis="x" angle="-90" />
       </transformations>
-      <material id="red"/>
-      <texture id="clear"/>
+      <material id="null"/>
+      <texture id="cloth"/>
       <geometry type="cylinder" base="6" top="6" height="5" slices="20" stacks="20" />
     </object>
 
@@ -1362,14 +1364,91 @@
 <!--/QUADROS-->
     
 <!--TABULEIRO & MESA-->
-		<object id="tabuleiro" type="simple">
+		<!--<object id="tabuleiro" type="simple">
 			<transformations>
 			<translation x="0.0" y="19.6" z="0.0"/>
 			</transformations>
 			<material id="tabuleiro"/>
-			<texture id="board5"/>
+			<texture id="board1"/>
 			<geometry type="box" dx="22" dy="3.0" dz="22" />
-		</object>
+		</object>-->
+
+    <object id="tabuleiro" type="compound">
+      <transformations>
+        <translation x="0.0" y="19.6" z="0.0"/>
+      </transformations>
+      <material id="tabuleiro" />
+      <texture id="clear" />
+      <children>
+        <objectref id="tabuleiroTop" />
+        <objectref id="tabuleiroDown" />
+        <objectref id="tabuleiroFront" />
+        <objectref id="tabuleiroBack" />
+        <objectref id="tabuleiroRight" />
+        <objectref id="tabuleiroLeft" />
+      </children>
+    </object>
+
+    <object id="tabuleiroTop" type="simple">
+      <transformations>
+        <translation x="0.0" y="1.5" z="0.0"/>
+        <rotation axis="x" angle="-90" />
+      </transformations>
+      <material id="null"/>
+      <texture id="board1"/>
+      <geometry type="rectangle" x1="-11.0" y1="-11.0" x2="11.0" y2="11.0" />
+    </object>
+
+    <object id="tabuleiroDown" type="simple">
+      <transformations>
+        <translation x="0.0" y="-1.5" z="0.0"/>
+        <rotation axis="x" angle="90" />
+      </transformations>
+      <material id="null"/>
+      <texture id="marble"/>
+      <geometry type="rectangle" x1="-11.0" y1="-11.0" x2="11.0" y2="11.0" />
+    </object>
+
+    <object id="tabuleiroFront" type="simple">
+      <transformations>
+        <translation x="0.0" y="0.0" z="11.0"/>
+      </transformations>
+      <material id="null"/>
+      <texture id="marble"/>
+      <geometry type="rectangle" x1="-11.0" y1="-1.5" x2="11.0" y2="1.5" />
+    </object>
+
+    <object id="tabuleiroBack" type="simple">
+      <transformations>
+        <translation x="0.0" y="0.0" z="-11.0"/>
+        <rotation axis="y" angle="180" />
+      </transformations>
+      <material id="null"/>
+      <texture id="marble"/>
+      <geometry type="rectangle" x1="-11.0" y1="-1.5" x2="11.0" y2="1.5" />
+    </object>
+
+    <object id="tabuleiroRight" type="simple">
+      <transformations>
+        <translation x="11.0" y="0.0" z="0.0"/>
+        <rotation axis="y" angle="90" />
+      </transformations>
+      <material id="null"/>
+      <texture id="marble"/>
+      <geometry type="rectangle" x1="-11.0" y1="-1.5" x2="11.0" y2="1.5" />
+    </object>
+
+    <object id="tabuleiroLeft" type="simple">
+      <transformations>
+        <translation x="-11.0" y="0.0" z="0.0"/>
+        <rotation axis="y" angle="-90" />
+      </transformations>
+      <material id="null"/>
+      <texture id="marble"/>
+      <geometry type="rectangle" x1="-11.0" y1="-1.5" x2="11.0" y2="1.5" />
+    </object>
+    
+    
 <!--/TABULEIRO & MESA-->
     
 <!-- BILHAR -->
@@ -1429,12 +1508,9 @@
 
     <object id="PaiPerna" type="compound">
       <transformations>
-
       </transformations>
       <material id="null" />
       <texture id="madeira" />
-
-
       <children>
         <objectref id="perna1" />
         <objectref id="perna2" />
