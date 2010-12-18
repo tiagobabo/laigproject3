@@ -104,7 +104,9 @@
   <ItemGroup>
     <None Include="charset" />
     <None Include="hasamishogi.pl" />
-    <None Include="hasamiShogi.sgx" />
+    <None Include="hasamiShogi.sgx">
+      <SubType>Designer</SubType>
+    </None>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -1363,7 +1363,6 @@ void pecaAniConquest(int status){
 				for(int i = 0; i<pecaConquest.size();i++){
 					if(pecaConquest.at(i)->y+gameSpeed/2 < 30.0){
 						pecaConquest.at(i)->y+=gameSpeed/2;
-						glutTimerFunc(mili_secs, pecaAniConquest, 0);
 					}
 					else{
 						pecaConquest.at(i)->y=30.0;
@@ -1384,6 +1383,7 @@ void pecaAniConquest(int status){
 						//end of play
 					}
 				}
+				if(pecaConquest.size() != 0 && pecaConquest.at(i)->y != 30.0) glutTimerFunc(mili_secs, pecaAniConquest, 0);
 				break;
 			case 1:
 				for(int i=0; i<pecaConquest.size();i++){
@@ -1412,7 +1412,7 @@ void requestCPUPlay(int i)
 {
 	pedeJogadaCPU = i;
 }
-
+void pickingAction(GLuint answer);
 void pecaAniSelect(int status){
 	
 	switch(status){
@@ -1451,7 +1451,9 @@ void pecaAniSelect(int status){
 						modoCPU = 0;
 					changePlayer();
 					mouseBlock=false;
-					glutTimerFunc(mili_secs, requestCPUPlay, 1); 
+					if(oneMoreUndo && modoCPUvsJogador) pickingAction(501);
+					else
+						glutTimerFunc(mili_secs, requestCPUPlay, 1); 
 				}
 			}
 			break;
@@ -1644,7 +1646,6 @@ void checkConquest(vector<Peca*> conq){
 			pecaConquest.push_back(conq.at(i));
 	}
 	pecaAniConquest(1);
-
 }
 
 void processPlay(float row, float column, float answerRow, float answerColumn, float answer) {
@@ -1661,7 +1662,7 @@ void processPlay(float row, float column, float answerRow, float answerColumn, f
 			cout << "--------------------/JOGADA-----------------------" << endl;
 			confCol = answerColumn;
 			confRow = answerRow;
-			drawConf = 1;
+			if((modoJogVsJog || flagJog) && !undo) drawConf = 1;
 			drawConfirmation();
 			stopTime = 0;
 			pecaAniMovV(0);
@@ -1676,7 +1677,7 @@ void processPlay(float row, float column, float answerRow, float answerColumn, f
 			cout << "--------------------/JOGADA-----------------------" << endl;
 			confCol = answerColumn;
 			confRow = answerRow;
-			drawConf = 1;
+			if((modoJogVsJog || flagJog) && !undo) drawConf = 1;
 			drawConfirmation();
 			stopTime = 0;
 			pecaAniMovH(0);
@@ -1805,9 +1806,12 @@ void pickingAction(GLuint answer) {
 		}
 		else if(answer == 501){
 			if(jogo.getJogo().size() != 0 && !mouseBlock){
+				undo = 1;
 				processPlay(jogo.getJogo().back()->toRow, jogo.getJogo().back()->toColumn, jogo.getJogo().back()->fromRow, jogo.getJogo().back()->fromColumn, -1);
 				checkConquest(jogo.getJogo().back()->PecasConq);
 				jogo.retrieveLast();
+				if(modoCPUvsJogador) oneMoreUndo = !oneMoreUndo;
+				undo = 0;
 			}
 		}
 		else if(answer == 502){
