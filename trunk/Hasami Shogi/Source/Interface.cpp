@@ -2,6 +2,60 @@
 //
 #include "Interface.h"
 
+void processScene(Node* node){
+
+	for(int i=0; i< node->nodes.size(); i++)
+	{
+		if(gameScene == 301){
+			node->nodes.at(i)->visi=1;
+			if(node->nodes.at(i)->texture != NULL)
+				if(node->nodes.at(i)->texture->id=="board2"){
+						node->nodes.at(i)->texture=board1;
+				}
+				else if(node->nodes.at(i)->texture->id=="chao2"){
+						node->nodes.at(i)->texture=floor1;
+				}
+				else if(node->nodes.at(i)->texture->id=="marble2"){
+						node->nodes.at(i)->texture=marble1;
+				}
+				else if(node->nodes.at(i)->texture->id=="wall2"){
+						node->nodes.at(i)->texture=wall1;
+				}
+				else if(node->nodes.at(i)->texture->id=="balcao2"){
+						node->nodes.at(i)->texture=bar1;
+				}
+				processScene(node->nodes.at(i));
+		}
+		else if(gameScene == 302){
+			node->nodes.at(i)->visi=1;
+			if(node->nodes.at(i)->texture != NULL)
+				if(node->nodes.at(i)->texture->id=="board1"){
+						node->nodes.at(i)->texture=board2;
+				}
+				else if(node->nodes.at(i)->texture->id=="chao"){
+						node->nodes.at(i)->texture=floor2;
+				}
+				else if(node->nodes.at(i)->texture->id=="marble"){
+						node->nodes.at(i)->texture=marble2;
+				}
+				else if(node->nodes.at(i)->texture->id=="wall"){
+						node->nodes.at(i)->texture=wall2;
+				}
+				else if(node->nodes.at(i)->texture->id=="balcao"){
+						node->nodes.at(i)->texture=bar2;
+				}
+				processScene(node->nodes.at(i));
+		}
+		else if(gameScene == 303){
+			if(node->nodes.at(i)->getID()!="tabuleiro"){
+				node->nodes.at(i)->visi=0;
+				processScene(node->nodes.at(i));
+			}
+		}
+	}
+
+}
+
 void calcPont(){
 int numPlayer1=0;
 int numPlayer2=0;
@@ -935,6 +989,33 @@ void drawConfirmation()
 	glPopMatrix();
 }
 
+void inicializacaoTexturas()
+{
+	for(int i=0; i<cena.textures.size(); i++)
+	{
+		if(cena.textures.at(i)->id=="board1")
+			board1=cena.textures.at(i);
+		else if(cena.textures.at(i)->id=="board2")
+			board2=cena.textures.at(i);
+		else if(cena.textures.at(i)->id=="chao")
+			floor1=cena.textures.at(i);
+		else if(cena.textures.at(i)->id=="chao2")
+			floor2=cena.textures.at(i);
+		else if(cena.textures.at(i)->id=="marble")
+			marble1=cena.textures.at(i);
+		else if(cena.textures.at(i)->id=="marble2")
+			marble2=cena.textures.at(i);
+		else if(cena.textures.at(i)->id=="wall")
+			wall1=cena.textures.at(i);
+		else if(cena.textures.at(i)->id=="wall2")
+			wall2=cena.textures.at(i);
+		else if(cena.textures.at(i)->id=="balcao")
+			bar1=cena.textures.at(i);
+		else if(cena.textures.at(i)->id=="balcao2")
+			bar2=cena.textures.at(i);
+	}
+}
+
 //Initializes the pieces of the game
 void inicializacaoPecas()
 {
@@ -1079,7 +1160,7 @@ void display(void)
         if(ingame && !terminajogo){
 			drawWidget(GL_RENDER);
 			drawScene(GL_RENDER);
-			glCallList(1);
+			raiz->draw();
 			if(modoJogVsJog)
 			{
 				glPushMatrix();
@@ -1798,12 +1879,15 @@ void pickingAction(GLuint answer) {
 						gameScene=303;
 					else
 						gameScene--;
+
+					processScene(raiz);
 				}
 				else if(answer == 3){
 					if(gameScene==303)
 						gameScene=301;
 					else
 						gameScene++;
+					processScene(raiz);
 				}
 				else if(answer == 5){
 					if(gameTime == 304)
@@ -2109,7 +2193,7 @@ void processMouse(int button, int state, int x, int y) {
 			if(ingame && !terminajogo){
 				drawWidget(GL_SELECT);
 				drawScene(GL_SELECT);
-				glCallList(1);
+				raiz->draw();
 			}
 			else if(!ingame && !terminajogo)
 				drawMenu(GL_SELECT);
@@ -2418,6 +2502,9 @@ void inicializacao()
 	pixmap2.setTexture(403);
 	pixmap2.readBMPFile("textures/cpu2.bmp");
 	pixmap2.setTexture(404);
+
+	inicializacaoTexturas();
+
 	t3dInit();
 	inicializacaoPecas();
 
@@ -2426,9 +2513,9 @@ void inicializacao()
 	matrixViewPlayer[2][0] = sin(angView);
 	matrixViewPlayer[2][2] = cos(angView);
 
-	glNewList(1,GL_COMPILE);
+	/*glNewList(1,GL_COMPILE);
 		raiz->draw();
-	glEndList();
+	glEndList();*/
 
 }
 

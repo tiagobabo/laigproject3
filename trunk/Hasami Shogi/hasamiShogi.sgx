@@ -59,11 +59,14 @@
     <!-- Os identificadores "id" nao podem ser repetidos -->
     <!-- s e t: factores de escala (ver notas finais) -->
     <texture id="board1" file="textures/board1.bmp" length_s="22.0" length_t="22.0" />
+    <texture id="board2" file="textures/board2.bmp" length_s="22.0" length_t="22.0" />
     <texture id="wood" file="textures/wood.bmp" length_s="40.0" length_t="30.0" />
     <texture id="door" file="textures/door.bmp" length_s="20.0" length_t="40.0" />
     <texture id="wall" file="textures/wall3.bmp" length_s="40.0" length_t="80.0" />
+    <texture id="wall2" file="textures/wall4.bmp" length_s="40.0" length_t="80.0" />
     <texture id="brick" file="textures/brick.bmp" length_s="40.0" length_t="40.0" />
     <texture id="chao" file="textures/floor.bmp" length_s="40.0" length_t="40.0" />
+    <texture id="chao2" file="textures/floor2.bmp" length_s="40.0" length_t="40.0" />
     <texture id="roof" file="textures/roof.bmp" length_s="40.0" length_t="40.0" />
     <texture id="muralhas" file="textures/muralhas.bmp" length_s="4.0" length_t="4.0" />
     <texture id="sandeman" file="textures/sandeman.bmp" length_s="4.0" length_t="4.0" />
@@ -77,10 +80,12 @@
     <texture id="madeira" file="textures/madeira.bmp" length_s="1.0" length_t="1.0" />
     <texture id="verde" file="textures/verde.bmp" length_s="1.0" length_t="1.0" />
     <texture id="balcao" file="textures/balcao.bmp" length_s="20" length_t="20.0" />
+    <texture id="balcao2" file="textures/balcao2.bmp" length_s="20" length_t="20.0" />
     <texture id="estante" file="textures/chao.bmp" length_s="20" length_t="20.0" />
     <texture id="assento" file="textures/metal.bmp" length_s="20" length_t="20.0" />
     <texture id="almofada" file="textures/almofada.bmp" length_s="50" length_t="0.0" />
     <texture id="marble" file="textures/marble.bmp" length_s="22.0" length_t="3.0" />
+    <texture id="marble2" file="textures/marble2.bmp" length_s="22.0" length_t="3.0" />
     <texture id="cloth" file="textures/cloth.bmp" length_s="5.0" length_t="5.0" />
   </textures>
 	<materials>
@@ -222,7 +227,6 @@
     <object id="sala" type="compound">
       <transformations>
       </transformations>
-      <visib id="1"/>
       <material id="white"/>
       <texture id="clear"/>
       <children>
@@ -1364,19 +1368,12 @@
 <!--/QUADROS-->
     
 <!--TABULEIRO & MESA-->
-		<!--<object id="tabuleiro" type="simple">
-			<transformations>
-			<translation x="0.0" y="19.6" z="0.0"/>
-			</transformations>
-			<material id="tabuleiro"/>
-			<texture id="board1"/>
-			<geometry type="box" dx="22" dy="3.0" dz="22" />
-		</object>-->
 
     <object id="tabuleiro" type="compound">
       <transformations>
         <translation x="0.0" y="19.6" z="0.0"/>
       </transformations>
+      <visib id="1"/>
       <material id="tabuleiro" />
       <texture id="clear" />
       <children>
