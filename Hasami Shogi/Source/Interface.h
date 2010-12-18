@@ -114,6 +114,17 @@ float rotY = 0, rotX = 0;
 int ghost = 0;
 string ghosts;
 
+Texture* board1;
+Texture* board2;
+Texture* floor1;
+Texture* floor2;
+Texture* marble1;
+Texture* marble2;
+Texture* wall1;
+Texture* wall2;
+Texture* bar1;
+Texture* bar2;
+
 // Declaracao de algumas funcoes necessarias em mais do que uma parte do codigo
 
 void processPlay(float row, float column, float answerRow, float answerColumn, float answer);
