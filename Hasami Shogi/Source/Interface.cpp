@@ -212,68 +212,6 @@ void aniStartGame(int status){
 	}
 }
 
-void drawPieceTop(){
-	glBegin(GL_POLYGON);
-		glNormal3d(0.0,1.0,0.0);  // esta normal fica comum aos 4 vertices
-		glTexCoord2f(0.0,0.0); glVertex3d( -0.5, 0.0,  0.5);
-		glTexCoord2f(1.0,0.0); glVertex3d(0.5, 0.0,  0.5);
-		glTexCoord2f(1.0,1.0); glVertex3d(0.4, 0.0,  -0.5);
-		glTexCoord2f(0.0,1.0); glVertex3d(-0.4, 0.0,  -0.5);
-	glEnd();
-}
-
-void drawPieceLateralR(){
-	glBegin(GL_POLYGON);
-		glNormal3d(0.0,1.0,0.0);  // esta normal fica comum aos 4 vertices
-		glTexCoord2f(0.0,0.0); glVertex3d( -0.1, 0.0,  0.5);
-		glTexCoord2f(1.0,0.0); glVertex3d(0.1, 0.0,  0.5);
-		glTexCoord2f(1.0,1.0); glVertex3d(0.1, 0.0,  -0.5);
-		glTexCoord2f(0.0,1.0); glVertex3d(0.0, 0.0,  -0.5);
-	glEnd();
-}
-
-void drawPieceLateralL(){
-	glBegin(GL_POLYGON);
-		glNormal3d(0.0,1.0,0.0);  // esta normal fica comum aos 4 vertices
-		glTexCoord2f(0.0,0.0); glVertex3d( -0.1, 0.0,  0.5);
-		glTexCoord2f(1.0,0.0); glVertex3d(0.1, 0.0,  0.5);
-		glTexCoord2f(1.0,1.0); glVertex3d(0.0, 0.0,  -0.5);
-		glTexCoord2f(0.0,1.0); glVertex3d(-0.1, 0.0,  -0.5);
-	glEnd();
-}
-
-void drawPieceBack(){
-	glBegin(GL_POLYGON);
-		glNormal3d(0.0,1.0,0.0);  // esta normal fica comum aos 4 vertices
-		glTexCoord2f(0.0,0.0); glVertex3d( -0.1, 0.0,  0.5);
-		glTexCoord2f(1.0,0.0); glVertex3d(0.1, 0.0,  0.5);
-		glTexCoord2f(1.0,1.0); glVertex3d(0.1, 0.0,  -0.5);
-		glTexCoord2f(0.0,1.0); glVertex3d(-0.1, 0.0,  -0.5);
-	glEnd();
-}
-
-void drawPieceFront(){
-	glBegin(GL_POLYGON);
-		glNormal3d(0.0,1.0,0.0);  // esta normal fica comum aos 4 vertices
-		glTexCoord2f(0.0,0.0); glVertex3d( -0.05, 0.0,  0.4);
-		glTexCoord2f(1.0,0.0); glVertex3d(0.05, 0.0,  0.4);
-		glTexCoord2f(1.0,1.0); glVertex3d(0.05, 0.0,  -0.4);
-		glTexCoord2f(0.0,1.0); glVertex3d(-0.05, 0.0,  -0.4);
-	glEnd();
-}
-
-void drawPieceSquare(){
-
-	glBegin(GL_POLYGON);
-		glNormal3d(0.0,1.0,0.0);  // esta normal fica comum aos 4 vertices
-		glTexCoord2f(0.0,0.0); glVertex3d( -0.5, 0.0,  0.5);
-		glTexCoord2f(1.0,0.0); glVertex3d(0.5, 0.0,  0.5);
-		glTexCoord2f(1.0,1.0); glVertex3d(0.5, 0.0,  -0.5);
-		glTexCoord2f(0.0,1.0); glVertex3d(-0.5, 0.0,  -0.5);
-	glEnd();
-
-}
-
 void drawPiece(int player, int ghost){
 	double ang = atan(10.0)*180/PI;
 	double ang2 = atan(0.1)*180/PI;
@@ -300,63 +238,20 @@ void drawPiece(int player, int ghost){
 		glDisable(GL_LIGHTING);
 	}
 	//Topo
-	else if(ghost == 0)
+	else if(ghost == 0){
 		glEnable(GL_TEXTURE_2D);
+		gluQuadricTexture(glQ,true);
+	}
 	glBindTexture(GL_TEXTURE_2D, (player+106));
-	glPushMatrix();
-	glTranslatef(0.0,0.2,0.0);
-	glTranslatef(0.0,0.0,0.5);
-	glRotatef(-(90.0-ang),1.0,0.0,0.0);
-	glTranslatef(0.0,0.0,-0.5);
-	drawPieceTop();
-	glPopMatrix();
+	glTranslatef(0.0,0.5,0.0);
+	gluSphere(glQ, 0.5,20,20);
 
-	//Fundo
-	glPushMatrix();
-	glRotatef(180.0, 0.0,0.0,1.0);
-	drawPieceTop();
-	glPopMatrix();
-
-	//Lateral Direita
-	glPushMatrix();
-	glTranslatef(0.5,0.1,0.0);
-	glTranslatef(0.0,0.0,0.5);
-	glRotatef(ang2,0.0,1.0,0.0);
-	glTranslatef(0.0,0.0,-0.5);
-	glRotatef(-90.0, 0.0,0.0,1.0);
-	drawPieceLateralR();
-	glPopMatrix();
-	
-	//Lateral esquerda
-	glPushMatrix();
-	glTranslatef(-0.5,0.1,0.0);
-	glTranslatef(0.0,0.0,0.5);
-	glRotatef(ang2,0.0,-1.0,0.0);
-	glTranslatef(0.0,0.0,-0.5);
-	glRotatef(90.0, 0.0,0.0,1.0);
-	drawPieceLateralL();
-	glPopMatrix();
-	
-	//Tras
-	glPushMatrix();
-	glTranslatef(0.0,0.1,0.5);
-	glRotatef(90.0, 1.0,0.0,0.0);
-	glRotatef(90.0, 0.0,1.0,0.0);
-	drawPieceBack();
-	glPopMatrix();
-	
-	//Frente
-	glPushMatrix();
-	glTranslatef(0.0,0.05,-0.5);
-	glRotatef(-90.0, 1.0,0.0,0.0);
-	glRotatef(90.0, 0.0,1.0,0.0);
-	drawPieceFront();
-	glPopMatrix();
 	glEnable(GL_LIGHTING);
 	glDisable (GL_BLEND);
 	glColor4f(1.0,1.0,1.0,1.0);
 	glDisable(GL_COLOR_MATERIAL);
 	glDisable(GL_TEXTURE_2D);
+	gluQuadricTexture(glQ,false);
 }
 
 void drawWidgetButton(float x, float y, int texture)

@@ -720,7 +720,7 @@
         <rotation axis="x" angle="-90" />
       </transformations>
       <material id="null"/>
-      <texture id="clear"/>
+      <texture id="assento"/>
       <geometry type="cylinder" base="0.5" top="0.5" height="25" slices="20" stacks="20" />
     </object>
 
@@ -728,7 +728,7 @@
       <transformations>
         <rotation axis="x" angle="-90" />
       </transformations>
-      <material id="null"/>
+      <material id="red"/>
       <texture id="cloth"/>
       <geometry type="cylinder" base="6" top="6" height="5" slices="20" stacks="20" />
     </object>
@@ -740,7 +740,7 @@
         <rotation axis="x" angle="-90" />
       </transformations>
       <material id="null"/>
-      <texture id="clear"/>
+      <texture id="assento"/>
       <geometry type="cylinder" base="6" top="6" height="5" slices="20" stacks="20" />
     </object>
 
