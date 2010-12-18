@@ -362,6 +362,7 @@ void drawPiece(int player, int ghost){
 void drawWidgetButton(float x, float y, int texture)
 {
 	//enableTransparent();
+	gluQuadricTexture(glQ,true);
 	glEnable(GL_TEXTURE_2D);
 	glBindTexture(GL_TEXTURE_2D, texture);
 	glPushMatrix();
@@ -371,6 +372,7 @@ void drawWidgetButton(float x, float y, int texture)
 	gluDisk(glQ,0.0,1.0,20,20);
 	glPopMatrix();
 	glDisable(GL_TEXTURE_2D);
+	gluQuadricTexture(glQ,false);
 	//disableTransparent();
 }
 
@@ -644,43 +646,23 @@ void drawQuitGameButton()
 	disableTransparent();
 }
 
-void drawOptionScene()
+void drawOptionScene(float x, float y, int texture)
 {
-	//enableTransparent();
-	glPushMatrix();
-	glRotatef(-45,1.0,0.0,0.0);
-	glTranslatef(20.0,11.0,30);
-	glRotatef(90,1.0,0.0,0.0);
-	glBegin(GL_POLYGON);
-		glNormal3d(0.0,1.0,0.0);  // esta normal fica comum aos 4 vertices
-		glTexCoord2f(0.0,0.375); glVertex3d( -20.0, 0.0,  3.0);
-		glTexCoord2f(1.0,0.375); glVertex3d(20.0, 0.0,  3.0);
-		glTexCoord2f(1.0,0.625); glVertex3d(20.0, 0.0,  -3.0);
-		glTexCoord2f(0.0,0.625); glVertex3d(-20.0, 0.0,  -3.0);
-	glEnd();
-	glPopMatrix();
-	//disableTransparent();
-}
-
-void drawOptionResolution()
-{
-	//enableTransparent();
 	glEnable(GL_TEXTURE_2D);
-	glBindTexture(GL_TEXTURE_2D, gameResolution);
+	glBindTexture(GL_TEXTURE_2D, texture);
 	glPushMatrix();
 	glRotatef(-45,1.0,0.0,0.0);
-	glTranslatef(20.0,3.0,30);
+	glTranslatef(x,y,30);
 	glRotatef(90,1.0,0.0,0.0);
 	glBegin(GL_POLYGON);
 		glNormal3d(0.0,1.0,0.0);  // esta normal fica comum aos 4 vertices
 		glTexCoord2f(0.0,0.0); glVertex3d( -20.0, 0.0,  3.0);
 		glTexCoord2f(1.0,0.0); glVertex3d(20.0, 0.0,  3.0);
-		glTexCoord2f(1.0,(38.0/256.0)); glVertex3d(20.0, 0.0,  -3.0);
-		glTexCoord2f(0.0,(38.0/256.0)); glVertex3d(-20.0, 0.0,  -3.0);
+		glTexCoord2f(1.0,35.0/256.0); glVertex3d(20.0, 0.0,  -3.0);
+		glTexCoord2f(0.0,35.0/256.0); glVertex3d(-20.0, 0.0,  -3.0);
 	glEnd();
 	glPopMatrix();
 	glDisable(GL_TEXTURE_2D);
-	//disableTransparent();
 }
 
 void drawOptionBackForward(float x, float y)
@@ -703,7 +685,6 @@ void drawOptionBackForward(float x, float y)
 
 void drawOptionSwitch(float x, float y, int switchNum)
 {
-	//enableTransparent();
 	glEnable(GL_TEXTURE_2D);
 	glBindTexture(GL_TEXTURE_2D, switchNum);
 	glPushMatrix();
@@ -719,7 +700,6 @@ void drawOptionSwitch(float x, float y, int switchNum)
 	glEnd();
 	glPopMatrix();
 	glDisable(GL_TEXTURE_2D);
-	//disableTransparent();
 }
 
 void drawBackMenu()
@@ -857,35 +837,36 @@ void drawMenu(GLenum mode)
 		case 101:
 			if (mode == GL_SELECT)
 				glLoadName(1);
-			drawOptionScene();
+			drawOptionScene(20.0,8.0,gameScene);
 
 			if (mode == GL_SELECT)
 				glLoadName(2);
-			drawOptionBackForward(-5.0,11.0);
+			drawOptionBackForward(-5.0,8.0);
 
 			if (mode == GL_SELECT)
 				glLoadName(3);
-			drawOptionBackForward(45.0,11.0);
-
+			drawOptionBackForward(45.0,8.0);
+			
 			if (mode == GL_SELECT)
 				glLoadName(4);
-			drawOptionResolution();
+			drawOptionScene(20.0,-3.0,gameTime);
 
 			if (mode == GL_SELECT)
 				glLoadName(5);
-			drawOptionBackForward(-5.0,3.0);
+			drawOptionBackForward(-5.0,-3.0);
 
 			if (mode == GL_SELECT)
 				glLoadName(6);
-			drawOptionBackForward(45.0,3.0);
+			drawOptionBackForward(45.0,-3.0);
 
 			if (mode == GL_SELECT)
 				glLoadName(7);
-			drawOptionSwitch(20.0,-6.0, switchRecord);
+			drawOptionSwitch(20.0,-11.0, switchFullScreen);
 
 			if (mode == GL_SELECT)
 				glLoadName(8);
-			drawOptionSwitch(20.0,-14.0, switchFullScreen);
+			drawBackMenu();
+
 			break;
 
 		case 102:
@@ -1829,8 +1810,13 @@ void pickingAction(GLuint answer) {
 				jogo.retrieveLast();
 			}
 		}
-		else if(answer == 502)
+		else if(answer == 502){
+			if(stopCameraTexture == 111)
+				stopCameraTexture = 112;
+			else
+				stopCameraTexture = 111;
 			stopCamera = !stopCamera;
+		}
 		else{
 
 			int player = answer/100;
@@ -1908,25 +1894,55 @@ void pickingAction(GLuint answer) {
 				}
 				break;
 			case 101:
-				if(answer == 5){
-					if(gameResolution > 202)
-						gameResolution--;
+				if(answer == 2){
+					if(gameScene==301)
+						gameScene=303;
 					else
-						gameResolution = 206;
+						gameScene--;
+				}
+				else if(answer == 3){
+					if(gameScene==303)
+						gameScene=301;
+					else
+						gameScene++;
+				}
+				else if(answer == 5){
+					if(gameTime == 304)
+						gameTime = 306;
+					else
+						gameTime--;
+					
+					switch(gameTime){
+						case 304:
+							timeplay=30;
+							break;
+						case 305:
+							timeplay=60;
+							break;
+						case 306:
+							timeplay=90;
+							break;
+					}
 				}
 				else if(answer == 6){
-					if(gameResolution < 206)
-						gameResolution++;
+					if(gameTime == 306)
+						gameTime = 304;
 					else
-						gameResolution = 202;
+						gameTime++;
+
+					switch(gameTime){
+						case 304:
+							timeplay=30;
+							break;
+						case 305:
+							timeplay=60;
+							break;
+						case 306:
+							timeplay=90;
+							break;
+					}
 				}
 				else if(answer == 7){
-					if(switchRecord == 208)
-						switchRecord = 207;
-					else
-						switchRecord = 208;
-				}
-				else if(answer == 8){
 					if(switchFullScreen == 208){
 						switchFullScreen = 207;
 						glutFullScreen();
@@ -1936,6 +1952,9 @@ void pickingAction(GLuint answer) {
 						glutPositionWindow(INITIALPOS_X,INITIALPOS_Y);
 						switchFullScreen = 208;
 					}
+				}
+				else if(answer == 8){
+					menuSelected = 100;
 				}
 				break;
 			case 102:
@@ -2463,24 +2482,34 @@ void inicializacao()
 	pixmap2.setTexture(108);
 	pixmap2.readBMPFile("textures/end.bmp");
 	pixmap2.setTexture(110);
+	pixmap2.readBMPFile("textures/cameraTurnOn.bmp");
+	pixmap2.setTexture(111);
+	pixmap2.readBMPFile("textures/cameraTurnOff.bmp");
+	pixmap2.setTexture(112);
+	pixmap2.readBMPFile("textures/undo.bmp");
+	pixmap2.setTexture(113);
+	pixmap2.readBMPFile("textures/menuB.bmp");
+	pixmap2.setTexture(114);
 
 
 	//options
-	pixmap2.readBMPFile("textures/res1.bmp");
-	pixmap2.setTexture(202);
-	pixmap2.readBMPFile("textures/res2.bmp");
-	pixmap2.setTexture(203);
-	pixmap2.readBMPFile("textures/res3.bmp");
-	pixmap2.setTexture(204);
-	pixmap2.readBMPFile("textures/res4.bmp");
-	pixmap2.setTexture(205);
-	pixmap2.readBMPFile("textures/res5.bmp");
-	pixmap2.setTexture(206);
 	pixmap2.readBMPFile("textures/switch_on.bmp");
 	pixmap2.setTexture(207);
 	pixmap2.readBMPFile("textures/switch_off.bmp");
 	pixmap2.setTexture(208);
 
+	pixmap2.readBMPFile("textures/set1.bmp");
+	pixmap2.setTexture(301);
+	pixmap2.readBMPFile("textures/set2.bmp");
+	pixmap2.setTexture(302);
+	pixmap2.readBMPFile("textures/noset.bmp");
+	pixmap2.setTexture(303);
+	pixmap2.readBMPFile("textures/30s.bmp");
+	pixmap2.setTexture(304);
+	pixmap2.readBMPFile("textures/60s.bmp");
+	pixmap2.setTexture(305);
+	pixmap2.readBMPFile("textures/90s.bmp");
+	pixmap2.setTexture(306);
 
 	pixmap2.readBMPFile("textures/player1.bmp");
 	pixmap2.setTexture(401);

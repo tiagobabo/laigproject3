@@ -1,6 +1,6 @@
 #define getCurrentTime GetTickCount
 #define gameRatio 9		//default 9
-#define gameSpeed 0.5	//default 0.5
+#define gameSpeed 0.5	//default 1
 #define viewSpeed 2		//default 2
 int viewSelected = 0;	//default 0
 bool ingame = false;	//default false
@@ -8,9 +8,9 @@ int menuFade = 100;		//default 100
 int terminajogo = 0;	//default 0
 int menuSelected = 100;	//default 100
 int firstGame = 0;
-int gameResolution = 202; //default 640x480
 int gameScene = 301; //default 301
-int switchRecord = 208; //default off
+int gameTime = 304;
+int switchRecord = 207; //default on
 int switchFullScreen = 208; //default off
 int pontJog1 = 9;
 int pontJog2 = 9;
@@ -18,9 +18,9 @@ int numPlayRecord = 0;
 bool Record = false;
 bool RecordNext = false;
 int gameWon = 401; // default 401 (player1)
-int menuTexture = 2;
-int undoTexture = 2;
-int stopCameraTexture = 2;
+int menuTexture = 114;
+int undoTexture = 113;
+int stopCameraTexture = 111;
 int stopCamera = 0;
 
 //Game Modes
@@ -37,7 +37,7 @@ int pedeJogadaCPU = 1;
 int CPUMode1 = 0;
 int CPUMode2 = 0;
 int continuaCPU = 0;
-int timeplay = 40;
+int timeplay = 30;
 time_t start,endtime;
 int stopTime = 0;
 int modoJogVsJog = 0;
