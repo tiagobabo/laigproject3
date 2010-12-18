@@ -2481,7 +2481,7 @@ int main(int argc, char* argv[])
 	glutInitDisplayMode(GLUT_DEPTH | GLUT_DOUBLE | GLUT_RGBA);
 	glutInitWindowSize (DIMX, DIMY);
 	glutInitWindowPosition (INITIALPOS_X, INITIALPOS_Y);
-	main_window = glutCreateWindow (argv[0]);
+	main_window = glutCreateWindow ("Hasami Shogi");
 
 	raiz = loadScene(&cena);
 	
