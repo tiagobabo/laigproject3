@@ -42,7 +42,8 @@ time_t start,endtime;
 int stopTime = 0;
 int modoJogVsJog = 0;
 int escSelected = 0;
-
+int oneMoreUndo = 0;
+int undo = 0;
 
 
 float gameMatrix[gameRatio][gameRatio] = {{0,0,0,0,0,0,0,0,0},{0,0,0,0,0,0,0,0,0},{0,0,0,0,0,0,0,0,0},{0,0,0,0,0,0,0,0,0},{0,0,0,0,0,0,0,0,0},{0,0,0,0,0,0,0,0,0},{0,0,0,0,0,0,0,0,0},{0,0,0,0,0,0,0,0,0},{0,0,0,0,0,0,0,0,0}};
@@ -137,6 +138,7 @@ vector<Jogada*> Jogo::getJogo(void){
 
 void Jogo::retrieveLast(void){
 	this->Jogadas.pop_back();
+
 }
 
 void Jogo::reset(void){
