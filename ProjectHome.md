@@ -1,0 +1,1 @@
+Interface gráfica 3D para o jogo Hasami Shogi.
